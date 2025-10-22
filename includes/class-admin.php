@@ -245,147 +245,210 @@ class Clear_Map_Admin
     {
     ?>
         <div class="wrap andrea-map-admin">
-            <h1>The Andrea Map Settings</h1>
+            <h1>Clear Map Settings</h1>
+            <p class="settings-subtitle">Configure API keys, map display options, and clustering behavior</p>
 
             <form method="post" action="options.php">
                 <?php settings_fields('clear_map_settings'); ?>
 
-                <h2>API Configuration</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">Mapbox Access Token</th>
-                        <td>
-                            <input type="text" name="clear_map_mapbox_token"
-                                value="<?php echo esc_attr(get_option('clear_map_mapbox_token')); ?>"
-                                class="regular-text" />
-                            <p class="description">Your Mapbox public access token (<a href="https://account.mapbox.com/access-tokens/" target="_blank">Get token</a>)</p>
-                        </td>
-                    </tr>
+                <div class="settings-grid">
+                    <!-- API Configuration Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-admin-network"></span>
+                                API Configuration
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-field">
+                                <label for="clear_map_mapbox_token">
+                                    Mapbox Access Token
+                                    <span class="required">*</span>
+                                    <span class="help-tip" title="Your Mapbox public access token. Required for map display.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_mapbox_token" name="clear_map_mapbox_token"
+                                    value="<?php echo esc_attr(get_option('clear_map_mapbox_token')); ?>"
+                                    class="widefat" placeholder="pk.eyJ1..." />
+                                <p class="field-description">
+                                    <a href="https://account.mapbox.com/access-tokens/" target="_blank">Get your Mapbox token →</a>
+                                </p>
+                            </div>
 
-                    <tr>
-                        <th scope="row">Google Geocoding API Key (Optional)</th>
-                        <td>
-                            <input type="text" name="clear_map_google_api_key"
-                                value="<?php echo esc_attr(get_option('clear_map_google_api_key')); ?>"
-                                class="regular-text" />
-                            <p class="description">
-                                Optional fallback if Mapbox is not available.
-                                <strong>Mapbox is used by default for geocoding (100k free requests/month).</strong>
-                                (<a href="https://console.cloud.google.com/" target="_blank">Get Google key</a>)
-                            </p>
-                        </td>
-                    </tr>
-                </table>
+                            <div class="settings-field">
+                                <label for="clear_map_google_api_key">
+                                    Google Geocoding API Key
+                                    <span class="optional-badge">Optional</span>
+                                    <span class="help-tip" title="Fallback for geocoding if Mapbox is unavailable. Mapbox provides 100k free requests/month.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_google_api_key" name="clear_map_google_api_key"
+                                    value="<?php echo esc_attr(get_option('clear_map_google_api_key')); ?>"
+                                    class="widefat" placeholder="AIza..." />
+                                <p class="field-description">
+                                    <a href="https://console.cloud.google.com/" target="_blank">Get Google API key →</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                <h2>Geocoding Tools</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">Manual Geocoding</th>
-                        <td>
-                            <button type="button" class="button button-secondary" id="run-geocoding-btn">
-                                <span class="dashicons dashicons-location" style="margin-top: 3px;"></span>
-                                Run Geocoding on All POIs
-                            </button>
-                            <span class="spinner" id="geocoding-spinner" style="float: none; margin: 0 10px; visibility: hidden;"></span>
-                            <p class="description">
-                                Use this to add addresses to POIs that have coordinates but no addresses.
-                                This will use reverse geocoding (coordinates → address) via Mapbox API.
-                            </p>
-                            <div id="geocoding-status" style="margin-top: 10px;"></div>
-                        </td>
-                    </tr>
-                </table>
+                    <!-- Geocoding Tools Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-location"></span>
+                                Geocoding Tools
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-field">
+                                <label>
+                                    Manual Geocoding
+                                    <span class="help-tip" title="Converts coordinates to addresses for POIs that are missing address information.">?</span>
+                                </label>
+                                <button type="button" class="button button-secondary geocoding-btn" id="run-geocoding-btn">
+                                    <span class="dashicons dashicons-location"></span>
+                                    Run Geocoding on All POIs
+                                </button>
+                                <span class="spinner" id="geocoding-spinner"></span>
+                                <p class="field-description">
+                                    Adds addresses to POIs that have coordinates but no addresses using reverse geocoding via Mapbox API.
+                                </p>
+                                <div id="geocoding-status"></div>
+                            </div>
+                        </div>
+                    </div>
 
-                <h2>Display Settings</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">Building Icon (SVG)</th>
-                        <td>
-                            <input type="text" name="clear_map_building_icon_svg" id="clear_map_building_icon_svg" value="<?php echo esc_attr(get_option('clear_map_building_icon_svg', '')); ?>" class="regular-text" />
-                            <button class="button" id="clear_map_building_icon_svg_upload">Select SVG from Media Library</button>
-                            <p class="description">Upload or select an SVG from the WordPress Media Library.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Icon (PNG)</th>
-                        <td>
-                            <input type="text" name="clear_map_building_icon_png" id="clear_map_building_icon_png" value="<?php echo esc_attr(get_option('clear_map_building_icon_png', '')); ?>" class="regular-text" />
-                            <button class="button" id="clear_map_building_icon_png_upload">Select PNG from Media Library</button>
-                            <p class="description">Upload or select a PNG from the WordPress Media Library. For best results, use a transparent PNG with the pin tip at the bottom center.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Address</th>
-                        <td>
-                            <input type="text" name="clear_map_building_address" value="<?php echo esc_attr(get_option('clear_map_building_address', '261 West 24th Street, New York, NY 10011')); ?>" class="regular-text" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Phone</th>
-                        <td>
-                            <input type="text" name="clear_map_building_phone" value="<?php echo esc_attr(get_option('clear_map_building_phone', '')); ?>" class="regular-text" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Email</th>
-                        <td>
-                            <input type="email" name="clear_map_building_email" value="<?php echo esc_attr(get_option('clear_map_building_email', '')); ?>" class="regular-text" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Description</th>
-                        <td>
-                            <textarea name="clear_map_building_description" rows="3" class="large-text"><?php echo esc_textarea(get_option('clear_map_building_description', '')); ?></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Building Icon Width</th>
-                        <td>
-                            <input type="text" name="clear_map_building_icon_width" value="<?php echo esc_attr(get_option('clear_map_building_icon_width', '40px')); ?>" class="regular-text" />
-                            <p class="description">Set the width of the building icon (e.g. 40px or 10%).</p>
-                        </td>
-                    </tr>
-                </table>
+                    <!-- Building Information Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-building"></span>
+                                Building Information
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-field">
+                                <label for="clear_map_building_icon_svg">
+                                    Building Icon (SVG)
+                                    <span class="help-tip" title="Upload an SVG icon to mark your building location on the map.">?</span>
+                                </label>
+                                <div class="input-with-button">
+                                    <input type="text" id="clear_map_building_icon_svg" name="clear_map_building_icon_svg"
+                                        value="<?php echo esc_attr(get_option('clear_map_building_icon_svg', '')); ?>"
+                                        class="widefat" placeholder="URL to SVG file..." />
+                                    <button type="button" class="button" id="clear_map_building_icon_svg_upload">
+                                        <span class="dashicons dashicons-upload"></span> Select SVG
+                                    </button>
+                                </div>
+                            </div>
 
-                <h2>Clustering Settings</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">Cluster Distance (px)</th>
-                        <td>
-                            <input type="number" name="clear_map_cluster_distance"
-                                value="<?php echo esc_attr(get_option('clear_map_cluster_distance', 50)); ?>"
-                                min="20" max="200" />
-                            <p class="description">Pixel distance for clustering markers</p>
-                        </td>
-                    </tr>
+                            <div class="settings-field">
+                                <label for="clear_map_building_icon_png">
+                                    Building Icon (PNG)
+                                    <span class="help-tip" title="Alternative PNG icon. For best results, use a transparent PNG with the pin tip at the bottom center.">?</span>
+                                </label>
+                                <div class="input-with-button">
+                                    <input type="text" id="clear_map_building_icon_png" name="clear_map_building_icon_png"
+                                        value="<?php echo esc_attr(get_option('clear_map_building_icon_png', '')); ?>"
+                                        class="widefat" placeholder="URL to PNG file..." />
+                                    <button type="button" class="button" id="clear_map_building_icon_png_upload">
+                                        <span class="dashicons dashicons-upload"></span> Select PNG
+                                    </button>
+                                </div>
+                            </div>
 
-                    <tr>
-                        <th scope="row">Cluster Min Points</th>
-                        <td>
-                            <input type="number" name="clear_map_cluster_min_points"
-                                value="<?php echo esc_attr(get_option('clear_map_cluster_min_points', 3)); ?>"
-                                min="2" max="10" />
-                            <p class="description">Minimum markers required to form a cluster</p>
-                        </td>
-                    </tr>
-                </table>
+                            <div class="settings-field">
+                                <label for="clear_map_building_icon_width">
+                                    Building Icon Width
+                                    <span class="help-tip" title="Size of the building icon on the map (e.g., 40px or 10%).">?</span>
+                                </label>
+                                <input type="text" id="clear_map_building_icon_width" name="clear_map_building_icon_width"
+                                    value="<?php echo esc_attr(get_option('clear_map_building_icon_width', '40px')); ?>"
+                                    class="small-text" placeholder="40px" />
+                            </div>
 
-                <h2>Map Overlay Settings</h2>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">Show Subway Lines</th>
-                        <td>
-                            <label>
-                                <input type="checkbox" name="clear_map_show_subway_lines"
-                                    value="1" <?php checked(get_option('clear_map_show_subway_lines', 0), 1); ?> />
-                                Display NYC subway lines on the map
-                            </label>
-                            <p class="description">Show MTA subway lines with official colors as an overlay on the map</p>
-                        </td>
-                    </tr>
-                </table>
+                            <div class="settings-field">
+                                <label for="clear_map_building_address">Building Address</label>
+                                <input type="text" id="clear_map_building_address" name="clear_map_building_address"
+                                    value="<?php echo esc_attr(get_option('clear_map_building_address', '261 West 24th Street, New York, NY 10011')); ?>"
+                                    class="widefat" />
+                            </div>
 
-                <?php submit_button(); ?>
+                            <div class="settings-row">
+                                <div class="settings-field">
+                                    <label for="clear_map_building_phone">Building Phone</label>
+                                    <input type="text" id="clear_map_building_phone" name="clear_map_building_phone"
+                                        value="<?php echo esc_attr(get_option('clear_map_building_phone', '')); ?>"
+                                        class="widefat" placeholder="(212) 555-1234" />
+                                </div>
+
+                                <div class="settings-field">
+                                    <label for="clear_map_building_email">Building Email</label>
+                                    <input type="email" id="clear_map_building_email" name="clear_map_building_email"
+                                        value="<?php echo esc_attr(get_option('clear_map_building_email', '')); ?>"
+                                        class="widefat" placeholder="info@example.com" />
+                                </div>
+                            </div>
+
+                            <div class="settings-field">
+                                <label for="clear_map_building_description">Building Description</label>
+                                <textarea id="clear_map_building_description" name="clear_map_building_description"
+                                    rows="3" class="widefat"><?php echo esc_textarea(get_option('clear_map_building_description', '')); ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Display Settings Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-admin-settings"></span>
+                                Map Display Settings
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-row">
+                                <div class="settings-field">
+                                    <label for="clear_map_cluster_distance">
+                                        Cluster Distance (px)
+                                        <span class="help-tip" title="Pixel distance for grouping nearby markers into clusters.">?</span>
+                                    </label>
+                                    <input type="number" id="clear_map_cluster_distance" name="clear_map_cluster_distance"
+                                        value="<?php echo esc_attr(get_option('clear_map_cluster_distance', 50)); ?>"
+                                        min="20" max="200" class="small-text" />
+                                    <span class="field-unit">20-200</span>
+                                </div>
+
+                                <div class="settings-field">
+                                    <label for="clear_map_cluster_min_points">
+                                        Cluster Min Points
+                                        <span class="help-tip" title="Minimum number of markers required to form a cluster.">?</span>
+                                    </label>
+                                    <input type="number" id="clear_map_cluster_min_points" name="clear_map_cluster_min_points"
+                                        value="<?php echo esc_attr(get_option('clear_map_cluster_min_points', 3)); ?>"
+                                        min="2" max="10" class="small-text" />
+                                    <span class="field-unit">2-10</span>
+                                </div>
+                            </div>
+
+                            <div class="settings-field">
+                                <label class="toggle-label">
+                                    <input type="checkbox" name="clear_map_show_subway_lines" class="toggle-checkbox"
+                                        value="1" <?php checked(get_option('clear_map_show_subway_lines', 0), 1); ?> />
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-text">
+                                        Show NYC Subway Lines
+                                        <span class="help-tip" title="Display MTA subway lines with official colors as an overlay on the map.">?</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-footer">
+                    <?php submit_button('Save Settings', 'primary large', 'submit', false); ?>
+                </div>
             </form>
         </div>
     <?php
