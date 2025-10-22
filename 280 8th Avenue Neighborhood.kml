@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>280 8th Avenue Neighborhood</name>
+    <description/>
+    <Style id="icon-1899-000000-nodesc-normal">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-000000-nodesc-highlight">
+      <IconStyle>
+        <color>ff000000</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-000000-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-000000-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-000000-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-097138-labelson-nodesc">
+      <IconStyle>
+        <color>ff387109</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-1A237E-nodesc-normal">
+      <IconStyle>
+        <color>ff7e231a</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-1A237E-nodesc-highlight">
+      <IconStyle>
+        <color>ff7e231a</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-1A237E-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-1A237E-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-1A237E-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-880E4F-nodesc-normal">
+      <IconStyle>
+        <color>ff4f0e88</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-880E4F-nodesc-highlight">
+      <IconStyle>
+        <color>ff4f0e88</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-880E4F-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-880E4F-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-880E4F-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-A52714-nodesc-normal">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-A52714-nodesc-highlight">
+      <IconStyle>
+        <color>ff1427a5</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-A52714-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-A52714-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-A52714-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-E65100-nodesc-normal">
+      <IconStyle>
+        <color>ff0051e6</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-E65100-nodesc-highlight">
+      <IconStyle>
+        <color>ff0051e6</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-E65100-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-E65100-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-E65100-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Parks</name>
+      <Placemark>
+        <name>The High Line</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0047649,40.7479925,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Hudson River Park</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.009261,40.7492961,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Madison Square Park</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9879992,40.7421951,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Clement Clarke Moore Park</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0043787,40.7466458,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Pier 54 (Little Island)</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0099739,40.7415481,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Soccer Field at Chelsea Park</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0014131,40.7502352,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Pinwheel Park</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9989941,40.7468066,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Penn South Playground</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9987076,40.7476258,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Chelsea Green Playground</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9959448,40.7415825,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Dr. Gertrude B. Kelly Playground</name>
+        <styleUrl>#icon-1899-097138-labelson-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.002026,40.7416759,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Schools</name>
+      <Placemark>
+        <name>High School of Fashion Industries</name>
+        <styleUrl>#icon-1899-880E4F-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9965165,40.7454593,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Fashion Institute of Technology</name>
+        <styleUrl>#icon-1899-880E4F-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9950292,40.7472624,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>P.S. 033 Chelsea Prep</name>
+        <styleUrl>#icon-1899-880E4F-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0002751,40.7488818,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Intermediate School 70</name>
+        <styleUrl>#icon-1899-880E4F-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0024525,40.7426584,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Transportation</name>
+      <Placemark>
+        <name><![CDATA[23rd Street C & E Subway Station]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.998451,40.745312,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>23rd Street 1 Subway Station</name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.995659,40.74408,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[23rd Street F & M Subway Station & PATH Station]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9928415,40.7428922,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[23rd Street R & W Subway Station]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9892052,40.7412039,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Moynihan Train Hall at Penn Station</name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9957489,40.7517137,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Citi Bike: West 24th Street & 7th Avenue]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9952989,40.7448763,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Citi Bike: West 22nd Street & 8th Avenue]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9991536,40.7447515,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Citi Bike: West 24th Street & 8th Avenue]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9980711,40.7459108,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Citi Bike: West 25th Street & 8th Avenue]]></name>
+        <styleUrl>#icon-1899-000000-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9973263,40.7465,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Museums & Entertainment]]></name>
+      <Placemark>
+        <name>Museum of Illusions - New York</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0029842,40.7397011,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Whitney Museum of American Art</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0088629,40.7395877,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Rubin Museum of Himalayan Art</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9973455,40.7399603,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>SVA Theatre</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9996948,40.7460403,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The McKittrick Hotel</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.003805,40.75066,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Joyce Theater</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0007328,40.7427464,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Gotham Comedy Club</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.996455,40.7442304,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Poster House</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9933284,40.7435919,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>David Zwirner</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.006985,40.745866,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Greene Naftali</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.003659,40.749778,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Agora Gallery</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0045565,40.749429,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>National Museum of Mathematics</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9878621,40.7436338,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Museum at FIT</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.994427,40.7464494,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>New York Live Arts</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9982715,40.7422303,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The FLAG Art Foundation</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0048864,40.7500435,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Michael Rosenfeld Gallery</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0077256,40.7461564,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Edge</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.001055,40.7533936,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Vessel</name>
+        <styleUrl>#icon-1899-E65100-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0021537,40.7538073,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Grocery & Shopping]]></name>
+      <Placemark>
+        <name>Ideal Marketplace</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.998974,40.7500302,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Gristedes</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.999542,40.744453,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Gristedes</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0011597,40.7470808,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Eataly NYC Flatiron</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9900845,40.742045,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Trader Joe's]]></name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9941211,40.7420901,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Whole Foods Market</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9952913,40.7449592,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Target</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.997897,40.745512,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bicycle Habitat</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9956814,40.7444539,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Michaels</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9937968,40.7420623,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Home Depot</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9913589,40.7418476,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Best Buy</name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.992714,40.7426187,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[P.C. Richard & Son]]></name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9914824,40.7427596,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[D'Agostino Grocery Store]]></name>
+        <styleUrl>#icon-1899-1A237E-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0066243,40.7371001,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Bars, Cafes & Dining]]></name>
+      <Placemark>
+        <name>Café Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9967323,40.7443036,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Joe's Pizza on 8th Ave]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9997923,40.7439139,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Brooklyn Bagel & Coffee Company]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9976407,40.7461674,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bathtub Gin</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0031575,40.7435711,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Cucina Alba</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.006574,40.7448385,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Artichoke Basille's Pizza]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0065507,40.7440765,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Chelsea Market</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0061439,40.7424396,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Catch Steak New York</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0040829,40.7423522,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Starbucks Reserve Roastery New York</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0051549,40.7415944,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>ZiZi</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9999607,40.7429063,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>LOULOU</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0001698,40.7426678,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>COQODAQ</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9887467,40.7400559,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>COTE Korean Steakhouse</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9912527,40.7413041,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Momoya Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9964645,40.7426356,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Oscar Wilde</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9900721,40.7451638,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Shukette</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0005218,40.7471546,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Empire Diner</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0044081,40.7470815,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Porchlight</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0049906,40.7520383,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>La Barra at Mercado Little Spain</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0017387,40.7525233,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Ci Siamo</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9989141,40.7526152,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>La Bergamote (Chelsea)</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0028086,40.7448924,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Mermaid Inn - Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.004196,40.7481297,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Portale</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9962661,40.7402203,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Cafeteria</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9979937,40.7405304,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Dim Sum Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.998629,40.7446121,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Qanoon restaurant</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0019871,40.7452272,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bocca di Bacco</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0030237,40.7446239,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Citizens Of Chelsea, A Breakfast Restaurant & Cafe]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0005643,40.7480998,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Mustang Harry's]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9929116,40.7483311,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Fellini Coffee Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9992533,40.7445688,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Zucker's Bagels & Smoked Fish]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9986184,40.7447988,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Chelsea Square Diner</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.001278,40.746205,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>El Quijote</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9969322,40.744545,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Smithfield Hall NYC</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9935444,40.7447306,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Zia Maria Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9993382,40.7454027,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sushi by Bou - Chelsea NYC @ Super Nice Coffee</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9956094,40.7445598,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Blank Street Coffee</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9945904,40.7459595,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Spicy Moon Chelsea</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9987117,40.7443082,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Chip City</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9946739,40.7458201,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Pura Vida Miami</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.989201,40.74431,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Grey Dog—Flatiron</name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -73.9909535,40.7447201,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Jack's Wife Freda]]></name>
+        <styleUrl>#icon-1899-A52714-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -74.0014193,40.7408832,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
