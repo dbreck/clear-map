@@ -265,7 +265,7 @@ class Clear_Map_Admin
                                 <label for="clear_map_mapbox_token">
                                     Mapbox Access Token
                                     <span class="required">*</span>
-                                    <span class="help-tip" title="Your Mapbox public access token. Required for map display.">?</span>
+                                    <span class="help-tip" data-tooltip="Your Mapbox public access token. Required for map display.">?</span>
                                 </label>
                                 <input type="text" id="clear_map_mapbox_token" name="clear_map_mapbox_token"
                                     value="<?php echo esc_attr(get_option('clear_map_mapbox_token')); ?>"
@@ -279,7 +279,7 @@ class Clear_Map_Admin
                                 <label for="clear_map_google_api_key">
                                     Google Geocoding API Key
                                     <span class="optional-badge">Optional</span>
-                                    <span class="help-tip" title="Fallback for geocoding if Mapbox is unavailable. Mapbox provides 100k free requests/month.">?</span>
+                                    <span class="help-tip" data-tooltip="Fallback for geocoding if Mapbox is unavailable. Mapbox provides 100k free requests/month.">?</span>
                                 </label>
                                 <input type="text" id="clear_map_google_api_key" name="clear_map_google_api_key"
                                     value="<?php echo esc_attr(get_option('clear_map_google_api_key')); ?>"
@@ -303,7 +303,7 @@ class Clear_Map_Admin
                             <div class="settings-field">
                                 <label>
                                     Manual Geocoding
-                                    <span class="help-tip" title="Converts coordinates to addresses for POIs that are missing address information.">?</span>
+                                    <span class="help-tip" data-tooltip="Converts coordinates to addresses for POIs that are missing address information.">?</span>
                                 </label>
                                 <button type="button" class="button button-secondary geocoding-btn" id="run-geocoding-btn">
                                     <span class="dashicons dashicons-location"></span>
@@ -330,7 +330,7 @@ class Clear_Map_Admin
                             <div class="settings-field">
                                 <label for="clear_map_building_icon_svg">
                                     Building Icon (SVG)
-                                    <span class="help-tip" title="Upload an SVG icon to mark your building location on the map.">?</span>
+                                    <span class="help-tip" data-tooltip="Upload an SVG icon to mark your building location on the map.">?</span>
                                 </label>
                                 <div class="input-with-button">
                                     <input type="text" id="clear_map_building_icon_svg" name="clear_map_building_icon_svg"
@@ -345,7 +345,7 @@ class Clear_Map_Admin
                             <div class="settings-field">
                                 <label for="clear_map_building_icon_png">
                                     Building Icon (PNG)
-                                    <span class="help-tip" title="Alternative PNG icon. For best results, use a transparent PNG with the pin tip at the bottom center.">?</span>
+                                    <span class="help-tip" data-tooltip="Alternative PNG icon. For best results, use a transparent PNG with the pin tip at the bottom center.">?</span>
                                 </label>
                                 <div class="input-with-button">
                                     <input type="text" id="clear_map_building_icon_png" name="clear_map_building_icon_png"
@@ -360,7 +360,7 @@ class Clear_Map_Admin
                             <div class="settings-field">
                                 <label for="clear_map_building_icon_width">
                                     Building Icon Width
-                                    <span class="help-tip" title="Size of the building icon on the map (e.g., 40px or 10%).">?</span>
+                                    <span class="help-tip" data-tooltip="Size of the building icon on the map (e.g., 40px or 10%).">?</span>
                                 </label>
                                 <input type="text" id="clear_map_building_icon_width" name="clear_map_building_icon_width"
                                     value="<?php echo esc_attr(get_option('clear_map_building_icon_width', '40px')); ?>"
@@ -411,7 +411,7 @@ class Clear_Map_Admin
                                 <div class="settings-field">
                                     <label for="clear_map_cluster_distance">
                                         Cluster Distance (px)
-                                        <span class="help-tip" title="Pixel distance for grouping nearby markers into clusters.">?</span>
+                                        <span class="help-tip" data-tooltip="Pixel distance for grouping nearby markers into clusters.">?</span>
                                     </label>
                                     <input type="number" id="clear_map_cluster_distance" name="clear_map_cluster_distance"
                                         value="<?php echo esc_attr(get_option('clear_map_cluster_distance', 50)); ?>"
@@ -422,7 +422,7 @@ class Clear_Map_Admin
                                 <div class="settings-field">
                                     <label for="clear_map_cluster_min_points">
                                         Cluster Min Points
-                                        <span class="help-tip" title="Minimum number of markers required to form a cluster.">?</span>
+                                        <span class="help-tip" data-tooltip="Minimum number of markers required to form a cluster.">?</span>
                                     </label>
                                     <input type="number" id="clear_map_cluster_min_points" name="clear_map_cluster_min_points"
                                         value="<?php echo esc_attr(get_option('clear_map_cluster_min_points', 3)); ?>"
@@ -438,7 +438,7 @@ class Clear_Map_Admin
                                     <span class="toggle-switch"></span>
                                     <span class="toggle-text">
                                         Show NYC Subway Lines
-                                        <span class="help-tip" title="Display MTA subway lines with official colors as an overlay on the map.">?</span>
+                                        <span class="help-tip" data-tooltip="Display MTA subway lines with official colors as an overlay on the map.">?</span>
                                     </span>
                                 </label>
                             </div>
