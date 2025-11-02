@@ -388,20 +388,13 @@ class ClearMap {
         add_option('clear_map_zoom_threshold', 15);
         add_option('clear_map_show_subway_lines', 0);
         add_option('clear_map_activity', array());
-        
-        // Default categories with colors
-        $default_categories = array(
-            'restaurants' => array('name' => 'Restaurants', 'color' => '#D4A574'),
-            'arts_culture' => array('name' => 'Arts + Culture', 'color' => '#8B7355'),
-            'shopping' => array('name' => 'Shopping', 'color' => '#A68B5B'),
-            'fitness' => array('name' => 'Fitness', 'color' => '#6B5B73'),
-            'services' => array('name' => 'Services', 'color' => '#9B8B6B')
-        );
-        add_option('clear_map_categories', $default_categories);
-        
+
+        // Start with empty categories - will be created during KML import
+        add_option('clear_map_categories', array());
+
         // Start with empty POIs - to be imported from KML
         add_option('clear_map_pois', array());
-        
+
         $this->log_activity('Plugin activated');
     }
     

@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Mira Mar Sarasota</name>
+    <description>Points of Interest around Mira Mar</description>
+    <Style id="icon-1899-0288D1-nodesc-normal">
+      <IconStyle>
+        <color>ffd18802</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-0288D1-nodesc-highlight">
+      <IconStyle>
+        <color>ffd18802</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-0288D1-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-0288D1-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-0288D1-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1899-880E4F-nodesc-normal">
+      <IconStyle>
+        <color>ff4f0e88</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1899-880E4F-nodesc-highlight">
+      <IconStyle>
+        <color>ff4f0e88</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+        <hotSpot x="32" xunits="pixels" y="64" yunits="insetPixels"/>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1899-880E4F-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1899-880E4F-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1899-880E4F-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Folder>
+      <name>Home</name>
+      <Placemark>
+        <name>Mira Mar</name>
+        <styleUrl>#icon-1899-880E4F-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5425099,27.3348793,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Sipping & Dining]]></name>
+      <Placemark>
+        <name>Caragiulos Italian American</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5423135,27.334676,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bar Hana</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5441976,27.336033,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Beso</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5407811,27.3356998,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Boca</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5405124,27.3361442,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Palm Avenue Deli</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5440568,27.3359314,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[1592 | Wood Fired Kitchen & Cocktails]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.538793,27.3362598,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Waffle Monkey Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5427976,27.3346178,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Cafe Epicure</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5439146,27.3355288,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>KOJO</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5444382,27.3362523,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Comida</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5397971,27.3355298,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Clasico Italian Chophouse</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5437411,27.335698,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[C'est La Vie - Pastries Breakfast & Dinner]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5395355,27.3366184,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Drunken Poet Cafe Thai Bistro & Sushi Bar]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5392578,27.3362141,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Duval's Fresh. Local. Seafood.]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.541927,27.3366489,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Mattison's City Grille]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.540834,27.336722,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[O & A Coffee and Supply Downtown Sarasota]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.543807,27.3350363,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Owen's Fish Camp -Downtown SRQ]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5396992,27.3319222,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Project Coffee</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5391928,27.3318318,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sage</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.54617,27.3370954,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Selva Downtown Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.543484,27.335749,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>State Street Eating House + Cocktails</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5399044,27.33588,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Tzeva</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5448872,27.3365922,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Hyde Park Prime Steakhouse</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5404589,27.3358431,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Buddy Brew Coffee</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.544416,27.3364,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Indigenous Restaurant</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5329472,27.3343461,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Jack Dusty</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5490273,27.3377837,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Mediterraneo</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5316122,27.3363613,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Ocean Prime Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5478765,27.3395433,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Tommy Bahama Restaurant, Bar & Store]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5762714,27.3193768,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Columbia Restaurant</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.57728,27.3192075,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Venezia Italian Restaurant</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5778822,27.3188481,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Libby's]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5335068,27.3159131,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Crab & Fin Restaurant]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.576493,27.318078,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Blu Kouzina</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.57826,27.3193528,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Natural Spaces</name>
+      <Placemark>
+        <name>Bayfront Park</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5449753,27.3310489,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Marie Selby Botanical Gardens Downtown Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.539718,27.3275053,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Ringling Bridge Causeway Park</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5590321,27.3290424,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Marina Jack</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5460879,27.3329723,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Siesta Beach</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.552834,27.265423,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Lido Key Beach</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5772038,27.3110574,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Longboat Key</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.6589881,27.4125417,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Anna Maria Island</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.7144811,27.5041264,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Bay Park</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.548793,27.3416398,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Legacy Trail</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4756619,27.2378061,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bird Key Park</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5610669,27.3275414,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Beach</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5620425,27.2706038,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Retail & Shopping]]></name>
+      <Placemark>
+        <name>Burns Court</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5398165,27.3324477,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Lotus boutique</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5414467,27.3362139,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Uprooted Rose - Luxury Flowers Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5432495,27.3348959,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Isabel</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5323593,27.3365829,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>J.McLaughlin</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5404966,27.3366475,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>EILEEN FISHER</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5405379,27.3365973,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Greiners Fine Men's Clothing of Sarasota]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5427741,27.3349545,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Toy Lab</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.541853,27.3365782,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bookstore1</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.541313,27.3355659,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>St. Armands Circle</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5772805,27.3183915,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Mall at University Town Center</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4529923,27.3844836,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Southside Village</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5314356,27.3184954,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Arts + Culture</name>
+      <Placemark>
+        <name>Palm Avenue Fine Art LLC</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5436669,27.3351234,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>MARA Art Studio + Gallery</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.542701,27.3343842,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Art Center Sarasota</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5475425,27.3424924,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Thomsen Fine Art</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5436669,27.3351234,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Arts and Cultural Alliance of Sarasota County</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5464586,27.3489891,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Define Art Gallery and Studio</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.542762,27.3345114,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Arts & Central]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5429256,27.3414551,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>New Modern Contemporary Art</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5401863,27.3314398,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Creaturo Studio / Gallery</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5445995,27.3360184,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>AlexArt International Art Gallery</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5431529,27.336687,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>St. Armands Circle</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5772805,27.3183915,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Mall at University Town Center</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4529923,27.3844836,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Crossings at Siesta Key</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.528775,27.3007175,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Incanto Moda Italiana</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5428025,27.3344507,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[The Bazaar on Apricot & Lime]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5247609,27.3435333,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Commons</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4990841,27.3438483,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Colonial Village Shopping Center</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.523698,27.3386817,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Pavilion</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5212878,27.2606811,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Lotus boutique</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5414395,27.3363415,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Sarasota Collection Home Store</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5425201,27.3417003,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Arts & Entertainment]]></name>
+      <Placemark>
+        <name>Sarasota Opera House</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5435728,27.3370057,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Florida Studio Theatre</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5453235,27.3367757,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Van Wezel Performing Arts Hall</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5504342,27.3427563,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The John and Mable Ringling Museum of Art</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5605716,27.3815477,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Polo Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4005687,27.380188,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Ca' d'Zan]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5645354,27.3829253,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Asolo Repertory Theatre</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5584417,27.3832361,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Jungle Gardens</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5563064,27.3678751,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Mote Marine Laboratory</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5773352,27.3331533,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Necessities</name>
+      <Placemark>
+        <name>Sarasota Farmers Market</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5406589,27.3368498,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Whole Foods Market</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5409834,27.3377195,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name><![CDATA[Morton's Gourmet Market]]></name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5340668,27.3158988,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Bradenton International Airport</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5537992,27.3950766,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sarasota Memorial Hospital</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.531735,27.3185566,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Ringling College of Art and Design</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.548481,27.3603682,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name><![CDATA[Golf, Racquet, & Country Clubs]]></name>
+      <Placemark>
+        <name>Longboat Key Club Moorings</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.6186676,27.3711166,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>University Park Country Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4740262,27.4046791,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Sara Bay Country Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.5674448,27.4155478,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Founders Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.3941755,27.3382496,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Laurel Oak Country Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4162682,27.3076378,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>The Ritz-Carlton Members Golf Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.3883819,27.41403,0
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Bobby Jones Golf Club</name>
+        <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+        <Point>
+          <coordinates>
+            -82.4881934,27.3455409,0
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
