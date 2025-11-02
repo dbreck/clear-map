@@ -31,6 +31,7 @@ class ClearMap {
         add_action('wp_ajax_clear_map_import_kml_pois', array($this, 'handle_kml_import'));
         add_action('wp_ajax_clear_map_save_imported_pois', array($this, 'save_imported_pois'));
         add_action('wp_ajax_clear_map_run_geocoding', array($this, 'run_manual_geocoding'));
+        add_action('update_option_clear_map_building_address', array($this, 'geocode_building_address'), 10, 2);
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
     }
@@ -171,23 +172,8 @@ class ClearMap {
                 }
             }
         }
-        
-        // Ensure we have default categories
-        $default_categories = array(
-            'restaurants' => array('name' => 'Restaurants', 'color' => '#D4A574'),
-            'shopping' => array('name' => 'Shopping', 'color' => '#A68B5B'),
-            'arts_culture' => array('name' => 'Arts + Culture', 'color' => '#8B7355'),
-            'fitness' => array('name' => 'Fitness', 'color' => '#6B5B73'),
-            'services' => array('name' => 'Services', 'color' => '#9B8B6B'),
-            'general' => array('name' => 'General', 'color' => '#888888')
-        );
-        
-        foreach ($default_categories as $key => $data) {
-            if (!isset($new_categories[$key])) {
-                $new_categories[$key] = $data;
-            }
-        }
-        
+
+        // Save only the categories that were imported from KML
         update_option('clear_map_categories', $new_categories);
         
         // Organize POIs by category
@@ -377,7 +363,25 @@ class ClearMap {
     public function deactivate() {
         flush_rewrite_rules();
     }
-    
+
+    public function geocode_building_address($old_value, $new_value) {
+        // Only geocode if address actually changed and is not empty
+        if ($old_value === $new_value || empty($new_value)) {
+            return;
+        }
+
+        $api_handler = new Clear_Map_API_Handler();
+        $result = $api_handler->geocode_address($new_value, 'Building Address');
+
+        if ($result && !isset($result['error'])) {
+            update_option('clear_map_building_lat', $result['lat']);
+            update_option('clear_map_building_lng', $result['lng']);
+            error_log('Clear Map: Building address geocoded successfully: ' . $result['lat'] . ', ' . $result['lng']);
+        } else {
+            error_log('Clear Map: Failed to geocode building address: ' . ($result['message'] ?? 'Unknown error'));
+        }
+    }
+
     private function create_default_data() {
         // Set default options
         add_option('clear_map_mapbox_token', '');
