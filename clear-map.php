@@ -31,6 +31,7 @@ class ClearMap {
         add_action('wp_ajax_clear_map_import_kml_pois', array($this, 'handle_kml_import'));
         add_action('wp_ajax_clear_map_save_imported_pois', array($this, 'save_imported_pois'));
         add_action('wp_ajax_clear_map_run_geocoding', array($this, 'run_manual_geocoding'));
+        add_action('wp_ajax_clear_map_geocode_building', array($this, 'ajax_geocode_building'));
         add_action('update_option_clear_map_building_address', array($this, 'geocode_building_address'), 10, 2);
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
@@ -456,6 +457,40 @@ class ClearMap {
             ));
         } else {
             wp_send_json_error('Reverse geocoding failed');
+        }
+    }
+
+    public function ajax_geocode_building() {
+        check_ajax_referer('clear_map_geocode_building', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        $address = get_option('clear_map_building_address', '');
+
+        if (empty($address)) {
+            wp_send_json_error('No building address found. Please enter an address and try again.');
+        }
+
+        $api_handler = new Clear_Map_API_Handler();
+        $result = $api_handler->geocode_address($address, 'Building Address');
+
+        if ($result && !isset($result['error'])) {
+            update_option('clear_map_building_lat', $result['lat']);
+            update_option('clear_map_building_lng', $result['lng']);
+
+            $this->log_activity('Building address geocoded: ' . $address);
+
+            wp_send_json_success(array(
+                'message' => 'Building address geocoded successfully!',
+                'lat' => $result['lat'],
+                'lng' => $result['lng'],
+                'address' => $result['formatted_address'] ?? $address
+            ));
+        } else {
+            $error_message = $result['message'] ?? 'Unknown error';
+            wp_send_json_error('Geocoding failed: ' . $error_message);
         }
     }
 }

@@ -54,6 +54,39 @@ jQuery(document).ready(function ($) {
     }
   })
 
+  // Geocode building address
+  $("#geocode-building-address").on("click", function () {
+    const button = $(this)
+    const originalText = button.html()
+    const address = $("#clear_map_building_address").val()
+
+    if (!address) {
+      alert("Please enter a building address first.")
+      return
+    }
+
+    button.prop("disabled", true).html('<span class="dashicons dashicons-update spin"></span> Geocoding...')
+
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_geocode_building",
+        nonce: button.data("nonce"),
+      },
+      function (response) {
+        if (response.success) {
+          alert(`Building address geocoded successfully!\n\nLocation: ${response.data.lat}, ${response.data.lng}`)
+        } else {
+          alert("Error geocoding address: " + (response.data || "Unknown error"))
+        }
+        button.prop("disabled", false).html(originalText)
+      }
+    ).fail(function () {
+      alert("Error geocoding address. Please try again.")
+      button.prop("disabled", false).html(originalText)
+    })
+  })
+
   // Clear all POIs functionality
   $("#clear-all-pois-btn").on("click", function () {
     const confirmMessage = "Are you sure you want to clear ALL POIs and categories?\n\n" +

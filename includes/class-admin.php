@@ -368,10 +368,19 @@ class Clear_Map_Admin
                             </div>
 
                             <div class="settings-field">
-                                <label for="clear_map_building_address">Building Address</label>
-                                <input type="text" id="clear_map_building_address" name="clear_map_building_address"
-                                    value="<?php echo esc_attr(get_option('clear_map_building_address', '261 West 24th Street, New York, NY 10011')); ?>"
-                                    class="widefat" />
+                                <label for="clear_map_building_address">
+                                    Building Address
+                                    <span class="help-tip" data-tooltip="The address will be automatically geocoded when you save. This location will be marked with your custom icon on the map.">?</span>
+                                </label>
+                                <div class="input-with-button">
+                                    <input type="text" id="clear_map_building_address" name="clear_map_building_address"
+                                        value="<?php echo esc_attr(get_option('clear_map_building_address', '')); ?>"
+                                        class="widefat" placeholder="Enter building address..." />
+                                    <button type="button" class="button" id="geocode-building-address"
+                                        data-nonce="<?php echo wp_create_nonce('clear_map_geocode_building'); ?>">
+                                        <span class="dashicons dashicons-location"></span> Geocode Now
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="settings-row">
