@@ -35,7 +35,7 @@ class Clear_Map_KML_Parser {
     
     private function log($message) {
         $this->debug_log[] = $message;
-        error_log('Andrea Map KML Parser: ' . $message);
+        error_log('Clear Map KML Parser: ' . $message);
     }
     
     public function get_debug_log() {

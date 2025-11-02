@@ -50,8 +50,6 @@ class Clear_Map_API_Handler {
         $url = add_query_arg(array(
             'access_token' => $this->mapbox_token,
             'limit' => 1,
-            'proximity' => '-74.0060,40.7128', // NYC center for proximity bias
-            'bbox' => '-74.2591,40.4774,-73.7004,40.9176', // NYC bounds
             'types' => 'address,poi' // Look for addresses and points of interest
         ), $endpoint);
 
@@ -59,7 +57,6 @@ class Clear_Map_API_Handler {
 
         if (is_wp_error($response)) {
             $error_result = array('error' => 'network_error', 'message' => $response->get_error_message());
-            set_transient($cache_key, $error_result, HOUR_IN_SECONDS);
             error_log('Clear Map: Network error geocoding with Mapbox ' . $poi_name . ': ' . $response->get_error_message());
             return $error_result;
         }
@@ -74,14 +71,6 @@ class Clear_Map_API_Handler {
 
             $lng = $coordinates[0];
             $lat = $coordinates[1];
-
-            // Validate coordinates are in reasonable range for NYC
-            if (!$this->validate_nyc_coordinates($lat, $lng)) {
-                $error_result = array('error' => 'invalid_coordinates', 'message' => 'Geocoded coordinates outside NYC area');
-                set_transient($cache_key, $error_result, DAY_IN_SECONDS);
-                error_log('Clear Map: Invalid coordinates for ' . $poi_name . ': ' . $lat . ', ' . $lng);
-                return $error_result;
-            }
 
             $coords = array(
                 'lat' => $lat,
@@ -100,7 +89,6 @@ class Clear_Map_API_Handler {
         } else {
             $error_msg = isset($data['message']) ? $data['message'] : 'No results found';
             $error_result = array('error' => 'geocoding_failed', 'message' => $error_msg);
-            set_transient($cache_key, $error_result, DAY_IN_SECONDS);
             error_log('Clear Map: Mapbox geocoding failed for ' . $poi_name . ' (' . $cleaned_address . '): ' . $error_msg);
             return $error_result;
         }
@@ -120,15 +108,13 @@ class Clear_Map_API_Handler {
         $url = add_query_arg(array(
             'address' => urlencode($cleaned_address),
             'key' => $this->google_api_key,
-            'region' => 'us',
-            'bounds' => '40.4774,-74.2591|40.9176,-73.7004'
+            'region' => 'us'
         ), 'https://maps.googleapis.com/maps/api/geocode/json');
 
         $response = wp_remote_get($url, array('timeout' => 10));
 
         if (is_wp_error($response)) {
             $error_result = array('error' => 'network_error', 'message' => $response->get_error_message());
-            set_transient($cache_key, $error_result, HOUR_IN_SECONDS);
             return $error_result;
         }
 
@@ -138,12 +124,6 @@ class Clear_Map_API_Handler {
         if ($data['status'] === 'OK' && !empty($data['results'])) {
             $result = $data['results'][0];
             $location = $result['geometry']['location'];
-
-            if (!$this->validate_nyc_coordinates($location['lat'], $location['lng'])) {
-                $error_result = array('error' => 'invalid_coordinates');
-                set_transient($cache_key, $error_result, DAY_IN_SECONDS);
-                return $error_result;
-            }
 
             $coords = array(
                 'lat' => $location['lat'],
@@ -157,7 +137,6 @@ class Clear_Map_API_Handler {
             return $coords;
         } else {
             $error_result = array('error' => 'geocoding_failed', 'message' => 'Status: ' . $data['status']);
-            set_transient($cache_key, $error_result, DAY_IN_SECONDS);
             return $error_result;
         }
     }
@@ -405,34 +384,8 @@ class Clear_Map_API_Handler {
     private function clean_address_for_geocoding($address) {
         // Remove extra whitespace
         $address = trim(preg_replace('/\s+/', ' ', $address));
-        
-        // NYC-specific address cleaning
-        $address = preg_replace('/\b(New York City|NYC)\b/i', 'New York', $address);
-        
-        // Ensure NY state is included for NYC addresses
-        if (stripos($address, 'New York') !== false && stripos($address, ', NY') === false) {
-            $address .= ', NY';
-        }
-        
-        // Add zip code patterns for better geocoding
-        if (preg_match('/\b(Manhattan|Brooklyn|Queens|Bronx|Staten Island)\b/i', $address) && !preg_match('/\d{5}/', $address)) {
-            // Could add common zip codes, but let's keep it simple for now
-        }
-        
+
         return $address;
-    }
-    
-    private function validate_nyc_coordinates($lat, $lng) {
-        // NYC bounds (generous to include surrounding areas)
-        $nyc_bounds = array(
-            'lat_min' => 40.4774,
-            'lat_max' => 40.9176,
-            'lng_min' => -74.2591,
-            'lng_max' => -73.7004
-        );
-        
-        return ($lat >= $nyc_bounds['lat_min'] && $lat <= $nyc_bounds['lat_max'] &&
-                $lng >= $nyc_bounds['lng_min'] && $lng <= $nyc_bounds['lng_max']);
     }
     
     private function get_mapbox_precision($feature) {

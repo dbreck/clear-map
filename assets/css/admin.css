@@ -1,11 +1,11 @@
-/* The Andrea Map Admin Styles */
+/* Clear Map Admin Styles */
 
 .clear-map-admin {
     max-width: 1200px;
 }
 
 /* Dashboard Styles */
-.andrea-dashboard-grid {
+.clear-map-dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
@@ -615,7 +615,7 @@ input[type="file"] {
 
 /* Responsive admin styles */
 @media (max-width: 1200px) {
-    .andrea-dashboard-grid {
+    .clear-map-dashboard-grid {
         grid-template-columns: 1fr;
     }
     
@@ -642,7 +642,7 @@ input[type="file"] {
 }
 
 @media (max-width: 768px) {
-    .andrea-dashboard-grid {
+    .clear-map-dashboard-grid {
         gap: 15px;
     }
     

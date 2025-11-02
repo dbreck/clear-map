@@ -17,24 +17,15 @@ class Clear_Map_Renderer
         $pois = get_option('clear_map_pois', array());
         $building_address = get_option('clear_map_building_address', '');
 
-        // Geocode POIs if needed
-        $api_handler = new Clear_Map_API_Handler();
-        $geocoding_result = $api_handler->geocode_pois($pois);
-        
-        // Extract POIs from the geocoding result (maintains backward compatibility)
-        $geocoded_pois = $geocoding_result;
-        if (isset($geocoding_result['pois'])) {
-            $geocoded_pois = $geocoding_result['pois'];
-        }
-        
-        $building_coords_result = $api_handler->geocode_address($building_address, 'Building Address');
-        
-        // Handle geocoding result format
+        // Get stored building coordinates (geocoded separately via admin)
+        $building_lat = get_option('clear_map_building_lat', null);
+        $building_lng = get_option('clear_map_building_lng', null);
+
         $building_coords = null;
-        if ($building_coords_result && !isset($building_coords_result['error'])) {
+        if ($building_lat && $building_lng) {
             $building_coords = array(
-                'lat' => $building_coords_result['lat'],
-                'lng' => $building_coords_result['lng']
+                'lat' => floatval($building_lat),
+                'lng' => floatval($building_lng)
             );
         }
 
@@ -53,7 +44,7 @@ class Clear_Map_Renderer
             'buildingEmail' => get_option('clear_map_building_email', ''),
             'buildingDescription' => get_option('clear_map_building_description', ''),
             'categories' => $categories,
-            'pois' => $geocoded_pois,
+            'pois' => $pois,
             'clusterDistance' => get_option('clear_map_cluster_distance', 50),
             'clusterMinPoints' => get_option('clear_map_cluster_min_points', 3),
             'zoomThreshold' => get_option('clear_map_zoom_threshold', 15),

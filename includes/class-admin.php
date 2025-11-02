@@ -141,16 +141,16 @@ class Clear_Map_Admin
 
         $is_configured = !empty($mapbox_token) && !empty($google_key);
 ?>
-        <div class="wrap andrea-map-admin">
-            <h1>The Andrea Map Dashboard</h1>
+        <div class="wrap clear-map-admin">
+            <h1>Clear Map Dashboard</h1>
 
             <?php if (!$is_configured): ?>
                 <div class="notice notice-warning">
-                    <p><strong>Setup Required:</strong> Please configure your API keys in <a href="<?php echo admin_url('admin.php?page=andrea-map-settings'); ?>">Settings</a> to get started.</p>
+                    <p><strong>Setup Required:</strong> Please configure your API keys in <a href="<?php echo admin_url('admin.php?page=clear-map-settings'); ?>">Settings</a> to get started.</p>
                 </div>
             <?php endif; ?>
 
-            <div class="andrea-dashboard-grid">
+            <div class="clear-map-dashboard-grid">
                 <div class="dashboard-card">
                     <h2>Quick Stats</h2>
                     <div class="stats-grid">
@@ -244,7 +244,7 @@ class Clear_Map_Admin
     public function settings_page()
     {
     ?>
-        <div class="wrap andrea-map-admin">
+        <div class="wrap clear-map-admin">
             <h1>Clear Map Settings</h1>
             <p class="settings-subtitle">Configure API keys, map display options, and clustering behavior</p>
 
@@ -457,7 +457,7 @@ class Clear_Map_Admin
     public function import_page()
     {
     ?>
-        <div class="wrap andrea-map-admin">
+        <div class="wrap clear-map-admin">
             <h1>Import POIs from KML</h1>
 
             <div class="import-instructions">
@@ -563,7 +563,7 @@ class Clear_Map_Admin
     public function manage_page()
     {
     ?>
-        <div class="wrap andrea-map-admin">
+        <div class="wrap clear-map-admin">
             <h1>Manage Categories & POIs</h1>
 
             <form method="post" action="options.php">

@@ -281,8 +281,8 @@ jQuery(document).ready(function ($) {
                         ${importStatsHtml}
                     </div>
                     <div class="import-actions" style="margin-top: 15px;">
-                        <a href="admin.php?page=andrea-map" class="button button-primary">View Dashboard</a>
-                        <a href="admin.php?page=andrea-map-manage" class="button button-secondary">Manage POIs</a>
+                        <a href="admin.php?page=clear-map" class="button button-primary">View Dashboard</a>
+                        <a href="admin.php?page=clear-map-manage" class="button button-secondary">Manage POIs</a>
                     </div>
                 `)
 
@@ -396,7 +396,7 @@ jQuery(document).ready(function ($) {
       function (response) {
         if (response.success) {
           alert(`Successfully imported ${response.data.imported} POIs!`)
-          window.location.href = "admin.php?page=andrea-map"
+          window.location.href = "admin.php?page=clear-map"
         } else {
           alert("Save failed: " + response.data)
         }
@@ -417,8 +417,8 @@ jQuery(document).ready(function ($) {
 
     const categoryHtml = `
             <div class="category-row" data-key="${newKey}">
-                <input type="text" name="andrea_map_categories[${newKey}][name]" value="" placeholder="Category Name" />
-                <input type="text" name="andrea_map_categories[${newKey}][color]" value="#D4A574" class="color-picker" />
+                <input type="text" name="clear_map_categories[${newKey}][name]" value="" placeholder="Category Name" />
+                <input type="text" name="clear_map_categories[${newKey}][color]" value="#D4A574" class="color-picker" />
                 <button type="button" class="button remove-category">Remove</button>
             </div>
         `
@@ -447,11 +447,11 @@ jQuery(document).ready(function ($) {
 
     const poiHtml = `
             <div class="poi-row" data-category="${category}" data-index="${existingPois}">
-                <input type="text" name="andrea_map_pois[${category}][${existingPois}][name]" value="" placeholder="POI Name" />
-                <input type="text" name="andrea_map_pois[${category}][${existingPois}][address]" value="" placeholder="Address" />
-                <textarea name="andrea_map_pois[${category}][${existingPois}][description]" placeholder="Description"></textarea>
-                <input type="url" name="andrea_map_pois[${category}][${existingPois}][website]" value="" placeholder="Website URL" />
-                <input type="hidden" name="andrea_map_pois[${category}][${existingPois}][photo]" value="" class="poi-photo-url" />
+                <input type="text" name="clear_map_pois[${category}][${existingPois}][name]" value="" placeholder="POI Name" />
+                <input type="text" name="clear_map_pois[${category}][${existingPois}][address]" value="" placeholder="Address" />
+                <textarea name="clear_map_pois[${category}][${existingPois}][description]" placeholder="Description"></textarea>
+                <input type="url" name="clear_map_pois[${category}][${existingPois}][website]" value="" placeholder="Website URL" />
+                <input type="hidden" name="clear_map_pois[${category}][${existingPois}][photo]" value="" class="poi-photo-url" />
                 <button type="button" class="button upload-photo">Upload Photo</button>
                 <button type="button" class="button remove-poi">Remove</button>
             </div>
@@ -498,7 +498,7 @@ jQuery(document).ready(function ($) {
   })
 
   // SVG Media uploader for Building Icon
-  $("#andrea_map_building_icon_svg_upload").on("click", function (e) {
+  $("#clear_map_building_icon_svg_upload").on("click", function (e) {
     e.preventDefault()
     var custom_uploader = wp
       .media({
@@ -510,7 +510,7 @@ jQuery(document).ready(function ($) {
       .on("select", function () {
         var attachment = custom_uploader.state().get("selection").first().toJSON()
         if (attachment.url && attachment.url.endsWith(".svg")) {
-          $("#andrea_map_building_icon_svg").val(attachment.url)
+          $("#clear_map_building_icon_svg").val(attachment.url)
         } else {
           alert("Please select an SVG file.")
         }
@@ -519,9 +519,9 @@ jQuery(document).ready(function ($) {
   })
 
   // Building Icon PNG upload
-  $("#andrea_map_building_icon_png_upload").on("click", function (e) {
+  $("#clear_map_building_icon_png_upload").on("click", function (e) {
     e.preventDefault()
-    const input = $("#andrea_map_building_icon_png")
+    const input = $("#clear_map_building_icon_png")
     const frame = wp.media({
       title: "Select PNG Icon",
       button: { text: "Use this PNG" },
@@ -568,16 +568,16 @@ jQuery(document).ready(function ($) {
     }
 
     // Only validate on the settings and manage pages
-    if (!form.find('input[name="andrea_map_mapbox_token"], input[name="andrea_map_categories"]').length) {
+    if (!form.find('input[name="clear_map_mapbox_token"], input[name="clear_map_categories"]').length) {
       return
     }
 
     let hasErrors = false
 
     // Check required API keys on settings page
-    if (form.find('input[name="andrea_map_mapbox_token"]').length) {
-      const mapboxToken = $('input[name="andrea_map_mapbox_token"]').val()
-      const googleApiKey = $('input[name="andrea_map_google_api_key"]').val()
+    if (form.find('input[name="clear_map_mapbox_token"]').length) {
+      const mapboxToken = $('input[name="clear_map_mapbox_token"]').val()
+      const googleApiKey = $('input[name="clear_map_google_api_key"]').val()
 
       if (!mapboxToken.trim()) {
         alert("Mapbox access token is required.")
