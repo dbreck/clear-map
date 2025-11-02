@@ -627,6 +627,16 @@ class Clear_Map_Admin
         echo '<textarea name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][description]" placeholder="Description">' . esc_textarea($poi['description']) . '</textarea>';
         echo '<input type="url" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][website]" value="' . esc_attr($poi['website']) . '" placeholder="Website URL" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][photo]" value="' . esc_attr($poi['photo']) . '" class="poi-photo-url" />';
+
+        // Preserve coordinate and geocoding data as hidden fields
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][lat]" value="' . esc_attr($poi['lat'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][lng]" value="' . esc_attr($poi['lng'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][coordinate_source]" value="' . esc_attr($poi['coordinate_source'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][needs_geocoding]" value="' . esc_attr($poi['needs_geocoding'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][reverse_geocoded]" value="' . esc_attr($poi['reverse_geocoded'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoded_address]" value="' . esc_attr($poi['geocoded_address'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoding_precision]" value="' . esc_attr($poi['geocoding_precision'] ?? '') . '" />';
+
         echo '<button type="button" class="button upload-photo">Upload Photo</button>';
         echo '<button type="button" class="button remove-poi">Remove</button>';
         echo '</div>';
