@@ -251,6 +251,7 @@ class ClearMap {
             name: poi.name || "Unnamed POI",
             address: poi.address || "",
             description: poi.description || "",
+            photo: poi.photo || "",
             website: poi.website || "",
             category: category,
             color: categoryColor,
@@ -299,6 +300,18 @@ class ClearMap {
     this.map.on("mouseleave", "unclustered-point", () => {
       this.map.getCanvas().style.cursor = ""
       this.hidePoiTooltip()
+    })
+
+    // Click to show detailed popup
+    this.map.on("click", "unclustered-point", (e) => {
+      const poi = e.features[0].properties
+      const coordinates = e.features[0].geometry.coordinates.slice()
+
+      // Hide the hover tooltip when showing the popup
+      this.hidePoiTooltip()
+
+      // Show detailed popup
+      this.showPoiPopup(poi, coordinates)
     })
 
     // Cluster click to zoom
@@ -451,6 +464,73 @@ class ClearMap {
   hidePoiTooltip() {
     const tooltip = document.querySelector(".clear-map-tooltip")
     if (tooltip) tooltip.remove()
+  }
+
+  showPoiPopup(poi, coordinates) {
+    // Build popup content
+    let popupContent = `<div class="poi-popup">`
+
+    // POI name (always shown)
+    popupContent += `<div class="poi-popup-name"><strong>${poi.name}</strong></div>`
+
+    // Photo (if available)
+    if (poi.photo) {
+      popupContent += `<div class="poi-popup-photo"><img src="${poi.photo}" alt="${poi.name}" style="width:100%;max-height:200px;object-fit:cover;border-radius:4px;margin:8px 0;" /></div>`
+    }
+
+    // Address (if available)
+    if (poi.address) {
+      popupContent += `<div class="poi-popup-address">${poi.address}</div>`
+    }
+
+    // Description (if available)
+    if (poi.description) {
+      popupContent += `<div class="poi-popup-description" style="margin-top:8px;">${poi.description}</div>`
+    }
+
+    // Website (if available)
+    if (poi.website) {
+      popupContent += `<div class="poi-popup-website" style="margin-top:8px;"><a href="${poi.website}" target="_blank" rel="noopener noreferrer">Visit Website</a></div>`
+    }
+
+    popupContent += `</div>`
+
+    // Determine best anchor position based on viewport space
+    const point = this.map.project(coordinates)
+    const canvas = this.map.getCanvas()
+    const canvasRect = canvas.getBoundingClientRect()
+
+    // Calculate distances from edges
+    const spaceTop = point.y
+    const spaceBottom = canvasRect.height - point.y
+    const spaceLeft = point.x
+    const spaceRight = canvasRect.width - point.x
+
+    // Determine best anchor (popup appears opposite to anchor)
+    // e.g., if anchor is 'bottom', popup appears above the pin
+    let anchor = 'bottom' // default: popup appears above pin
+
+    // Prioritize vertical placement first (above or below)
+    if (spaceBottom > spaceTop && spaceBottom > 250) {
+      anchor = 'top' // popup appears below pin
+    } else if (spaceTop > 250) {
+      anchor = 'bottom' // popup appears above pin
+    } else if (spaceRight > spaceLeft && spaceRight > 320) {
+      anchor = 'left' // popup appears to the right
+    } else if (spaceLeft > 320) {
+      anchor = 'right' // popup appears to the left
+    }
+
+    // Create and display the popup with smart positioning
+    new mapboxgl.Popup({
+      closeButton: true,
+      maxWidth: '300px',
+      anchor: anchor,
+      offset: 15
+    })
+      .setLngLat(coordinates)
+      .setHTML(popupContent)
+      .addTo(this.map)
   }
 
   addBuildingMarker() {
