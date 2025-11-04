@@ -2,7 +2,7 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 ## Features
 
@@ -133,6 +133,55 @@ The plugin provides several WordPress actions and filters for customization:
 - `wp_ajax_clear_map_geocode_building` - Geocode building address
 
 ## Changelog
+
+### Version 1.2.0 (2025-01-04)
+
+**Enhanced Category Filtering with Visual Feedback**
+
+- **Toggle-Based Category Filtering**:
+  - Click category to apply filter (shows only that category's POIs)
+  - Click again to remove filter (shows all POIs)
+  - Switch between categories by clicking different ones
+  - Single filter at a time (exclusive filtering maintained)
+
+- **Visual Filter Indicator**:
+  - Category icon changes from colored circle to X when filtered
+  - X icon uses same color as category for consistency
+  - Smooth transitions between states
+
+- **Auto Expand/Collapse POI Lists**:
+  - POI list automatically expands when filter is applied
+  - POI list automatically collapses when filter is removed
+  - POI list collapses when switching to different category
+  - Expand button remains independent for browsing without filtering
+
+- **User Experience Improvements**:
+  - Clear visual feedback for active filters
+  - Intuitive toggle behavior (click to filter, click again to clear)
+  - Smooth animations using GSAP
+  - Maintains accessibility attributes (aria-expanded)
+
+**Technical Implementation**:
+- Updated category HTML template with dual icon support
+- Added CSS filtered state with opacity transitions
+- Refactored JavaScript filter logic for toggle behavior
+- New `updateCategoryIcon()` helper method
+- Preserved backward compatibility with expand button
+
+### Version 1.1.1 (2025-01-XX)
+
+**POI Photo & Description Display**
+
+- **Clickable POI Popups**:
+  - POIs now display full details when clicked (not just hovered)
+  - Photos and descriptions (saved in admin) now visible on the map
+  - Smart viewport-aware popup positioning (above, below, left, or right of pin)
+  - Popups include: name, photo, address, description, and website link
+
+**Technical Implementation**:
+- Added `photo` field to GeoJSON properties in `poisToGeoJSON()` method
+- Added click handler for `unclustered-point` layer
+- Created new `showPoiPopup()` method with intelligent positioning logic
 
 ### Version 1.1.0 (2025-01-XX)
 

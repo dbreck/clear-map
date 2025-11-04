@@ -76,7 +76,7 @@ class Clear_Map_Renderer
             <div id="<?php echo esc_attr($map_id); ?>" class="clear-map"></div>
             <div class="clear-map-filters" id="<?php echo esc_attr($map_id); ?>-filters">
                 <div class="filters-header">
-                    <h5>Surrounding Points of Interest</h5>
+                    <h5>The Area</h5>
                     <button class="toggle-filters" type="button">
                         <span class="screen-reader-text">Toggle Filters</span>
                         <svg width="20" height="20" viewBox="0 0 20 20">
@@ -97,12 +97,15 @@ class Clear_Map_Renderer
                             </div>
                         </div>
                     <?php endif; ?>
-                    
+
                     <?php foreach ($categories as $cat_key => $category): ?>
                         <div class="filter-category" data-category="<?php echo esc_attr($cat_key); ?>">
                             <div class="category-header">
                                 <div class="category-toggle">
-                                    <span class="category-dot" style="background-color: <?php echo esc_attr($category['color']); ?>"></span>
+                                    <span class="category-icon">
+                                        <span class="category-dot" style="background-color: <?php echo esc_attr($category['color']); ?>"></span>
+                                        <span class="category-x" style="color: <?php echo esc_attr($category['color']); ?>;">✕</span>
+                                    </span>
                                     <span class="category-name"><?php echo esc_html($category['name']); ?></span>
                                 </div>
                                 <button class="category-expand" type="button">

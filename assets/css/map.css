@@ -109,15 +109,45 @@
     flex: 1;
 }
 
+.category-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+}
+
 .category-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    transition: transform 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .category-dot:hover {
     transform: scale(1.2);
+}
+
+.category-x {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: none;
+}
+
+/* Filtered state - show X, hide dot */
+.category-icon.filtered .category-dot {
+    opacity: 0;
+    display: none;
+}
+
+.category-icon.filtered .category-x {
+    opacity: 1;
+    display: block;
 }
 
 .category-name {

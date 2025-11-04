@@ -7,6 +7,7 @@ class ClearMap {
     this.clusterSource = null
     this.activeCategories = new Set(Object.keys(data.categories || {}))
     this.activePois = new Set()
+    this.filteredCategory = null // Track which category is currently filtered
 
     this.init()
   }
@@ -612,9 +613,11 @@ class ClearMap {
       if (categoryToggle) {
         categoryToggle.addEventListener("click", (e) => {
           const catKey = categoryEl.dataset.category
-          const isOnlyThis = this.activeCategories.size === 1 && this.activeCategories.has(catKey)
-          if (isOnlyThis) {
-            // Show all categories
+          const isCurrentlyFiltered = this.filteredCategory === catKey
+
+          if (isCurrentlyFiltered) {
+            // Turn OFF filter - show all categories
+            this.filteredCategory = null
             this.activeCategories = new Set(Object.keys(this.data.categories || {}))
             this.activePois.clear()
             Object.keys(this.data.pois).forEach((category) => {
@@ -622,11 +625,39 @@ class ClearMap {
                 this.activePois.add(`${category}-${idx}`)
               })
             })
-            // Mark UI
+
+            // Update UI: remove inactive class, change X back to dot, collapse POIs
             filtersEl.querySelectorAll(".filter-category").forEach((fc) => fc.classList.remove("inactive"))
             filtersEl.querySelectorAll(".poi-item").forEach((poiEl) => poiEl.classList.remove("inactive"))
+            this.updateCategoryIcon(catKey, false)
+
+            // Collapse POI list
+            poisEl.style.display = "none"
+            expandBtn.classList.remove("expanded")
+            poisEl.setAttribute("aria-expanded", "false")
+            this.animateAccordion(poisEl, false)
           } else {
-            // Only show this category
+            // Turn ON filter or SWITCH to this category
+            const previousCategory = this.filteredCategory
+
+            // If switching from another category, collapse and reset its icon
+            if (previousCategory) {
+              const prevCategoryEl = filtersEl.querySelector(`.filter-category[data-category="${previousCategory}"]`)
+              if (prevCategoryEl) {
+                const prevPoisEl = prevCategoryEl.querySelector(".category-pois")
+                const prevExpandBtn = prevCategoryEl.querySelector(".category-expand")
+                if (prevPoisEl) {
+                  prevPoisEl.style.display = "none"
+                  if (prevExpandBtn) prevExpandBtn.classList.remove("expanded")
+                  prevPoisEl.setAttribute("aria-expanded", "false")
+                  this.animateAccordion(prevPoisEl, false)
+                }
+                this.updateCategoryIcon(previousCategory, false)
+              }
+            }
+
+            // Set new filter
+            this.filteredCategory = catKey
             this.activeCategories = new Set([catKey])
             this.activePois.clear()
             if (this.data.pois[catKey]) {
@@ -634,10 +665,21 @@ class ClearMap {
                 this.activePois.add(`${catKey}-${idx}`)
               })
             }
-            // Mark UI
-            filtersEl.querySelectorAll(".filter-category").forEach((fc) => fc.classList.toggle("inactive", fc !== categoryEl))
+
+            // Update UI: mark other categories inactive, change dot to X, expand POIs
+            filtersEl.querySelectorAll(".filter-category").forEach((fc) =>
+              fc.classList.toggle("inactive", fc !== categoryEl)
+            )
             filtersEl.querySelectorAll(".poi-item").forEach((poiEl) => poiEl.classList.remove("inactive"))
+            this.updateCategoryIcon(catKey, true)
+
+            // Expand POI list
+            poisEl.style.display = "block"
+            expandBtn.classList.add("expanded")
+            poisEl.setAttribute("aria-expanded", "true")
+            this.animateAccordion(poisEl, true)
           }
+
           this.updateMap()
         })
       }
@@ -739,6 +781,23 @@ class ClearMap {
         duration: 0.3,
         ease: "power2.inOut",
       })
+    }
+  }
+
+  updateCategoryIcon(categoryKey, isFiltered) {
+    const filtersEl = document.getElementById(this.containerId + "-filters")
+    if (!filtersEl) return
+
+    const categoryEl = filtersEl.querySelector(`.filter-category[data-category="${categoryKey}"]`)
+    if (!categoryEl) return
+
+    const iconEl = categoryEl.querySelector(".category-icon")
+    if (!iconEl) return
+
+    if (isFiltered) {
+      iconEl.classList.add("filtered")
+    } else {
+      iconEl.classList.remove("filtered")
     }
   }
 
