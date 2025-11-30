@@ -74,6 +74,7 @@ class Clear_Map_Renderer
 ?>
         <div class="clear-map-container" data-map-id="<?php echo esc_attr($map_id); ?>" data-js-var="<?php echo esc_attr($js_var_name); ?>" style="height: <?php echo esc_attr($atts['height']); ?>;">
             <div id="<?php echo esc_attr($map_id); ?>" class="clear-map"></div>
+            <?php if (get_option('clear_map_show_filters', 1) == 1): ?>
             <div class="clear-map-filters" id="<?php echo esc_attr($map_id); ?>-filters">
                 <div class="filters-header">
                     <h5>The Area</h5>
@@ -129,6 +130,7 @@ class Clear_Map_Renderer
                     <?php endforeach; ?>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
 <?php
         return ob_get_clean();

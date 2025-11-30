@@ -84,6 +84,7 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_cluster_min_points');
         register_setting('clear_map_settings', 'clear_map_zoom_threshold');
         register_setting('clear_map_settings', 'clear_map_show_subway_lines');
+        register_setting('clear_map_settings', 'clear_map_show_filters');
         register_setting('clear_map_categories_pois', 'clear_map_categories');
         register_setting('clear_map_categories_pois', 'clear_map_pois');
     }
@@ -448,6 +449,18 @@ class Clear_Map_Admin
                                     <span class="toggle-text">
                                         Show NYC Subway Lines
                                         <span class="help-tip" data-tooltip="Display MTA subway lines with official colors as an overlay on the map.">?</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="settings-field">
+                                <label class="toggle-label">
+                                    <input type="checkbox" name="clear_map_show_filters" class="toggle-checkbox"
+                                        value="1" <?php checked(get_option('clear_map_show_filters', 1), 1); ?> />
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-text">
+                                        Show POI Filters Panel
+                                        <span class="help-tip" data-tooltip="Display the category filters/legend panel on the map.">?</span>
                                     </span>
                                 </label>
                             </div>
