@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,12 +15,20 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '1.2.0');
+define('CLEAR_MAP_VERSION', '1.3.0');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 // Load data migration script (only runs if CLEAR_MAP_MIGRATE is defined in wp-config.php)
 require_once CLEAR_MAP_PLUGIN_PATH . 'migrate-data.php';
+
+// Load GitHub updater for automatic updates
+require_once CLEAR_MAP_PLUGIN_PATH . 'includes/class-github-updater.php';
+
+// Initialize GitHub updater
+if (is_admin()) {
+    new Clear_Map_GitHub_Updater(__FILE__);
+}
 
 class ClearMap {
     

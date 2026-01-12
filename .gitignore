@@ -50,3 +50,10 @@ debug-*.php
 # Environment files
 .env
 .env.local
+
+# Release files (uploaded to GitHub releases, not tracked in repo)
+*.zip
+
+# Claude session notes (not needed in repo)
+.claud.md
+.claude/
