@@ -88,6 +88,101 @@ class Clear_Map_GitHub_Updater {
 		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
 		add_filter( 'upgrader_post_install', array( $this, 'after_install' ), 10, 3 );
 		add_filter( 'upgrader_source_selection', array( $this, 'fix_source_dir' ), 10, 4 );
+		add_filter( 'plugin_row_meta', array( $this, 'add_check_update_link' ), 10, 2 );
+		add_action( 'admin_init', array( $this, 'handle_check_update' ) );
+		add_action( 'admin_notices', array( $this, 'show_check_update_notice' ) );
+	}
+
+	/**
+	 * Show admin notice after manual update check.
+	 *
+	 * @since 1.4.1
+	 *
+	 * @return void
+	 */
+	public function show_check_update_notice() {
+		if ( ! isset( $_GET['clear_map_checked'] ) ) {
+			return;
+		}
+
+		$update_plugins = get_site_transient( 'update_plugins' );
+		$has_update     = isset( $update_plugins->response[ $this->slug ] );
+
+		if ( $has_update ) {
+			$new_version = $update_plugins->response[ $this->slug ]->new_version;
+			$message     = sprintf(
+				/* translators: %s: new version number */
+				__( 'Clear Map: Update available! Version %s is ready to install.', 'clear-map' ),
+				$new_version
+			);
+			$class = 'notice notice-info';
+		} else {
+			$message = __( 'Clear Map: You are running the latest version.', 'clear-map' );
+			$class   = 'notice notice-success';
+		}
+
+		printf( '<div class="%1$s is-dismissible"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+	}
+
+	/**
+	 * Add "Check for updates" link to plugin row meta.
+	 *
+	 * @since 1.4.1
+	 *
+	 * @param array  $links Array of plugin row meta links.
+	 * @param string $file  Plugin file basename.
+	 * @return array Modified links array.
+	 */
+	public function add_check_update_link( $links, $file ) {
+		if ( $this->slug !== $file ) {
+			return $links;
+		}
+
+		$check_url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'clear_map_check_update' => '1',
+				),
+				admin_url( 'plugins.php' )
+			),
+			'clear_map_check_update'
+		);
+
+		$links[] = '<a href="' . esc_url( $check_url ) . '">Check for updates</a>';
+
+		return $links;
+	}
+
+	/**
+	 * Handle manual update check request.
+	 *
+	 * @since 1.4.1
+	 *
+	 * @return void
+	 */
+	public function handle_check_update() {
+		if ( ! isset( $_GET['clear_map_check_update'] ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			return;
+		}
+
+		check_admin_referer( 'clear_map_check_update' );
+
+		// Clear the cached response so we get fresh data.
+		$this->github_response = null;
+
+		// Delete the update transient to force a fresh check.
+		delete_site_transient( 'update_plugins' );
+
+		// Trigger a fresh update check.
+		wp_update_plugins();
+
+		// Redirect back to plugins page with a message.
+		wp_safe_redirect( admin_url( 'plugins.php?clear_map_checked=1' ) );
+		exit;
 	}
 
 	/**
