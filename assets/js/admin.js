@@ -759,4 +759,69 @@ jQuery(document).ready(function ($) {
 
   $(window).on("resize", handleResponsive)
   handleResponsive()
+
+  // ========================================
+  // FILTER PANEL APPEARANCE SETTINGS
+  // ========================================
+
+  // Handle radio option visual selection state
+  $(".radio-option input[type='radio']").on("change", function () {
+    const $radioGroup = $(this).closest(".radio-group")
+    $radioGroup.find(".radio-option").removeClass("selected")
+    $(this).closest(".radio-option").addClass("selected")
+  })
+
+  // Initialize radio option selection state on page load
+  $(".radio-option input[type='radio']:checked").each(function () {
+    $(this).closest(".radio-option").addClass("selected")
+  })
+
+  // Handle conditional field visibility based on data attributes
+  function updateConditionalFields() {
+    $(".conditional-field[data-show-when]").each(function () {
+      const $field = $(this)
+      const watchInput = $field.data("show-when")
+      const showValue = $field.data("show-value")
+      const $input = $('input[name="' + watchInput + '"]:checked')
+
+      if ($input.length && $input.val() === showValue) {
+        $field.removeClass("hidden").slideDown(200)
+      } else {
+        $field.addClass("hidden").slideUp(200)
+      }
+    })
+  }
+
+  // Initialize on page load
+  updateConditionalFields()
+
+  // Listen for changes on any input that has conditional fields watching it
+  $('input[type="radio"], input[type="checkbox"]').on("change", function () {
+    updateConditionalFields()
+  })
+
+  // Handle transparent checkbox - disable color picker when transparent is checked
+  $('input[name="clear_map_filters_bg_transparent"]').on("change", function () {
+    const $colorPicker = $('input[name="clear_map_filters_bg_color"]')
+    const $colorPickerContainer = $colorPicker.closest(".wp-picker-container")
+
+    if ($(this).is(":checked")) {
+      $colorPickerContainer.addClass("disabled").css("opacity", "0.5")
+      $colorPicker.prop("disabled", true)
+    } else {
+      $colorPickerContainer.removeClass("disabled").css("opacity", "1")
+      $colorPicker.prop("disabled", false)
+    }
+  })
+
+  // Initialize transparent state on page load
+  if ($('input[name="clear_map_filters_bg_transparent"]').is(":checked")) {
+    const $colorPicker = $('input[name="clear_map_filters_bg_color"]')
+    const $colorPickerContainer = $colorPicker.closest(".wp-picker-container")
+    $colorPickerContainer.addClass("disabled").css("opacity", "0.5")
+    $colorPicker.prop("disabled", true)
+  }
+
+  // Initialize color pickers for filter panel settings
+  $(".color-picker-field").wpColorPicker()
 })

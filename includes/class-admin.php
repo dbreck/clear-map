@@ -85,6 +85,17 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_zoom_threshold');
         register_setting('clear_map_settings', 'clear_map_show_subway_lines');
         register_setting('clear_map_settings', 'clear_map_show_filters');
+
+        // Filter panel appearance settings.
+        register_setting('clear_map_settings', 'clear_map_filters_bg_color');
+        register_setting('clear_map_settings', 'clear_map_filters_bg_transparent');
+        register_setting('clear_map_settings', 'clear_map_filters_frosted');
+        register_setting('clear_map_settings', 'clear_map_filters_show_header');
+        register_setting('clear_map_settings', 'clear_map_filters_style');
+        register_setting('clear_map_settings', 'clear_map_filters_pill_border');
+        register_setting('clear_map_settings', 'clear_map_filters_pill_border_color');
+        register_setting('clear_map_settings', 'clear_map_filters_show_items');
+
         register_setting('clear_map_categories_pois', 'clear_map_categories');
         register_setting('clear_map_categories_pois', 'clear_map_pois');
     }
@@ -461,6 +472,111 @@ class Clear_Map_Admin
                                     <span class="toggle-text">
                                         Show POI Filters Panel
                                         <span class="help-tip" data-tooltip="Display the category filters/legend panel on the map.">?</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Panel Appearance Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-art"></span>
+                                Filter Panel Appearance
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-field">
+                                <label for="clear_map_filters_bg_color">
+                                    Background Color
+                                    <span class="help-tip" data-tooltip="Set the background color of the filter panel.">?</span>
+                                </label>
+                                <div class="color-field-row">
+                                    <input type="text" id="clear_map_filters_bg_color" name="clear_map_filters_bg_color"
+                                        value="<?php echo esc_attr(get_option('clear_map_filters_bg_color', '#FBF8F1')); ?>"
+                                        class="color-picker-field" data-default-color="#FBF8F1" />
+                                    <label class="inline-checkbox">
+                                        <input type="checkbox" name="clear_map_filters_bg_transparent"
+                                            value="1" <?php checked(get_option('clear_map_filters_bg_transparent', 0), 1); ?> />
+                                        Transparent
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-field">
+                                <label class="toggle-label">
+                                    <input type="checkbox" name="clear_map_filters_frosted" class="toggle-checkbox"
+                                        value="1" <?php checked(get_option('clear_map_filters_frosted', 0), 1); ?> />
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-text">
+                                        Enable Frosted Glass Effect
+                                        <span class="help-tip" data-tooltip="Adds a blur effect behind the panel. Works best with transparent or semi-transparent backgrounds.">?</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="settings-field">
+                                <label class="toggle-label">
+                                    <input type="checkbox" name="clear_map_filters_show_header" class="toggle-checkbox"
+                                        value="1" <?php checked(get_option('clear_map_filters_show_header', 1), 1); ?> />
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-text">
+                                        Show Header ("The Area")
+                                        <span class="help-tip" data-tooltip="Display the title header and collapse button at the top of the filter panel.">?</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="settings-field">
+                                <label>
+                                    Button Style
+                                    <span class="help-tip" data-tooltip="Choose how category filters are displayed.">?</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_filters_style" value="list"
+                                            <?php checked(get_option('clear_map_filters_style', 'list'), 'list'); ?> />
+                                        <span class="radio-text">List (colored dots with arrows)</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_filters_style" value="pills"
+                                            <?php checked(get_option('clear_map_filters_style', 'list'), 'pills'); ?> />
+                                        <span class="radio-text">Rounded Pills</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-field conditional-field" data-show-when="clear_map_filters_style" data-show-value="pills">
+                                <label>
+                                    Pill Border Color
+                                    <span class="help-tip" data-tooltip="Choose the border color for pill-style buttons.">?</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_filters_pill_border" value="category"
+                                            <?php checked(get_option('clear_map_filters_pill_border', 'category'), 'category'); ?> />
+                                        <span class="radio-text">Use category color</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_filters_pill_border" value="custom"
+                                            <?php checked(get_option('clear_map_filters_pill_border', 'category'), 'custom'); ?> />
+                                        <span class="radio-text">Custom color:</span>
+                                        <input type="text" id="clear_map_filters_pill_border_color" name="clear_map_filters_pill_border_color"
+                                            value="<?php echo esc_attr(get_option('clear_map_filters_pill_border_color', '#666666')); ?>"
+                                            class="color-picker-field small-color-picker" data-default-color="#666666" />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-field">
+                                <label class="toggle-label">
+                                    <input type="checkbox" name="clear_map_filters_show_items" class="toggle-checkbox"
+                                        value="1" <?php checked(get_option('clear_map_filters_show_items', 1), 1); ?> />
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-text">
+                                        Show Individual Items
+                                        <span class="help-tip" data-tooltip="When enabled, categories can be expanded to show individual POIs. When disabled, clicking a category toggles all its items on/off.">?</span>
                                     </span>
                                 </label>
                             </div>

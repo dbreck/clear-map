@@ -1211,3 +1211,210 @@ input[type="file"] {
         transform: none;
     }
 }
+
+/* ========================================
+   FILTER PANEL APPEARANCE FIELD STYLES
+   ======================================== */
+
+/* Color Field with Transparent Checkbox */
+.color-field-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.color-field-row .wp-picker-container {
+    margin: 0;
+}
+
+.transparent-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.transparent-option input[type="checkbox"] {
+    margin: 0;
+}
+
+.transparent-option label {
+    font-weight: normal;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Radio Group Styles */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    border: 2px solid #dcdcde;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.radio-option:hover {
+    background: #f0f0f1;
+    border-color: #c3c4c7;
+}
+
+.radio-option.selected {
+    background: #f0f6fc;
+    border-color: #2271b1;
+}
+
+.radio-option input[type="radio"] {
+    margin: 2px 0 0 0;
+    flex-shrink: 0;
+}
+
+.radio-option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.radio-option-label {
+    font-weight: 600;
+    color: #1d2327;
+    font-size: 14px;
+}
+
+.radio-option-description {
+    font-size: 12px;
+    color: #646970;
+    line-height: 1.4;
+}
+
+/* Horizontal Radio Group (compact) */
+.radio-group-horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.radio-group-horizontal .radio-option {
+    flex: 1;
+    min-width: 180px;
+}
+
+/* Conditional Field Container */
+.conditional-field {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    border-left: 3px solid #2271b1;
+}
+
+.conditional-field.hidden {
+    display: none;
+}
+
+.conditional-field .settings-field {
+    margin-bottom: 15px;
+}
+
+.conditional-field .settings-field:last-child {
+    margin-bottom: 0;
+}
+
+/* Color Picker with Label Inline */
+.color-picker-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.color-picker-inline label {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Checkbox Field in Settings Card */
+.checkbox-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.checkbox-field input[type="checkbox"] {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.checkbox-field-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.checkbox-field-label {
+    font-weight: 600;
+    color: #1d2327;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.checkbox-field-description {
+    font-size: 13px;
+    color: #646970;
+    line-height: 1.4;
+}
+
+/* Radio options in conditional field */
+.conditional-field .radio-group {
+    margin-top: 0;
+}
+
+.conditional-field .radio-option {
+    padding: 10px 12px;
+    background: #fff;
+}
+
+/* Custom Color Picker Input */
+.custom-color-input {
+    margin-top: 12px;
+    padding-left: 24px;
+}
+
+.custom-color-input.hidden {
+    display: none;
+}
+
+/* Section Divider */
+.settings-divider {
+    margin: 24px 0;
+    border: 0;
+    border-top: 1px solid #dcdcde;
+}
+
+/* Responsive styles for filter panel settings */
+@media (max-width: 600px) {
+    .color-field-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .radio-group-horizontal {
+        flex-direction: column;
+    }
+
+    .radio-group-horizontal .radio-option {
+        min-width: 100%;
+    }
+
+    .conditional-field {
+        padding: 12px;
+    }
+}

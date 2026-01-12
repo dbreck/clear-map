@@ -9,6 +9,10 @@ class ClearMap {
     this.activePois = new Set()
     this.filteredCategory = null // Track which category is currently filtered
 
+    // Filter panel appearance settings
+    this.filtersStyle = data.filtersStyle || 'list'
+    this.showItems = data.showItems !== false
+
     this.init()
   }
 
@@ -598,9 +602,10 @@ class ClearMap {
       const poisEl = categoryEl.querySelector(".category-pois")
       const categoryToggle = header.querySelector(".category-toggle")
 
-      // Expand/collapse POIs
-      if (expandBtn && poisEl) {
-        expandBtn.addEventListener("click", () => {
+      // Expand/collapse POIs (only when showItems is enabled)
+      if (this.showItems && expandBtn && poisEl) {
+        expandBtn.addEventListener("click", (e) => {
+          e.stopPropagation() // Prevent triggering category filter
           const isExpanded = poisEl.style.display !== "none"
           poisEl.style.display = isExpanded ? "none" : "block"
           expandBtn.classList.toggle("expanded", !isExpanded)
@@ -626,27 +631,33 @@ class ClearMap {
               })
             })
 
-            // Update UI: remove inactive class, change X back to dot, collapse POIs
-            filtersEl.querySelectorAll(".filter-category").forEach((fc) => fc.classList.remove("inactive"))
+            // Update UI: remove inactive and filtered classes
+            filtersEl.querySelectorAll(".filter-category").forEach((fc) => {
+              fc.classList.remove("inactive")
+              fc.classList.remove("filtered")
+            })
             filtersEl.querySelectorAll(".poi-item").forEach((poiEl) => poiEl.classList.remove("inactive"))
             this.updateCategoryIcon(catKey, false)
 
-            // Collapse POI list
-            poisEl.style.display = "none"
-            expandBtn.classList.remove("expanded")
-            poisEl.setAttribute("aria-expanded", "false")
-            this.animateAccordion(poisEl, false)
+            // Collapse POI list (only if showItems is enabled)
+            if (this.showItems && poisEl && expandBtn) {
+              poisEl.style.display = "none"
+              expandBtn.classList.remove("expanded")
+              poisEl.setAttribute("aria-expanded", "false")
+              this.animateAccordion(poisEl, false)
+            }
           } else {
             // Turn ON filter or SWITCH to this category
             const previousCategory = this.filteredCategory
 
-            // If switching from another category, collapse and reset its icon
+            // If switching from another category, collapse and reset its state
             if (previousCategory) {
               const prevCategoryEl = filtersEl.querySelector(`.filter-category[data-category="${previousCategory}"]`)
               if (prevCategoryEl) {
+                prevCategoryEl.classList.remove("filtered")
                 const prevPoisEl = prevCategoryEl.querySelector(".category-pois")
                 const prevExpandBtn = prevCategoryEl.querySelector(".category-expand")
-                if (prevPoisEl) {
+                if (this.showItems && prevPoisEl) {
                   prevPoisEl.style.display = "none"
                   if (prevExpandBtn) prevExpandBtn.classList.remove("expanded")
                   prevPoisEl.setAttribute("aria-expanded", "false")
@@ -666,18 +677,22 @@ class ClearMap {
               })
             }
 
-            // Update UI: mark other categories inactive, change dot to X, expand POIs
-            filtersEl.querySelectorAll(".filter-category").forEach((fc) =>
+            // Update UI: mark other categories inactive, add filtered class to this one
+            filtersEl.querySelectorAll(".filter-category").forEach((fc) => {
               fc.classList.toggle("inactive", fc !== categoryEl)
-            )
+              fc.classList.remove("filtered")
+            })
+            categoryEl.classList.add("filtered")
             filtersEl.querySelectorAll(".poi-item").forEach((poiEl) => poiEl.classList.remove("inactive"))
             this.updateCategoryIcon(catKey, true)
 
-            // Expand POI list
-            poisEl.style.display = "block"
-            expandBtn.classList.add("expanded")
-            poisEl.setAttribute("aria-expanded", "true")
-            this.animateAccordion(poisEl, true)
+            // Expand POI list (only if showItems is enabled)
+            if (this.showItems && poisEl && expandBtn) {
+              poisEl.style.display = "block"
+              expandBtn.classList.add("expanded")
+              poisEl.setAttribute("aria-expanded", "true")
+              this.animateAccordion(poisEl, true)
+            }
           }
 
           this.updateMap()

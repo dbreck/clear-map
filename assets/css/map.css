@@ -255,6 +255,125 @@
     line-height: 1.3;
 }
 
+/* ============================================
+   Filter Panel Appearance Variations
+   ============================================ */
+
+/* Frosted Glass Effect */
+.clear-map-filters.filters-frosted {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(251, 248, 241, 0.85);
+}
+
+/* No Header */
+.clear-map-filters.no-header .filters-header {
+    display: none;
+}
+
+.clear-map-filters.no-header .filters-content {
+    padding-top: 8px;
+}
+
+/* No Items (hide expand buttons and POI lists) */
+.clear-map-filters.no-items .category-expand {
+    display: none;
+}
+
+.clear-map-filters.no-items .category-pois {
+    display: none !important;
+}
+
+.clear-map-filters.no-items .category-header {
+    cursor: pointer;
+}
+
+/* ============================================
+   Pills Style
+   ============================================ */
+.filter-style-pills .filters-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 24px;
+}
+
+.filter-style-pills .filter-category {
+    border-bottom: none;
+    margin: 0;
+}
+
+.filter-style-pills .category-header {
+    border: 2px solid var(--pill-border-color, #666666);
+    border-radius: 50px;
+    padding: 14px 28px;
+    background: transparent;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.filter-style-pills .category-header:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.filter-style-pills .category-toggle {
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Hide colored dots in pill style */
+.filter-style-pills .category-icon {
+    display: none;
+}
+
+.filter-style-pills .category-name {
+    text-transform: none;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+/* Expand button positioning in pills */
+.filter-style-pills .category-expand {
+    position: absolute;
+    right: 20px;
+}
+
+/* Active/filtered state for pills */
+.filter-style-pills .filter-category.filtered .category-header {
+    background: var(--pill-border-color, #666666);
+    border-color: var(--pill-border-color, #666666);
+}
+
+.filter-style-pills .filter-category.filtered .category-name {
+    color: #ffffff;
+}
+
+.filter-style-pills .filter-category.filtered .category-expand {
+    color: #ffffff;
+}
+
+/* Inactive state for pills */
+.filter-style-pills .filter-category.inactive .category-header {
+    opacity: 0.5;
+}
+
+/* POI list in pills style */
+.filter-style-pills .category-pois {
+    background: transparent;
+    padding: 12px 28px 0;
+    margin-top: -4px;
+}
+
+.filter-style-pills .poi-item {
+    padding: 10px 0;
+}
+
+/* Pills style with items - position header relative for absolute expand button */
+.filter-style-pills .category-header {
+    position: relative;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .clear-map-container {
@@ -295,6 +414,28 @@
 
     .category-pois {
         padding: 0 20px 12px;
+    }
+
+    /* Pills style mobile */
+    .filter-style-pills .filters-content {
+        padding: 16px 20px;
+        gap: 10px;
+    }
+
+    .filter-style-pills .category-header {
+        padding: 12px 20px;
+    }
+
+    .filter-style-pills .category-name {
+        font-size: 14px;
+    }
+
+    .filter-style-pills .category-expand {
+        right: 16px;
+    }
+
+    .filter-style-pills .category-pois {
+        padding: 10px 20px 0;
     }
 }
 

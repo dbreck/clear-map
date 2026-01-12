@@ -2,7 +2,7 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 1.2.0
+**Version:** 1.4.0
 
 ## Features
 
@@ -133,6 +133,53 @@ The plugin provides several WordPress actions and filters for customization:
 - `wp_ajax_clear_map_geocode_building` - Geocode building address
 
 ## Changelog
+
+### Version 1.4.0 (2026-01-12)
+
+**Filter Panel Customization Settings**
+
+- **Background Appearance**:
+  - Custom background color picker
+  - Transparent background option
+  - Frosted glass effect (backdrop blur) toggle
+
+- **Header & Layout**:
+  - Show/hide header ("The Area" title) toggle
+  - Show individual items toggle (controls expand/collapse behavior)
+
+- **Button Styles**:
+  - List style (default) - colored dots with chevron arrows
+  - Pills style - rounded transparent pill buttons with borders
+
+- **Pill Border Options** (when pills style is selected):
+  - Use category color for each pill border
+  - Custom color for all pill borders
+
+- **Technical Implementation**:
+  - 8 new admin settings with modern card-based UI
+  - Conditional field display based on selected options
+  - CSS custom properties for dynamic pill border colors
+  - JavaScript conditional expand behavior based on settings
+  - Mobile-responsive pills style
+
+### Version 1.3.0 (2026-01-12)
+
+**WPBakery Page Builder Integration & GitHub Auto-Updates**
+
+- **WPBakery Element**:
+  - Added Clear Map as a WPBakery Page Builder element
+  - Configurable parameters: height, center coordinates, zoom level
+  - Design options: custom CSS class, element ID, CSS editor support
+  - Located in Content category with map pin icon
+
+- **GitHub Auto-Updates**:
+  - Automatic update checks from GitHub releases
+  - Seamless WordPress update integration
+  - Version comparison and changelog display
+
+- **New Files**:
+  - `includes/class-wpbakery.php` - WPBakery integration
+  - `includes/class-github-updater.php` - Auto-update functionality
 
 ### Version 1.2.0 (2025-01-04)
 

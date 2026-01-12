@@ -3,15 +3,77 @@
 ## Project Overview
 **Clear Map** is a WordPress plugin for interactive maps with POI (Point of Interest) filtering and category management. It uses Mapbox GL JS for map rendering and supports KML/KMZ imports with automatic geocoding via Mapbox Geocoding API (with Google as optional fallback).
 
-**GitHub Repo (upcoming)**: This plugin will be pushed to GitHub for reuse across multiple client sites.
+**GitHub Repo**: https://github.com/dbreck/clear-map
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
+**Current Version**: 1.4.0
+
 ---
 
-## Recent Session Summary (Version 1.2.0)
+## Recent Session Summary (Version 1.4.0)
 
-### Latest Update - Enhanced Category Filtering with Visual Feedback
+### Latest Update - Filter Panel Customization Settings
+**Date**: 2026-01-12
+**Feature**: Admin settings to customize filter panel appearance and behavior
+
+**What Changed:**
+- Added "Filter Panel Appearance" settings card in admin
+- Background color picker with transparent option
+- Frosted glass effect toggle (backdrop-filter blur)
+- Show/hide header toggle
+- Button style: List (default) vs Pills
+- Pill border color: Category color or custom color
+- Show individual items toggle (controls expand/collapse)
+
+**Technical Implementation:**
+- 8 new settings registered in `class-admin.php`
+- Settings card with modern UI (color pickers, toggles, radio groups)
+- Conditional field display using data attributes
+- CSS custom properties for dynamic pill border colors
+- JavaScript reads settings and conditionally enables expand behavior
+- "filtered" class added to category element for pills styling
+- Mobile-responsive pills style
+
+**Files Modified:**
+- `includes/class-admin.php` - New settings registration and UI card
+- `includes/class-map-renderer.php` - Passes settings to JS, builds CSS classes
+- `assets/css/map.css` - Pills style, frosted glass, no-header/no-items classes
+- `assets/js/map.js` - Reads settings, conditional expand behavior
+- `assets/css/admin.css` - Color field, radio group, conditional field styles
+- `assets/js/admin.js` - Conditional field visibility, color picker init
+
+**New Admin Settings:**
+- `clear_map_filters_bg_color` - Background color
+- `clear_map_filters_bg_transparent` - Transparent toggle
+- `clear_map_filters_frosted` - Frosted glass effect
+- `clear_map_filters_show_header` - Show header toggle
+- `clear_map_filters_style` - List or pills
+- `clear_map_filters_pill_border` - Category or custom
+- `clear_map_filters_pill_border_color` - Custom border color
+- `clear_map_filters_show_items` - Show individual items
+
+---
+
+## Previous Session Summary (Version 1.3.0)
+
+### WPBakery Page Builder Integration & GitHub Auto-Updates
+**Date**: 2026-01-12
+
+**What Changed:**
+- Added Clear Map as WPBakery Page Builder element
+- Added GitHub auto-update functionality
+- WordPress Coding Standards compliance
+
+**New Files:**
+- `includes/class-wpbakery.php` - WPBakery element registration
+- `includes/class-github-updater.php` - Auto-update from GitHub releases
+
+---
+
+## Previous Session Summary (Version 1.2.0)
+
+### Enhanced Category Filtering with Visual Feedback
 **Date**: 2025-01-04
 **Feature**: Toggle-based category filtering with visual indicators and auto-expand/collapse
 
@@ -23,26 +85,6 @@
 - Switching categories auto-collapses previous and expands new one
 - Expand button remains independent for browsing without filtering
 - Smooth animations and transitions between states
-
-**Technical Implementation:**
-- Added dual icon system (dot + X) in category HTML template
-- CSS filtered state with opacity transitions for smooth icon swaps
-- Refactored JavaScript category toggle logic from "show only" to "toggle on/off"
-- New `filteredCategory` property to track currently filtered category
-- New `updateCategoryIcon()` helper method to swap between dot and X
-- Integrated expand/collapse animation with filter toggle
-- Maintained single-filter behavior (exclusive filtering)
-
-**Files Modified:**
-- `includes/class-map-renderer.php` - Lines 105-108 (added X icon to template)
-- `assets/css/map.css` - Lines 112-151 (icon container and filtered state styles)
-- `assets/js/map.js` - Lines 10 (new property), 612-685 (refactored toggle logic), 787-802 (new helper method)
-
-**User Experience:**
-- Clear visual indicator when category is filtered (X replaces dot)
-- Intuitive: click once to filter, click again to clear
-- Smooth: automatic expand/collapse with animations
-- Flexible: expand button still works independently
 
 ---
 
@@ -125,8 +167,8 @@ This session focused on making the plugin truly portable and fixing critical bug
 
 ### GitHub Repository
 - **Repo**: https://github.com/dbreck/clear-map
-- **Version**: 1.1.1
-- **Status**: POI popup feature committed (not yet pushed)
+- **Version**: 1.4.0
+- **Status**: All features committed and pushed
 
 ---
 
@@ -140,6 +182,8 @@ This session focused on making the plugin truly portable and fixing critical bug
 - **`includes/class-api-handler.php`** - Handles geocoding (forward & reverse) via Mapbox/Google APIs
 - **`includes/class-kml-parser.php`** - Parses KML/KMZ files and extracts POIs with coordinates
 - **`includes/class-assets.php`** - Asset management
+- **`includes/class-wpbakery.php`** - WPBakery Page Builder integration
+- **`includes/class-github-updater.php`** - GitHub auto-update functionality
 
 ### Frontend Assets
 - **`assets/js/map.js`** - Map initialization, POI rendering, clustering, filters, popups (class: `ClearMap`)
@@ -325,7 +369,16 @@ Located in Settings page with button: "Run Geocoding on All POIs"
 - `clear_map_cluster_min_points` - Min POIs for cluster
 - `clear_map_zoom_threshold` - Zoom level threshold
 - `clear_map_show_subway_lines` - Subway layer toggle
+- `clear_map_show_filters` - Show filter panel toggle
 - `clear_map_activity` - Activity log (last 20 actions)
+- `clear_map_filters_bg_color` - Filter panel background color
+- `clear_map_filters_bg_transparent` - Transparent background toggle
+- `clear_map_filters_frosted` - Frosted glass effect toggle
+- `clear_map_filters_show_header` - Show header toggle
+- `clear_map_filters_style` - Button style (list or pills)
+- `clear_map_filters_pill_border` - Pill border mode (category or custom)
+- `clear_map_filters_pill_border_color` - Custom pill border color
+- `clear_map_filters_show_items` - Show individual items toggle
 
 ### AJAX Actions
 - `clear_map_import_kml_pois` - Handle KML file upload
@@ -432,21 +485,21 @@ Renamed from "The Andrea Map" to "Clear Map"
 
 ## Recent Commits
 
-### Latest Commit
-- **Commit**: `34d5a92`
-- **Message**: "Add POI photo and description display with viewport-aware popups"
-- **Changes**: 80 lines added to `assets/js/map.js`
-- **Status**: Committed locally, not yet pushed to origin
+### Version 1.4.0 - Filter Panel Customization
+- Added filter panel appearance settings (background, frosted glass, header, style)
+- Pills button style with category or custom border colors
+- Conditional expand behavior based on show items setting
+- Admin UI with color pickers, toggles, radio groups
 
-### Uncommitted Changes
-- **File**: `includes/class-map-renderer.php`
-- **Change**: Updated filters header text from "Surrounding Points of Interest" to "The Area"
-- **Status**: Modified but not committed
+### Version 1.3.0 - WPBakery & Auto-Updates
+- WPBakery Page Builder element integration
+- GitHub auto-update functionality
+- WordPress Coding Standards compliance
 
 ---
 
 ## End of Context
 
-**Next Session Goal**: Push latest changes to GitHub
-**Current Status**: POI photo/description display feature complete and committed
-**Ready for**: Git push, testing on production site, further enhancements
+**Current Version**: 1.4.0
+**Current Status**: Filter panel customization complete and pushed to GitHub
+**Ready for**: Testing filter panel settings, further enhancements
