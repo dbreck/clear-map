@@ -26,70 +26,100 @@ class Clear_Map_API_Handler {
         }
     }
 
-    private function geocode_address_mapbox($address, $poi_name = '') {
-        // Clean and enhance address for better geocoding
-        $cleaned_address = $this->clean_address_for_geocoding($address);
+    private function geocode_address_mapbox( $address, $poi_name = '' ) {
+        // Clean and enhance address for better geocoding.
+        $cleaned_address = $this->clean_address_for_geocoding( $address );
 
-        // Check cache first
-        $cache_key = 'clear_map_geocode_mapbox_' . md5($cleaned_address);
-        $cached = get_transient($cache_key);
+        // Check cache first.
+        $cache_key = 'clear_map_geocode_mapbox_' . md5( $cleaned_address );
+        $cached    = get_transient( $cache_key );
 
-        if ($cached !== false) {
-            if (isset($cached['error'])) {
-                error_log('Clear Map: Using cached Mapbox geocoding error for ' . $poi_name . ': ' . $cached['error']);
+        if ( false !== $cached ) {
+            if ( isset( $cached['error'] ) ) {
+                error_log( 'Clear Map: Using cached Mapbox geocoding error for ' . $poi_name . ': ' . $cached['error'] );
             } else {
-                error_log('Clear Map: Using cached Mapbox geocoding result for ' . $poi_name);
+                error_log( 'Clear Map: Using cached Mapbox geocoding result for ' . $poi_name );
             }
             return $cached;
         }
 
-        // Mapbox Geocoding API URL
+        // Mapbox Geocoding API URL.
         // https://docs.mapbox.com/api/search/geocoding/
-        $endpoint = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . urlencode($cleaned_address) . '.json';
+        $endpoint = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' . rawurlencode( $cleaned_address ) . '.json';
 
-        $url = add_query_arg(array(
-            'access_token' => $this->mapbox_token,
-            'limit' => 1,
-            'types' => 'address,poi' // Look for addresses and points of interest
-        ), $endpoint);
+        $url = add_query_arg(
+            array(
+                'access_token' => $this->mapbox_token,
+                'limit'        => 1,
+                'types'        => 'address,poi', // Look for addresses and points of interest.
+            ),
+            $endpoint
+        );
 
-        $response = wp_remote_get($url, array('timeout' => 10));
+        $response = wp_remote_get( $url, array( 'timeout' => 10 ) );
 
-        if (is_wp_error($response)) {
-            $error_result = array('error' => 'network_error', 'message' => $response->get_error_message());
-            error_log('Clear Map: Network error geocoding with Mapbox ' . $poi_name . ': ' . $response->get_error_message());
+        if ( is_wp_error( $response ) ) {
+            $error_result = array(
+                'error'   => 'network_error',
+                'message' => $response->get_error_message(),
+            );
+            error_log( 'Clear Map: Network error geocoding with Mapbox ' . $poi_name . ': ' . $response->get_error_message() );
             return $error_result;
         }
-        
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
 
-        // Mapbox returns features array, not status/results like Google
-        if (!empty($data['features']) && count($data['features']) > 0) {
-            $feature = $data['features'][0];
+        // Check HTTP status code for common errors.
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+            $error_messages = array(
+                401 => 'Invalid Mapbox access token. Please check your token in Settings.',
+                403 => 'Mapbox token does not have Geocoding API permissions. Please create a new token with the "Geocoding" scope enabled at mapbox.com/account/access-tokens',
+                429 => 'Mapbox rate limit exceeded. Please try again later.',
+            );
+
+            $error_msg = isset( $error_messages[ $status_code ] )
+                ? $error_messages[ $status_code ]
+                : 'Mapbox API error (HTTP ' . $status_code . ')';
+
+            $error_result = array(
+                'error'   => 'api_error',
+                'message' => $error_msg,
+            );
+            error_log( 'Clear Map: Mapbox geocoding HTTP error for ' . $poi_name . ': ' . $status_code . ' - ' . $error_msg );
+            return $error_result;
+        }
+
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        // Mapbox returns features array, not status/results like Google.
+        if ( ! empty( $data['features'] ) && count( $data['features'] ) > 0 ) {
+            $feature     = $data['features'][0];
             $coordinates = $feature['geometry']['coordinates']; // [lng, lat] format in Mapbox!
 
             $lng = $coordinates[0];
             $lat = $coordinates[1];
 
             $coords = array(
-                'lat' => $lat,
-                'lng' => $lng,
-                'formatted_address' => $feature['place_name'] ?? $cleaned_address,
-                'precision' => $this->get_mapbox_precision($feature),
-                'source' => 'mapbox'
+                'lat'               => $lat,
+                'lng'               => $lng,
+                'formatted_address' => isset( $feature['place_name'] ) ? $feature['place_name'] : $cleaned_address,
+                'precision'         => $this->get_mapbox_precision( $feature ),
+                'source'            => 'mapbox',
             );
 
-            // Cache for 24 hours
-            set_transient($cache_key, $coords, DAY_IN_SECONDS);
+            // Cache for 24 hours.
+            set_transient( $cache_key, $coords, DAY_IN_SECONDS );
 
-            error_log('Clear Map: Successfully geocoded with Mapbox: ' . $poi_name . ' to ' . $lat . ', ' . $lng);
+            error_log( 'Clear Map: Successfully geocoded with Mapbox: ' . $poi_name . ' to ' . $lat . ', ' . $lng );
 
             return $coords;
         } else {
-            $error_msg = isset($data['message']) ? $data['message'] : 'No results found';
-            $error_result = array('error' => 'geocoding_failed', 'message' => $error_msg);
-            error_log('Clear Map: Mapbox geocoding failed for ' . $poi_name . ' (' . $cleaned_address . '): ' . $error_msg);
+            $error_msg    = isset( $data['message'] ) ? $data['message'] : 'No results found';
+            $error_result = array(
+                'error'   => 'geocoding_failed',
+                'message' => $error_msg,
+            );
+            error_log( 'Clear Map: Mapbox geocoding failed for ' . $poi_name . ' (' . $cleaned_address . '): ' . $error_msg );
             return $error_result;
         }
     }
@@ -280,32 +310,55 @@ class Clear_Map_API_Handler {
         }
     }
 
-    private function reverse_geocode_mapbox($lat, $lng) {
-        $cache_key = 'clear_map_reverse_geocode_mapbox_' . md5($lat . ',' . $lng);
-        $cached = get_transient($cache_key);
+    private function reverse_geocode_mapbox( $lat, $lng ) {
+        $cache_key = 'clear_map_reverse_geocode_mapbox_' . md5( $lat . ',' . $lng );
+        $cached    = get_transient( $cache_key );
 
-        if ($cached !== false) {
-            error_log('Clear Map: Using cached Mapbox reverse geocoding result');
+        if ( false !== $cached ) {
+            error_log( 'Clear Map: Using cached Mapbox reverse geocoding result' );
             return $cached;
         }
 
-        $url = add_query_arg(array(
-            'access_token' => $this->mapbox_token,
-            'types' => 'address,poi'
-        ), "https://api.mapbox.com/geocoding/v5/mapbox.places/{$lng},{$lat}.json");
+        $url = add_query_arg(
+            array(
+                'access_token' => $this->mapbox_token,
+                'types'        => 'address,poi',
+            ),
+            "https://api.mapbox.com/geocoding/v5/mapbox.places/{$lng},{$lat}.json"
+        );
 
-        $response = wp_remote_get($url, array('timeout' => 10));
+        $response = wp_remote_get( $url, array( 'timeout' => 10 ) );
 
-        if (!is_wp_error($response)) {
-            $body = wp_remote_retrieve_body($response);
-            $data = json_decode($body, true);
+        if ( is_wp_error( $response ) ) {
+            error_log( 'Clear Map: Mapbox reverse geocoding network error: ' . $response->get_error_message() );
+            return '';
+        }
 
-            if (!empty($data['features']) && count($data['features']) > 0) {
-                $address = $data['features'][0]['place_name'];
-                set_transient($cache_key, $address, DAY_IN_SECONDS);
-                error_log('Clear Map: Mapbox reverse geocoding successful: ' . $address);
-                return $address;
-            }
+        // Check HTTP status code for common errors.
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+            $error_messages = array(
+                401 => 'Invalid Mapbox access token',
+                403 => 'Mapbox token does not have Geocoding API permissions',
+                429 => 'Mapbox rate limit exceeded',
+            );
+
+            $error_msg = isset( $error_messages[ $status_code ] )
+                ? $error_messages[ $status_code ]
+                : 'HTTP ' . $status_code;
+
+            error_log( 'Clear Map: Mapbox reverse geocoding HTTP error: ' . $error_msg );
+            return '';
+        }
+
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( ! empty( $data['features'] ) && count( $data['features'] ) > 0 ) {
+            $address = $data['features'][0]['place_name'];
+            set_transient( $cache_key, $address, DAY_IN_SECONDS );
+            error_log( 'Clear Map: Mapbox reverse geocoding successful: ' . $address );
+            return $address;
         }
 
         return '';
