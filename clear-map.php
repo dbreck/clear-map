@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 1.4.4
+ * Version: 1.4.5
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '1.4.4');
+define('CLEAR_MAP_VERSION', '1.4.5');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -471,36 +471,46 @@ class ClearMap {
     }
 
     public function ajax_geocode_building() {
-        check_ajax_referer('clear_map_geocode_building', 'nonce');
+        check_ajax_referer( 'clear_map_geocode_building', 'nonce' );
 
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error('Unauthorized');
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
         }
 
-        $address = get_option('clear_map_building_address', '');
+        // Get address from POST data (current input value) or fall back to saved option.
+        $address = isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : '';
 
-        if (empty($address)) {
-            wp_send_json_error('No building address found. Please enter an address and try again.');
+        if ( empty( $address ) ) {
+            $address = get_option( 'clear_map_building_address', '' );
         }
+
+        if ( empty( $address ) ) {
+            wp_send_json_error( 'No building address found. Please enter an address and save settings first.' );
+        }
+
+        // Also save the address to the option so it persists.
+        update_option( 'clear_map_building_address', $address );
 
         $api_handler = new Clear_Map_API_Handler();
-        $result = $api_handler->geocode_address($address, 'Building Address');
+        $result      = $api_handler->geocode_address( $address, 'Building Address' );
 
-        if ($result && !isset($result['error'])) {
-            update_option('clear_map_building_lat', $result['lat']);
-            update_option('clear_map_building_lng', $result['lng']);
+        if ( $result && ! isset( $result['error'] ) ) {
+            update_option( 'clear_map_building_lat', $result['lat'] );
+            update_option( 'clear_map_building_lng', $result['lng'] );
 
-            $this->log_activity('Building address geocoded: ' . $address);
+            $this->log_activity( 'Building address geocoded: ' . $address );
 
-            wp_send_json_success(array(
-                'message' => 'Building address geocoded successfully!',
-                'lat' => $result['lat'],
-                'lng' => $result['lng'],
-                'address' => $result['formatted_address'] ?? $address
-            ));
+            wp_send_json_success(
+                array(
+                    'message' => 'Building address geocoded successfully!',
+                    'lat'     => $result['lat'],
+                    'lng'     => $result['lng'],
+                    'address' => isset( $result['formatted_address'] ) ? $result['formatted_address'] : $address,
+                )
+            );
         } else {
-            $error_message = $result['message'] ?? 'Unknown error';
-            wp_send_json_error('Geocoding failed: ' . $error_message);
+            $error_message = isset( $result['message'] ) ? $result['message'] : 'Unknown error';
+            wp_send_json_error( 'Geocoding failed: ' . $error_message );
         }
     }
 }

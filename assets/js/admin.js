@@ -72,6 +72,7 @@ jQuery(document).ready(function ($) {
       {
         action: "clear_map_geocode_building",
         nonce: button.data("nonce"),
+        address: address,
       },
       function (response) {
         if (response.success) {

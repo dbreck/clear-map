@@ -382,17 +382,18 @@ class Clear_Map_Admin
                             <div class="settings-field">
                                 <label for="clear_map_building_address">
                                     Building Address
-                                    <span class="help-tip" data-tooltip="The address will be automatically geocoded when you save. This location will be marked with your custom icon on the map.">?</span>
+                                    <span class="help-tip" data-tooltip="Enter a full street address with city and state. Click 'Geocode Now' to convert to map coordinates.">?</span>
                                 </label>
                                 <div class="input-with-button">
                                     <input type="text" id="clear_map_building_address" name="clear_map_building_address"
                                         value="<?php echo esc_attr(get_option('clear_map_building_address', '')); ?>"
-                                        class="widefat" placeholder="Enter building address..." />
+                                        class="widefat" placeholder="123 Main Street, City, State ZIP" />
                                     <button type="button" class="button" id="geocode-building-address"
                                         data-nonce="<?php echo wp_create_nonce('clear_map_geocode_building'); ?>">
                                         <span class="dashicons dashicons-location"></span> Geocode Now
                                     </button>
                                 </div>
+                                <p class="description">Format: Street Address, City, State ZIP (e.g., 4900 Bridge Street, Tampa, FL 33611)</p>
                             </div>
 
                             <div class="settings-row">
