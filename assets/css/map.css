@@ -90,6 +90,12 @@
     padding: 0;
     max-height: 400px;
     overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+/* When container has explicit height, let content fill available space */
+.clear-map-filters[style*="height:"] .filters-content {
+    max-height: none;
 }
 
 /* Category Styles */
@@ -325,13 +331,24 @@
     border: 2px solid var(--pill-border-color, #666666);
     border-radius: 50px;
     padding: 14px 28px;
-    background: transparent;
+    background: var(--pill-bg-color, transparent);
     justify-content: center;
     transition: all 0.2s ease;
 }
 
 .filter-style-pills .category-header:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--pill-bg-hover, rgba(0, 0, 0, 0.03));
+}
+
+/* Pill frosted glass background */
+.filter-style-pills.pills-frosted .category-header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.filter-style-pills.pills-frosted .category-header:hover {
+    background: rgba(255, 255, 255, 0.85);
 }
 
 .filter-style-pills .category-toggle {

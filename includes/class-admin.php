@@ -94,6 +94,8 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_filters_style');
         register_setting('clear_map_settings', 'clear_map_filters_pill_border');
         register_setting('clear_map_settings', 'clear_map_filters_pill_border_color');
+        register_setting('clear_map_settings', 'clear_map_filters_pill_bg');
+        register_setting('clear_map_settings', 'clear_map_filters_pill_bg_color');
         register_setting('clear_map_settings', 'clear_map_filters_show_items');
         register_setting('clear_map_settings', 'clear_map_filters_width');
         register_setting('clear_map_settings', 'clear_map_filters_height');
@@ -594,6 +596,37 @@ class Clear_Map_Admin
                                                 value="<?php echo esc_attr(get_option('clear_map_filters_pill_border_color', '#666666')); ?>"
                                                 class="color-picker-field small-color-picker" data-default-color="#666666" />
                                         </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-field conditional-field" data-show-when="clear_map_filters_style" data-show-value="pills">
+                                <label>
+                                    Pill Background
+                                    <span class="help-tip" data-tooltip="Choose the background style for pill buttons.">?</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_filters_pill_bg" value="transparent"
+                                            <?php checked(get_option('clear_map_filters_pill_bg', 'transparent'), 'transparent'); ?> />
+                                        <span class="radio-option-label">Transparent</span>
+                                        <span class="radio-option-description">No background, border only</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_filters_pill_bg" value="color"
+                                            <?php checked(get_option('clear_map_filters_pill_bg', 'transparent'), 'color'); ?> />
+                                        <span class="radio-option-label">Solid Color</span>
+                                        <span class="radio-option-description">
+                                            <input type="text" id="clear_map_filters_pill_bg_color" name="clear_map_filters_pill_bg_color"
+                                                value="<?php echo esc_attr(get_option('clear_map_filters_pill_bg_color', '#ffffff')); ?>"
+                                                class="color-picker-field small-color-picker" data-default-color="#ffffff" />
+                                        </span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_filters_pill_bg" value="frosted"
+                                            <?php checked(get_option('clear_map_filters_pill_bg', 'transparent'), 'frosted'); ?> />
+                                        <span class="radio-option-label">Frosted Glass</span>
+                                        <span class="radio-option-description">Blur effect behind each pill button</span>
                                     </label>
                                 </div>
                             </div>

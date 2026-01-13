@@ -94,6 +94,8 @@ class Clear_Map_Renderer {
 		$filters_style            = $this->get_setting( $atts, 'filters_style', 'clear_map_filters_style', 'list' );
 		$filters_pill_border      = $this->get_setting( $atts, 'filters_pill_border', 'clear_map_filters_pill_border', 'category' );
 		$filters_pill_border_color = $this->get_setting( $atts, 'filters_pill_border_color', 'clear_map_filters_pill_border_color', '#666666' );
+		$filters_pill_bg          = $this->get_setting( $atts, 'filters_pill_bg', 'clear_map_filters_pill_bg', 'transparent' );
+		$filters_pill_bg_color    = $this->get_setting( $atts, 'filters_pill_bg_color', 'clear_map_filters_pill_bg_color', '#ffffff' );
 		$filters_show_items       = $this->get_setting( $atts, 'filters_show_items', 'clear_map_filters_show_items', 1 );
 
 		// Convert string values to proper types for boolean comparisons.
@@ -192,6 +194,11 @@ class Clear_Map_Renderer {
 			$filter_classes[] = 'bg-transparent';
 		}
 
+		// Add class for frosted pill backgrounds.
+		if ( 'pills' === $filters_style && 'frosted' === $filters_pill_bg ) {
+			$filter_classes[] = 'pills-frosted';
+		}
+
 		$filter_class = implode( ' ', $filter_classes );
 
 		// Build filter panel inline styles.
@@ -246,10 +253,16 @@ class Clear_Map_Renderer {
 					<?php endif; ?>
 
 					<?php
-					// Determine pill border color for inline styles.
+					// Determine pill inline styles.
 					$pill_border_inline = '';
-					if ( 'pills' === $filters_style && 'custom' === $filters_pill_border ) {
-						$pill_border_inline = '--pill-border-color: ' . esc_attr( $filters_pill_border_color ) . ';';
+					$pill_bg_inline     = '';
+					if ( 'pills' === $filters_style ) {
+						if ( 'custom' === $filters_pill_border ) {
+							$pill_border_inline = '--pill-border-color: ' . esc_attr( $filters_pill_border_color ) . ';';
+						}
+						if ( 'color' === $filters_pill_bg ) {
+							$pill_bg_inline = '--pill-bg-color: ' . esc_attr( $filters_pill_bg_color ) . '; --pill-bg-hover: ' . esc_attr( $filters_pill_bg_color ) . ';';
+						}
 					}
 					?>
 
@@ -262,6 +275,10 @@ class Clear_Map_Renderer {
 								$category_style = '--pill-border-color: ' . esc_attr( $category['color'] ) . ';';
 							} elseif ( $pill_border_inline ) {
 								$category_style = $pill_border_inline;
+							}
+							// Add pill background color.
+							if ( $pill_bg_inline ) {
+								$category_style .= ' ' . $pill_bg_inline;
 							}
 						}
 						?>

@@ -289,6 +289,36 @@ class Clear_Map_WPBakery {
 					),
 					array(
 						'type'        => 'dropdown',
+						'heading'     => __( 'Pill Background', 'clear-map' ),
+						'param_name'  => 'filters_pill_bg',
+						'value'       => array(
+							__( 'Use Global Setting', 'clear-map' ) => '',
+							__( 'Transparent', 'clear-map' )        => 'transparent',
+							__( 'Solid Color', 'clear-map' )        => 'color',
+							__( 'Frosted Glass', 'clear-map' )      => 'frosted',
+						),
+						'std'         => '',
+						'description' => __( 'Background style for pill buttons.', 'clear-map' ),
+						'dependency'  => array(
+							'element' => 'filters_style',
+							'value'   => array( 'pills' ),
+						),
+						'group'       => __( 'Filter Panel', 'clear-map' ),
+					),
+					array(
+						'type'        => 'colorpicker',
+						'heading'     => __( 'Pill Background Color', 'clear-map' ),
+						'param_name'  => 'filters_pill_bg_color',
+						'value'       => '',
+						'description' => __( 'Background color for pill buttons.', 'clear-map' ),
+						'dependency'  => array(
+							'element' => 'filters_pill_bg',
+							'value'   => array( 'color' ),
+						),
+						'group'       => __( 'Filter Panel', 'clear-map' ),
+					),
+					array(
+						'type'        => 'dropdown',
 						'heading'     => __( 'Show Individual Items', 'clear-map' ),
 						'param_name'  => 'filters_show_items',
 						'value'       => array(
