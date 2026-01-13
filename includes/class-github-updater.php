@@ -88,7 +88,7 @@ class Clear_Map_GitHub_Updater {
 		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
 		add_filter( 'upgrader_post_install', array( $this, 'after_install' ), 10, 3 );
 		add_filter( 'upgrader_source_selection', array( $this, 'fix_source_dir' ), 10, 4 );
-		add_filter( 'plugin_row_meta', array( $this, 'add_check_update_link' ), 10, 2 );
+		add_filter( 'plugin_action_links_' . $this->slug, array( $this, 'add_check_update_link' ) );
 		add_action( 'admin_init', array( $this, 'handle_check_update' ) );
 		add_action( 'admin_notices', array( $this, 'show_check_update_notice' ) );
 	}
@@ -125,19 +125,14 @@ class Clear_Map_GitHub_Updater {
 	}
 
 	/**
-	 * Add "Check for updates" link to plugin row meta.
+	 * Add "Check for updates" link to plugin action links.
 	 *
 	 * @since 1.4.1
 	 *
-	 * @param array  $links Array of plugin row meta links.
-	 * @param string $file  Plugin file basename.
+	 * @param array $links Array of plugin action links.
 	 * @return array Modified links array.
 	 */
-	public function add_check_update_link( $links, $file ) {
-		if ( $this->slug !== $file ) {
-			return $links;
-		}
-
+	public function add_check_update_link( $links ) {
 		$check_url = wp_nonce_url(
 			add_query_arg(
 				array(
@@ -148,7 +143,7 @@ class Clear_Map_GitHub_Updater {
 			'clear_map_check_update'
 		);
 
-		$links[] = '<a href="' . esc_url( $check_url ) . '">Check for updates</a>';
+		$links['check_updates'] = '<a href="' . esc_url( $check_url ) . '">' . esc_html__( 'Check for updates', 'clear-map' ) . '</a>';
 
 		return $links;
 	}
