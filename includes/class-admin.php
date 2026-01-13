@@ -96,6 +96,7 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_filters_pill_border_color');
         register_setting('clear_map_settings', 'clear_map_filters_show_items');
         register_setting('clear_map_settings', 'clear_map_filters_width');
+        register_setting('clear_map_settings', 'clear_map_filters_height');
 
         register_setting('clear_map_categories_pois', 'clear_map_categories');
         register_setting('clear_map_categories_pois', 'clear_map_pois');
@@ -506,15 +507,27 @@ class Clear_Map_Admin
                                 </div>
                             </div>
 
-                            <div class="settings-field">
-                                <label for="clear_map_filters_width">
-                                    Panel Width
-                                    <span class="help-tip" data-tooltip="Set the width of the filter panel. Use px, %, or vw units.">?</span>
-                                </label>
-                                <input type="text" id="clear_map_filters_width" name="clear_map_filters_width"
-                                    value="<?php echo esc_attr(get_option('clear_map_filters_width', '320px')); ?>"
-                                    class="small-text" placeholder="320px" />
-                                <p class="description">Examples: 320px, 25%, 20vw</p>
+                            <div class="settings-row">
+                                <div class="settings-field">
+                                    <label for="clear_map_filters_width">
+                                        Panel Width
+                                        <span class="help-tip" data-tooltip="Set the width of the filter panel. Use px, %, or vw units.">?</span>
+                                    </label>
+                                    <input type="text" id="clear_map_filters_width" name="clear_map_filters_width"
+                                        value="<?php echo esc_attr(get_option('clear_map_filters_width', '320px')); ?>"
+                                        class="small-text" placeholder="320px" />
+                                    <p class="description">e.g., 320px, 25%, 20vw</p>
+                                </div>
+                                <div class="settings-field">
+                                    <label for="clear_map_filters_height">
+                                        Panel Height
+                                        <span class="help-tip" data-tooltip="Set the height of the filter panel. Use px, %, vh units, or 'auto'.">?</span>
+                                    </label>
+                                    <input type="text" id="clear_map_filters_height" name="clear_map_filters_height"
+                                        value="<?php echo esc_attr(get_option('clear_map_filters_height', 'auto')); ?>"
+                                        class="small-text" placeholder="auto" />
+                                    <p class="description">e.g., auto, 400px, 50vh</p>
+                                </div>
                             </div>
 
                             <div class="settings-field">

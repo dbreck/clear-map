@@ -156,6 +156,12 @@ class Clear_Map_Renderer {
 			$filter_inline_style .= 'width: ' . esc_attr( $filter_width ) . ';';
 		}
 
+		// Height.
+		$filter_height = get_option( 'clear_map_filters_height', 'auto' );
+		if ( $filter_height && 'auto' !== $filter_height ) {
+			$filter_inline_style .= 'height: ' . esc_attr( $filter_height ) . '; max-height: ' . esc_attr( $filter_height ) . ';';
+		}
+
 		// Background color.
 		if ( 1 === (int) get_option( 'clear_map_filters_bg_transparent', 0 ) ) {
 			$filter_inline_style .= 'background-color: transparent;';
