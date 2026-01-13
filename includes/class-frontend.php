@@ -44,13 +44,32 @@ class Clear_Map_Frontend {
 	public function render_map_shortcode( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'height'     => '60vh',
-				'center_lat' => 40.7451,
-				'center_lng' => -74.0011,
-				'zoom'       => 14,
-				'el_id'      => '',
-				'el_class'   => '',
-				'css'        => '',
+				// General.
+				'height'                   => '',
+				'el_id'                    => '',
+				'el_class'                 => '',
+				'css'                      => '',
+				// Map Position.
+				'center_lat'               => '',
+				'center_lng'               => '',
+				'zoom'                     => '',
+				// Map Display.
+				'cluster_distance'         => '',
+				'cluster_min_points'       => '',
+				'zoom_threshold'           => '',
+				'show_subway_lines'        => '',
+				// Filter Panel.
+				'show_filters'             => '',
+				'filters_width'            => '',
+				'filters_height'           => '',
+				'filters_bg_color'         => '',
+				'filters_bg_transparent'   => '',
+				'filters_frosted'          => '',
+				'filters_show_header'      => '',
+				'filters_style'            => '',
+				'filters_pill_border'      => '',
+				'filters_pill_border_color' => '',
+				'filters_show_items'       => '',
 			),
 			$atts
 		);
