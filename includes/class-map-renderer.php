@@ -140,6 +140,11 @@ class Clear_Map_Renderer {
 			$filter_classes[] = 'no-items';
 		}
 
+		// Add class for transparent background (to remove shadow).
+		if ( 1 === (int) get_option( 'clear_map_filters_bg_transparent', 0 ) ) {
+			$filter_classes[] = 'bg-transparent';
+		}
+
 		$filter_class = implode( ' ', $filter_classes );
 
 		// Build filter panel background style.

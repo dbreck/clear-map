@@ -554,18 +554,21 @@ class Clear_Map_Admin
                                     <span class="help-tip" data-tooltip="Choose the border color for pill-style buttons.">?</span>
                                 </label>
                                 <div class="radio-group">
-                                    <label class="radio-label">
+                                    <label class="radio-option">
                                         <input type="radio" name="clear_map_filters_pill_border" value="category"
                                             <?php checked(get_option('clear_map_filters_pill_border', 'category'), 'category'); ?> />
-                                        <span class="radio-text">Use category color</span>
+                                        <span class="radio-option-label">Use category color</span>
+                                        <span class="radio-option-description">Each pill uses its category's assigned color</span>
                                     </label>
-                                    <label class="radio-label">
+                                    <label class="radio-option">
                                         <input type="radio" name="clear_map_filters_pill_border" value="custom"
                                             <?php checked(get_option('clear_map_filters_pill_border', 'category'), 'custom'); ?> />
-                                        <span class="radio-text">Custom color:</span>
-                                        <input type="text" id="clear_map_filters_pill_border_color" name="clear_map_filters_pill_border_color"
-                                            value="<?php echo esc_attr(get_option('clear_map_filters_pill_border_color', '#666666')); ?>"
-                                            class="color-picker-field small-color-picker" data-default-color="#666666" />
+                                        <span class="radio-option-label">Set color for all</span>
+                                        <span class="radio-option-description">
+                                            <input type="text" id="clear_map_filters_pill_border_color" name="clear_map_filters_pill_border_color"
+                                                value="<?php echo esc_attr(get_option('clear_map_filters_pill_border_color', '#666666')); ?>"
+                                                class="color-picker-field small-color-picker" data-default-color="#666666" />
+                                        </span>
                                     </label>
                                 </div>
                             </div>

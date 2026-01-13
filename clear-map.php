@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 1.4.6
+ * Version: 1.4.7
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '1.4.6');
+define('CLEAR_MAP_VERSION', '1.4.7');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 

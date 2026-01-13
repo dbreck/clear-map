@@ -38,6 +38,17 @@
     display: none;
 }
 
+/* Transparent background - remove shadow and border */
+.clear-map-filters.bg-transparent {
+    box-shadow: none;
+    border: none;
+}
+
+.clear-map-filters.bg-transparent .filters-header {
+    background: transparent;
+    border-bottom: none;
+}
+
 .filters-header {
     display: flex;
     align-items: center;
