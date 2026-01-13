@@ -147,14 +147,22 @@ class Clear_Map_Renderer {
 
 		$filter_class = implode( ' ', $filter_classes );
 
-		// Build filter panel background style.
-		$filter_bg_style = '';
+		// Build filter panel inline styles.
+		$filter_inline_style = '';
+
+		// Width.
+		$filter_width = get_option( 'clear_map_filters_width', '320px' );
+		if ( $filter_width ) {
+			$filter_inline_style .= 'width: ' . esc_attr( $filter_width ) . ';';
+		}
+
+		// Background color.
 		if ( 1 === (int) get_option( 'clear_map_filters_bg_transparent', 0 ) ) {
-			$filter_bg_style = 'background-color: transparent;';
+			$filter_inline_style .= 'background-color: transparent;';
 		} else {
 			$bg_color = get_option( 'clear_map_filters_bg_color', '#FBF8F1' );
 			if ( $bg_color ) {
-				$filter_bg_style = 'background-color: ' . esc_attr( $bg_color ) . ';';
+				$filter_inline_style .= 'background-color: ' . esc_attr( $bg_color ) . ';';
 			}
 		}
 
@@ -163,7 +171,7 @@ class Clear_Map_Renderer {
 		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>" style="height: <?php echo esc_attr( $atts['height'] ); ?>;">
 			<div id="<?php echo esc_attr( $map_id ); ?>" class="clear-map"></div>
 			<?php if ( 1 === (int) get_option( 'clear_map_show_filters', 1 ) ) : ?>
-			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_bg_style ); ?>">
+			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_inline_style ); ?>">
 				<?php if ( 1 === (int) get_option( 'clear_map_filters_show_header', 1 ) ) : ?>
 				<div class="filters-header">
 					<h5><?php esc_html_e( 'The Area', 'clear-map' ); ?></h5>

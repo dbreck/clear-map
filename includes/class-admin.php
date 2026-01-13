@@ -95,6 +95,7 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_filters_pill_border');
         register_setting('clear_map_settings', 'clear_map_filters_pill_border_color');
         register_setting('clear_map_settings', 'clear_map_filters_show_items');
+        register_setting('clear_map_settings', 'clear_map_filters_width');
 
         register_setting('clear_map_categories_pois', 'clear_map_categories');
         register_setting('clear_map_categories_pois', 'clear_map_pois');
@@ -503,6 +504,17 @@ class Clear_Map_Admin
                                         Transparent
                                     </label>
                                 </div>
+                            </div>
+
+                            <div class="settings-field">
+                                <label for="clear_map_filters_width">
+                                    Panel Width
+                                    <span class="help-tip" data-tooltip="Set the width of the filter panel. Use px, %, or vw units.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_filters_width" name="clear_map_filters_width"
+                                    value="<?php echo esc_attr(get_option('clear_map_filters_width', '320px')); ?>"
+                                    class="small-text" placeholder="320px" />
+                                <p class="description">Examples: 320px, 25%, 20vw</p>
                             </div>
 
                             <div class="settings-field">
