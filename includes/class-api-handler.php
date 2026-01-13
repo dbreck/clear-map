@@ -14,15 +14,35 @@ class Clear_Map_API_Handler {
         $this->google_api_key = get_option('clear_map_google_api_key');
     }
 
-    public function geocode_address($address, $poi_name = '') {
-        // Use Mapbox by default, fallback to Google if Mapbox token not available
-        if (!empty($this->mapbox_token)) {
-            return $this->geocode_address_mapbox($address, $poi_name);
-        } else if (!empty($this->google_api_key)) {
-            return $this->geocode_address_google($address, $poi_name);
+    public function geocode_address( $address, $poi_name = '' ) {
+        // Try Mapbox first, fall back to Google if Mapbox fails.
+        if ( ! empty( $this->mapbox_token ) ) {
+            $result = $this->geocode_address_mapbox( $address, $poi_name );
+
+            // If Mapbox succeeded, return the result.
+            if ( ! isset( $result['error'] ) ) {
+                return $result;
+            }
+
+            // Mapbox failed - try Google as fallback if available.
+            if ( ! empty( $this->google_api_key ) ) {
+                error_log( 'Clear Map: Mapbox geocoding failed, trying Google fallback for ' . $poi_name );
+                $google_result = $this->geocode_address_google( $address, $poi_name );
+
+                if ( ! isset( $google_result['error'] ) ) {
+                    return $google_result;
+                }
+
+                // Both failed - return the Mapbox error (more specific).
+                error_log( 'Clear Map: Google fallback also failed for ' . $poi_name );
+            }
+
+            return $result;
+        } elseif ( ! empty( $this->google_api_key ) ) {
+            return $this->geocode_address_google( $address, $poi_name );
         } else {
-            error_log('Clear Map: No Mapbox token or Google API key configured for geocoding');
-            return array('error' => 'no_api_key');
+            error_log( 'Clear Map: No Mapbox token or Google API key configured for geocoding' );
+            return array( 'error' => 'no_api_key' );
         }
     }
 
@@ -298,14 +318,27 @@ class Clear_Map_API_Handler {
         );
     }
 
-    private function reverse_geocode($lat, $lng) {
-        // Use Mapbox by default, fallback to Google if Mapbox token not available
-        if (!empty($this->mapbox_token)) {
-            return $this->reverse_geocode_mapbox($lat, $lng);
-        } else if (!empty($this->google_api_key)) {
-            return $this->reverse_geocode_google($lat, $lng);
+    private function reverse_geocode( $lat, $lng ) {
+        // Try Mapbox first, fall back to Google if Mapbox fails.
+        if ( ! empty( $this->mapbox_token ) ) {
+            $result = $this->reverse_geocode_mapbox( $lat, $lng );
+
+            // If Mapbox succeeded (non-empty result), return it.
+            if ( ! empty( $result ) ) {
+                return $result;
+            }
+
+            // Mapbox failed - try Google as fallback if available.
+            if ( ! empty( $this->google_api_key ) ) {
+                error_log( 'Clear Map: Mapbox reverse geocoding failed, trying Google fallback' );
+                return $this->reverse_geocode_google( $lat, $lng );
+            }
+
+            return '';
+        } elseif ( ! empty( $this->google_api_key ) ) {
+            return $this->reverse_geocode_google( $lat, $lng );
         } else {
-            error_log('Clear Map: No Mapbox token or Google API key configured for reverse geocoding');
+            error_log( 'Clear Map: No Mapbox token or Google API key configured for reverse geocoding' );
             return '';
         }
     }
