@@ -306,7 +306,12 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 50px 24px 20px;
+    padding: 20px 24px;
+}
+
+/* Pills with no header - add top padding */
+.filter-style-pills.no-header .filters-content {
+    padding-top: 50px;
 }
 
 .filter-style-pills .filter-category {

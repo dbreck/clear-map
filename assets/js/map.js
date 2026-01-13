@@ -40,6 +40,8 @@ class ClearMap {
       style: this.getCustomMapStyle(),
       center: [centerLng, centerLat],
       zoom: this.data.zoom,
+      minZoom: 2,
+      maxZoom: 20,
       attributionControl: false,
       scrollZoom: false, // disables scroll zoom on map creation (for Mapbox GL >=2.0.0)
     })
