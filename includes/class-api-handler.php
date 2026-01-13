@@ -33,8 +33,13 @@ class Clear_Map_API_Handler {
                     return $google_result;
                 }
 
-                // Both failed - return the Mapbox error (more specific).
-                error_log( 'Clear Map: Google fallback also failed for ' . $poi_name );
+                // Both failed - return combined error message.
+                error_log( 'Clear Map: Google fallback also failed for ' . $poi_name . ': ' . ( $google_result['message'] ?? 'Unknown' ) );
+                $result['message'] = 'Mapbox: ' . ( $result['message'] ?? 'Failed' ) . ' | Google: ' . ( $google_result['message'] ?? 'Failed' );
+            } else {
+                // No Google API key configured.
+                error_log( 'Clear Map: No Google API key configured for fallback' );
+                $result['message'] = ( $result['message'] ?? 'Mapbox failed' ) . ' (No Google API key configured for fallback)';
             }
 
             return $result;
@@ -42,7 +47,10 @@ class Clear_Map_API_Handler {
             return $this->geocode_address_google( $address, $poi_name );
         } else {
             error_log( 'Clear Map: No Mapbox token or Google API key configured for geocoding' );
-            return array( 'error' => 'no_api_key' );
+            return array(
+                'error'   => 'no_api_key',
+                'message' => 'No API keys configured. Please add a Mapbox token or Google API key in Settings.',
+            );
         }
     }
 
@@ -92,7 +100,7 @@ class Clear_Map_API_Handler {
         if ( 200 !== $status_code ) {
             $error_messages = array(
                 401 => 'Invalid Mapbox access token. Please check your token in Settings.',
-                403 => 'Mapbox token does not have Geocoding API permissions. Please create a new token with the "Geocoding" scope enabled at mapbox.com/account/access-tokens',
+                403 => 'Mapbox token rejected (403 Forbidden). If your token has URL restrictions, server-side geocoding will fail. Remove URL restrictions from your token at mapbox.com/account/access-tokens, or use Google Geocoding as fallback.',
                 429 => 'Mapbox rate limit exceeded. Please try again later.',
             );
 
