@@ -202,11 +202,11 @@ class Clear_Map_WPBakery {
 					// General Group
 					// =====================
 					array(
-						'type'        => 'textfield',
+						'type'        => 'responsive_textfield',
 						'heading'     => __( 'Map Height', 'clear-map' ),
 						'param_name'  => 'height',
 						'value'       => '',
-						'description' => __( 'Height of the map container (e.g., 60vh, 500px, 100%). Leave blank for default (60vh).', 'clear-map' ),
+						'description' => __( 'Height of the map container (e.g., 60vh, 500px, 100%). Use device icons to set per breakpoint.', 'clear-map' ),
 						'admin_label' => true,
 						'group'       => __( 'General', 'clear-map' ),
 					),

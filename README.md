@@ -2,7 +2,7 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 1.4.0
+**Version:** 1.9.0
 
 ## Features
 

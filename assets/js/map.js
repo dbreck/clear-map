@@ -803,6 +803,22 @@ class ClearMap {
   }
 
   /**
+   * Apply responsive container height to the map wrapper.
+   */
+  applyResponsiveContainerHeight() {
+    const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
+    if (!containerEl || !this.data.mapHeight) return
+
+    const height = this.getResponsiveValue(this.data.mapHeight, "60vh")
+    containerEl.style.height = height
+
+    // Resize map to fit new container
+    if (this.map) {
+      this.map.resize()
+    }
+  }
+
+  /**
    * Apply responsive styles to the filter panel.
    */
   applyResponsiveStyles() {
@@ -843,7 +859,8 @@ class ClearMap {
     const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
     if (!filtersEl || !containerEl) return
 
-    // Apply responsive styles first
+    // Apply responsive container height and styles
+    this.applyResponsiveContainerHeight()
     this.applyResponsiveStyles()
 
     // Add resize listener for responsive updates
@@ -851,6 +868,7 @@ class ClearMap {
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimeout)
       resizeTimeout = setTimeout(() => {
+        this.applyResponsiveContainerHeight()
         this.applyResponsiveStyles()
         this.updateMobileMode()
       }, 150)

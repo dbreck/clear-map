@@ -108,30 +108,31 @@ class Clear_Map_Renderer {
 		}
 
 		// Get settings with shortcode overrides.
-		$height              = $this->get_setting( $atts, 'height', '', '60vh' );
+		$height_raw          = $this->get_setting( $atts, 'height', '', '60vh' );
+		$height              = $this->parse_responsive_value( $height_raw, '60vh' );
 		$center_lat          = $this->get_setting( $atts, 'center_lat', '', 40.7451 );
 		$center_lng          = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
 		$zoom                = $this->get_setting( $atts, 'zoom', '', 14 );
-		$cluster_distance    = $this->get_setting( $atts, 'cluster_distance', 'clear_map_cluster_distance', 50 );
-		$cluster_min_points  = $this->get_setting( $atts, 'cluster_min_points', 'clear_map_cluster_min_points', 3 );
-		$zoom_threshold      = $this->get_setting( $atts, 'zoom_threshold', 'clear_map_zoom_threshold', 15 );
-		$show_subway_lines   = $this->get_setting( $atts, 'show_subway_lines', 'clear_map_show_subway_lines', 0 );
-		$show_filters        = $this->get_setting( $atts, 'show_filters', 'clear_map_show_filters', 1 );
+		// Display settings (WPBakery only, no global fallback).
+		$cluster_distance    = $this->get_setting( $atts, 'cluster_distance', '', 50 );
+		$cluster_min_points  = $this->get_setting( $atts, 'cluster_min_points', '', 3 );
+		$zoom_threshold      = $this->get_setting( $atts, 'zoom_threshold', '', 15 );
+		$show_subway_lines   = $this->get_setting( $atts, 'show_subway_lines', '', 0 );
 
 		// Filter panel appearance settings (responsive values from WPBakery).
-		$filters_width_raw        = $this->get_setting( $atts, 'filters_width', 'clear_map_filters_width', '320px' );
-		$filters_height_raw       = $this->get_setting( $atts, 'filters_height', 'clear_map_filters_height', 'auto' );
-		$filters_bg_color         = $this->get_setting( $atts, 'filters_bg_color', 'clear_map_filters_bg_color', '#FBF8F1' );
-		$filters_bg_transparent_raw = $this->get_setting( $atts, 'filters_bg_transparent', 'clear_map_filters_bg_transparent', 0 );
-		$filters_frosted_raw      = $this->get_setting( $atts, 'filters_frosted', 'clear_map_filters_frosted', 0 );
-		$filters_show_header_raw  = $this->get_setting( $atts, 'filters_show_header', 'clear_map_filters_show_header', 1 );
-		$filters_style_raw        = $this->get_setting( $atts, 'filters_style', 'clear_map_filters_style', 'list' );
-		$filters_pill_border      = $this->get_setting( $atts, 'filters_pill_border', 'clear_map_filters_pill_border', 'category' );
-		$filters_pill_border_color = $this->get_setting( $atts, 'filters_pill_border_color', 'clear_map_filters_pill_border_color', '#666666' );
-		$filters_pill_bg          = $this->get_setting( $atts, 'filters_pill_bg', 'clear_map_filters_pill_bg', 'transparent' );
-		$filters_pill_bg_color    = $this->get_setting( $atts, 'filters_pill_bg_color', 'clear_map_filters_pill_bg_color', '#ffffff' );
-		$filters_show_items_raw   = $this->get_setting( $atts, 'filters_show_items', 'clear_map_filters_show_items', 1 );
-		$show_filters_raw         = $this->get_setting( $atts, 'show_filters', 'clear_map_show_filters', 1 );
+		$filters_width_raw          = $this->get_setting( $atts, 'filters_width', '', '320px' );
+		$filters_height_raw         = $this->get_setting( $atts, 'filters_height', '', 'auto' );
+		$filters_bg_color           = $this->get_setting( $atts, 'filters_bg_color', '', '#FBF8F1' );
+		$filters_bg_transparent_raw = $this->get_setting( $atts, 'filters_bg_transparent', '', 0 );
+		$filters_frosted_raw        = $this->get_setting( $atts, 'filters_frosted', '', 0 );
+		$filters_show_header_raw    = $this->get_setting( $atts, 'filters_show_header', '', 1 );
+		$filters_style_raw          = $this->get_setting( $atts, 'filters_style', '', 'list' );
+		$filters_pill_border        = $this->get_setting( $atts, 'filters_pill_border', '', 'category' );
+		$filters_pill_border_color  = $this->get_setting( $atts, 'filters_pill_border_color', '', '#666666' );
+		$filters_pill_bg            = $this->get_setting( $atts, 'filters_pill_bg', '', 'transparent' );
+		$filters_pill_bg_color      = $this->get_setting( $atts, 'filters_pill_bg_color', '', '#ffffff' );
+		$filters_show_items_raw     = $this->get_setting( $atts, 'filters_show_items', '', 1 );
+		$show_filters_raw           = $this->get_setting( $atts, 'show_filters', '', 1 );
 
 		// Parse responsive values.
 		$filters_width          = $this->parse_responsive_value( $filters_width_raw, '320px' );
@@ -143,9 +144,9 @@ class Clear_Map_Renderer {
 		$filters_show_items     = $this->parse_responsive_value( $filters_show_items_raw, '1' );
 		$show_filters           = $this->parse_responsive_value( $show_filters_raw, '1' );
 
-		// Mobile settings (non-responsive).
-		$mobile_filters       = $this->get_setting( $atts, 'mobile_filters', 'clear_map_mobile_filters', 'below' );
-		$mobile_filters_style = $this->get_setting( $atts, 'mobile_filters_style', 'clear_map_mobile_filters_style', 'inherit' );
+		// Mobile settings (WPBakery only, no global fallback).
+		$mobile_filters       = $this->get_setting( $atts, 'mobile_filters', '', 'below' );
+		$mobile_filters_style = $this->get_setting( $atts, 'mobile_filters_style', '', 'inherit' );
 
 		// Convert string values to proper types for boolean comparisons (desktop values for backward compat).
 		$show_subway_lines             = 1 === (int) $show_subway_lines;
@@ -190,6 +191,8 @@ class Clear_Map_Renderer {
 			// Mobile settings for JS.
 			'mobileFilters'       => $mobile_filters,
 			'mobileFiltersStyle'  => $mobile_filters_style,
+			// Map height (responsive).
+			'mapHeight'           => $height,
 		);
 
 		// Enqueue assets.
@@ -281,7 +284,7 @@ class Clear_Map_Renderer {
 
 		ob_start();
 		?>
-		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>" style="height: <?php echo esc_attr( $height ); ?>;">
+		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>" style="height: <?php echo esc_attr( $height['desktop'] ); ?>;">
 			<div id="<?php echo esc_attr( $map_id ); ?>" class="clear-map"></div>
 			<?php if ( $show_filters_desktop ) : ?>
 			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_inline_style ); ?>">
