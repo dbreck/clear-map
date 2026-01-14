@@ -102,7 +102,6 @@ class Clear_Map_Admin
 
         // Mobile settings.
         register_setting('clear_map_settings', 'clear_map_mobile_filters');
-        register_setting('clear_map_settings', 'clear_map_mobile_filters_height');
         register_setting('clear_map_settings', 'clear_map_mobile_filters_style');
 
         register_setting('clear_map_categories_pois', 'clear_map_categories');
@@ -686,17 +685,6 @@ class Clear_Map_Admin
                                         <span class="radio-option-description">Hide filter panel completely on mobile</span>
                                     </label>
                                 </div>
-                            </div>
-
-                            <div class="settings-field conditional-field" data-show-when="clear_map_mobile_filters" data-show-value="below">
-                                <label for="clear_map_mobile_filters_height">
-                                    Mobile Filter Height
-                                    <span class="help-tip" data-tooltip="Set the maximum height of the filter panel on mobile. Use 'auto' to fit content.">?</span>
-                                </label>
-                                <input type="text" id="clear_map_mobile_filters_height" name="clear_map_mobile_filters_height"
-                                    value="<?php echo esc_attr(get_option('clear_map_mobile_filters_height', 'auto')); ?>"
-                                    class="small-text" placeholder="auto" />
-                                <p class="description">e.g., auto, 300px, 40vh</p>
                             </div>
 
                             <div class="settings-field">

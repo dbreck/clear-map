@@ -1,0 +1,112 @@
+/**
+ * WPBakery Admin Styles for Clear Map
+ *
+ * Styles for responsive device toggle buttons and custom param types.
+ *
+ * @package Clear_Map
+ * @since   1.7.0
+ */
+
+/* Responsive Field Container */
+.clear-map-responsive-field {
+    position: relative;
+}
+
+/* Device Toggle Buttons */
+.clear-map-responsive-field .device-toggles {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.clear-map-responsive-field .device-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    padding: 0;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.clear-map-responsive-field .device-btn:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+}
+
+.clear-map-responsive-field .device-btn.active {
+    background: #0073aa;
+    border-color: #006799;
+    color: #fff;
+}
+
+.clear-map-responsive-field .device-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+/* Device Input Fields */
+.clear-map-responsive-field .device-input {
+    width: 100%;
+    max-width: 100%;
+}
+
+.clear-map-responsive-field input.device-input[type="text"] {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.clear-map-responsive-field select.device-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 13px;
+    background: #fff;
+}
+
+/* Hide the combined value input */
+.clear-map-responsive-field .responsive-combined-value {
+    display: none !important;
+}
+
+/* Indicator for values set on other devices */
+.clear-map-responsive-field .device-btn.has-value:not(.active)::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #0073aa;
+    border-radius: 50%;
+}
+
+.clear-map-responsive-field .device-btn {
+    position: relative;
+}
+
+/* WPBakery Modal Overrides */
+.vc_ui-panel-content .clear-map-responsive-field .device-toggles {
+    margin-bottom: 10px;
+}
+
+.vc_ui-panel-content .clear-map-responsive-field .device-btn {
+    background: #f7f7f7;
+}
+
+.vc_ui-panel-content .clear-map-responsive-field .device-btn:hover {
+    background: #eee;
+}
+
+.vc_ui-panel-content .clear-map-responsive-field .device-btn.active {
+    background: #0073aa;
+}

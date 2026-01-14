@@ -772,39 +772,136 @@ class ClearMap {
     }
   }
 
+  /**
+   * Get current breakpoint based on viewport width.
+   * @returns {string} 'desktop', 'tablet', or 'mobile'
+   */
+  getBreakpoint() {
+    const width = window.innerWidth
+    if (width <= 768) return "mobile"
+    if (width <= 1024) return "tablet"
+    return "desktop"
+  }
+
+  /**
+   * Get responsive value for current breakpoint with inheritance.
+   * @param {object} values - Object with desktop/tablet/mobile keys
+   * @param {string} defaultValue - Default if no value set
+   * @returns {string} The value for current breakpoint
+   */
+  getResponsiveValue(values, defaultValue = "") {
+    if (!values || typeof values !== "object") return values || defaultValue
+
+    const breakpoint = this.getBreakpoint()
+    const desktop = values.desktop || defaultValue
+    const tablet = values.tablet || desktop // Inherit from desktop
+    const mobile = values.mobile || tablet // Inherit from tablet
+
+    if (breakpoint === "mobile") return mobile
+    if (breakpoint === "tablet") return tablet
+    return desktop
+  }
+
+  /**
+   * Apply responsive styles to the filter panel.
+   */
+  applyResponsiveStyles() {
+    const filtersEl = document.getElementById(this.containerId + "-filters")
+    const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
+    if (!filtersEl) return
+
+    const breakpoint = this.getBreakpoint()
+
+    // Get responsive values
+    const width = this.getResponsiveValue(this.data.filtersWidth, "320px")
+    const height = this.getResponsiveValue(this.data.filtersHeight, "auto")
+    const style = this.getResponsiveValue(this.data.filtersStyle, "list")
+
+    // Apply width (only on desktop/tablet, mobile is 100%)
+    if (breakpoint !== "mobile" && width) {
+      filtersEl.style.width = width
+    } else {
+      filtersEl.style.width = ""
+    }
+
+    // Apply height
+    if (height && height !== "auto") {
+      filtersEl.style.height = height
+      filtersEl.style.maxHeight = height
+    } else {
+      filtersEl.style.height = ""
+      filtersEl.style.maxHeight = ""
+    }
+
+    // Apply style class
+    filtersEl.classList.remove("filter-style-list", "filter-style-pills")
+    filtersEl.classList.add("filter-style-" + style)
+  }
+
   setupMobileDrawer() {
-    if (window.innerWidth <= 768) {
-      const filtersEl = document.getElementById(this.containerId + "-filters")
-      const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
-      if (!filtersEl || !containerEl) return
+    const filtersEl = document.getElementById(this.containerId + "-filters")
+    const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
+    if (!filtersEl || !containerEl) return
 
-      const mobileMode = this.data.mobileFilters || "below"
-      const mobileHeight = this.data.mobileFiltersHeight || "auto"
-      const mobileStyle = this.data.mobileFiltersStyle || "inherit"
+    // Apply responsive styles first
+    this.applyResponsiveStyles()
 
-      // Apply mobile display mode
-      if (mobileMode === "hidden") {
-        filtersEl.classList.add("mobile-filters-hidden")
-      } else if (mobileMode === "drawer") {
-        containerEl.classList.add("mobile-drawer-mode")
-        filtersEl.classList.add("mobile-drawer")
-      } else {
-        // Default: "below" - filters display below map
-        filtersEl.classList.add("mobile-filters-below")
+    // Add resize listener for responsive updates
+    let resizeTimeout
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        this.applyResponsiveStyles()
+        this.updateMobileMode()
+      }, 150)
+    })
 
-        // Apply mobile height if set
-        if (mobileHeight && mobileHeight !== "auto") {
-          filtersEl.style.maxHeight = mobileHeight
-          filtersEl.style.overflowY = "auto"
-        }
+    // Apply mobile-specific mode
+    this.updateMobileMode()
+  }
+
+  /**
+   * Update mobile display mode based on current breakpoint.
+   */
+  updateMobileMode() {
+    const filtersEl = document.getElementById(this.containerId + "-filters")
+    const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
+    if (!filtersEl || !containerEl) return
+
+    const breakpoint = this.getBreakpoint()
+
+    // Remove all mobile mode classes first
+    filtersEl.classList.remove("mobile-filters-hidden", "mobile-filters-below", "mobile-drawer")
+    containerEl.classList.remove("mobile-drawer-mode")
+
+    // Only apply mobile modes on mobile breakpoint
+    if (breakpoint !== "mobile") return
+
+    const mobileMode = this.data.mobileFilters || "below"
+    const mobileStyle = this.data.mobileFiltersStyle || "inherit"
+    const mobileHeight = this.getResponsiveValue(this.data.filtersHeight, "auto")
+
+    // Apply mobile display mode
+    if (mobileMode === "hidden") {
+      filtersEl.classList.add("mobile-filters-hidden")
+    } else if (mobileMode === "drawer") {
+      containerEl.classList.add("mobile-drawer-mode")
+      filtersEl.classList.add("mobile-drawer")
+    } else {
+      // Default: "below" - filters display below map
+      filtersEl.classList.add("mobile-filters-below")
+
+      // Apply mobile height if set
+      if (mobileHeight && mobileHeight !== "auto") {
+        filtersEl.style.maxHeight = mobileHeight
+        filtersEl.style.overflowY = "auto"
       }
+    }
 
-      // Apply mobile filter style override
-      if (mobileStyle !== "inherit") {
-        // Remove desktop style class and add mobile style
-        filtersEl.classList.remove("filter-style-list", "filter-style-pills")
-        filtersEl.classList.add("filter-style-" + mobileStyle)
-      }
+    // Apply mobile filter style override
+    if (mobileStyle !== "inherit") {
+      filtersEl.classList.remove("filter-style-list", "filter-style-pills")
+      filtersEl.classList.add("filter-style-" + mobileStyle)
     }
   }
 

@@ -28,6 +28,153 @@ class Clear_Map_WPBakery {
 	 */
 	public function __construct() {
 		add_action( 'vc_before_init', array( $this, 'register_element' ) );
+		add_action( 'vc_before_init', array( $this, 'register_custom_params' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+	}
+
+	/**
+	 * Enqueue admin assets for WPBakery custom params.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $hook The current admin page.
+	 * @return void
+	 */
+	public function enqueue_admin_assets( $hook ) {
+		// Only load on post edit screens where WPBakery might be active.
+		if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'clear-map-wpbakery',
+			CLEAR_MAP_PLUGIN_URL . 'assets/css/wpbakery-admin.css',
+			array(),
+			CLEAR_MAP_VERSION
+		);
+
+		wp_enqueue_script(
+			'clear-map-wpbakery',
+			CLEAR_MAP_PLUGIN_URL . 'assets/js/wpbakery-admin.js',
+			array( 'jquery' ),
+			CLEAR_MAP_VERSION,
+			true
+		);
+	}
+
+	/**
+	 * Register custom WPBakery param types.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return void
+	 */
+	public function register_custom_params() {
+		if ( ! function_exists( 'vc_add_shortcode_param' ) ) {
+			return;
+		}
+
+		vc_add_shortcode_param( 'responsive_textfield', array( $this, 'responsive_textfield_param' ) );
+		vc_add_shortcode_param( 'responsive_dropdown', array( $this, 'responsive_dropdown_param' ) );
+	}
+
+	/**
+	 * Render responsive textfield param.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array  $settings Param settings.
+	 * @param string $value    Current value (pipe-separated: desktop|tablet|mobile).
+	 * @return string HTML output.
+	 */
+	public function responsive_textfield_param( $settings, $value ) {
+		$values  = explode( '|', $value );
+		$desktop = isset( $values[0] ) ? $values[0] : '';
+		$tablet  = isset( $values[1] ) ? $values[1] : '';
+		$mobile  = isset( $values[2] ) ? $values[2] : '';
+
+		$output = '<div class="clear-map-responsive-field" data-param-name="' . esc_attr( $settings['param_name'] ) . '">';
+		$output .= '<div class="device-toggles">';
+		$output .= '<button type="button" class="device-btn active" data-device="desktop" title="' . esc_attr__( 'Desktop', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-desktop"></span>';
+		$output .= '</button>';
+		$output .= '<button type="button" class="device-btn" data-device="tablet" title="' . esc_attr__( 'Tablet', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-tablet"></span>';
+		$output .= '</button>';
+		$output .= '<button type="button" class="device-btn" data-device="mobile" title="' . esc_attr__( 'Mobile', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-smartphone"></span>';
+		$output .= '</button>';
+		$output .= '</div>';
+
+		$output .= '<input type="text" class="wpb_vc_param_value device-input" data-device="desktop" value="' . esc_attr( $desktop ) . '" />';
+		$output .= '<input type="text" class="device-input" data-device="tablet" value="' . esc_attr( $tablet ) . '" style="display:none;" />';
+		$output .= '<input type="text" class="device-input" data-device="mobile" value="' . esc_attr( $mobile ) . '" style="display:none;" />';
+		$output .= '<input type="hidden" name="' . esc_attr( $settings['param_name'] ) . '" class="responsive-combined-value wpb_vc_param_value ' . esc_attr( $settings['param_name'] ) . ' ' . esc_attr( $settings['type'] ) . '" value="' . esc_attr( $value ) . '" />';
+
+		$output .= '</div>';
+
+		return $output;
+	}
+
+	/**
+	 * Render responsive dropdown param.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array  $settings Param settings.
+	 * @param string $value    Current value (pipe-separated: desktop|tablet|mobile).
+	 * @return string HTML output.
+	 */
+	public function responsive_dropdown_param( $settings, $value ) {
+		$values  = explode( '|', $value );
+		$desktop = isset( $values[0] ) ? $values[0] : '';
+		$tablet  = isset( $values[1] ) ? $values[1] : '';
+		$mobile  = isset( $values[2] ) ? $values[2] : '';
+
+		$options = isset( $settings['value'] ) ? $settings['value'] : array();
+
+		$output = '<div class="clear-map-responsive-field" data-param-name="' . esc_attr( $settings['param_name'] ) . '">';
+		$output .= '<div class="device-toggles">';
+		$output .= '<button type="button" class="device-btn active" data-device="desktop" title="' . esc_attr__( 'Desktop', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-desktop"></span>';
+		$output .= '</button>';
+		$output .= '<button type="button" class="device-btn" data-device="tablet" title="' . esc_attr__( 'Tablet', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-tablet"></span>';
+		$output .= '</button>';
+		$output .= '<button type="button" class="device-btn" data-device="mobile" title="' . esc_attr__( 'Mobile', 'clear-map' ) . '">';
+		$output .= '<span class="dashicons dashicons-smartphone"></span>';
+		$output .= '</button>';
+		$output .= '</div>';
+
+		// Desktop select.
+		$output .= '<select class="device-input" data-device="desktop">';
+		foreach ( $options as $label => $opt_value ) {
+			$selected = ( $opt_value === $desktop ) ? ' selected="selected"' : '';
+			$output .= '<option value="' . esc_attr( $opt_value ) . '"' . $selected . '>' . esc_html( $label ) . '</option>';
+		}
+		$output .= '</select>';
+
+		// Tablet select.
+		$output .= '<select class="device-input" data-device="tablet" style="display:none;">';
+		foreach ( $options as $label => $opt_value ) {
+			$selected = ( $opt_value === $tablet ) ? ' selected="selected"' : '';
+			$output .= '<option value="' . esc_attr( $opt_value ) . '"' . $selected . '>' . esc_html( $label ) . '</option>';
+		}
+		$output .= '</select>';
+
+		// Mobile select.
+		$output .= '<select class="device-input" data-device="mobile" style="display:none;">';
+		foreach ( $options as $label => $opt_value ) {
+			$selected = ( $opt_value === $mobile ) ? ' selected="selected"' : '';
+			$output .= '<option value="' . esc_attr( $opt_value ) . '"' . $selected . '>' . esc_html( $label ) . '</option>';
+		}
+		$output .= '</select>';
+
+		$output .= '<input type="hidden" name="' . esc_attr( $settings['param_name'] ) . '" class="responsive-combined-value wpb_vc_param_value ' . esc_attr( $settings['param_name'] ) . ' ' . esc_attr( $settings['type'] ) . '" value="' . esc_attr( $value ) . '" />';
+
+		$output .= '</div>';
+
+		return $output;
 	}
 
 	/**
@@ -170,7 +317,7 @@ class Clear_Map_WPBakery {
 					// Filter Panel Group
 					// =====================
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Show Filter Panel', 'clear-map' ),
 						'param_name'  => 'show_filters',
 						'value'       => array(
@@ -179,23 +326,23 @@ class Clear_Map_WPBakery {
 							__( 'No', 'clear-map' )                 => '0',
 						),
 						'std'         => '',
-						'description' => __( 'Show or hide the filter panel on the map.', 'clear-map' ),
+						'description' => __( 'Show or hide the filter panel. Use device icons to set per breakpoint.', 'clear-map' ),
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'textfield',
+						'type'        => 'responsive_textfield',
 						'heading'     => __( 'Panel Width', 'clear-map' ),
 						'param_name'  => 'filters_width',
 						'value'       => '',
-						'description' => __( 'Width of filter panel (e.g., 320px, 25%, 20vw). Leave blank for global setting.', 'clear-map' ),
+						'description' => __( 'Width of filter panel (e.g., 320px, 25%, 100%). Use device icons to set per breakpoint.', 'clear-map' ),
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'textfield',
+						'type'        => 'responsive_textfield',
 						'heading'     => __( 'Panel Height', 'clear-map' ),
 						'param_name'  => 'filters_height',
 						'value'       => '',
-						'description' => __( 'Height of filter panel (e.g., 400px, 50%, 50vh, or auto). Leave blank for global setting.', 'clear-map' ),
+						'description' => __( 'Height of filter panel (e.g., 400px, auto). Use device icons to set per breakpoint.', 'clear-map' ),
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
@@ -207,7 +354,7 @@ class Clear_Map_WPBakery {
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Transparent Background', 'clear-map' ),
 						'param_name'  => 'filters_bg_transparent',
 						'value'       => array(
@@ -220,7 +367,7 @@ class Clear_Map_WPBakery {
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Frosted Glass Effect', 'clear-map' ),
 						'param_name'  => 'filters_frosted',
 						'value'       => array(
@@ -233,7 +380,7 @@ class Clear_Map_WPBakery {
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Show Header', 'clear-map' ),
 						'param_name'  => 'filters_show_header',
 						'value'       => array(
@@ -246,7 +393,7 @@ class Clear_Map_WPBakery {
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Button Style', 'clear-map' ),
 						'param_name'  => 'filters_style',
 						'value'       => array(
@@ -318,7 +465,7 @@ class Clear_Map_WPBakery {
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 					array(
-						'type'        => 'dropdown',
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Show Individual Items', 'clear-map' ),
 						'param_name'  => 'filters_show_items',
 						'value'       => array(
@@ -328,6 +475,34 @@ class Clear_Map_WPBakery {
 						),
 						'std'         => '',
 						'description' => __( 'Show expandable POI lists under each category.', 'clear-map' ),
+						'group'       => __( 'Filter Panel', 'clear-map' ),
+					),
+					array(
+						'type'        => 'dropdown',
+						'heading'     => __( 'Mobile Filter Display', 'clear-map' ),
+						'param_name'  => 'mobile_filters',
+						'value'       => array(
+							__( 'Use Global Setting', 'clear-map' ) => '',
+							__( 'Below Map', 'clear-map' )          => 'below',
+							__( 'Bottom Drawer', 'clear-map' )      => 'drawer',
+							__( 'Hidden', 'clear-map' )             => 'hidden',
+						),
+						'std'         => '',
+						'description' => __( 'How the filter panel appears on mobile devices (768px and below).', 'clear-map' ),
+						'group'       => __( 'Filter Panel', 'clear-map' ),
+					),
+					array(
+						'type'        => 'dropdown',
+						'heading'     => __( 'Mobile Filter Style', 'clear-map' ),
+						'param_name'  => 'mobile_filters_style',
+						'value'       => array(
+							__( 'Use Global Setting', 'clear-map' ) => '',
+							__( 'Inherit from Desktop', 'clear-map' ) => 'inherit',
+							__( 'List', 'clear-map' )               => 'list',
+							__( 'Rounded Pills', 'clear-map' )      => 'pills',
+						),
+						'std'         => '',
+						'description' => __( 'Override the button style specifically for mobile devices.', 'clear-map' ),
 						'group'       => __( 'Filter Panel', 'clear-map' ),
 					),
 

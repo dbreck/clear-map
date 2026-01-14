@@ -45,6 +45,40 @@ class Clear_Map_Renderer {
 	}
 
 	/**
+	 * Parse responsive value from pipe-separated string.
+	 *
+	 * WPBakery responsive fields store values as "desktop|tablet|mobile".
+	 * This method parses that into an array with inheritance fallback.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $value   The pipe-separated responsive value.
+	 * @param mixed  $default Default value if parsing fails.
+	 * @return array Array with 'desktop', 'tablet', 'mobile' keys.
+	 */
+	private function parse_responsive_value( $value, $default = '' ) {
+		// If empty or not a string with pipes, return default for all.
+		if ( empty( $value ) || ! is_string( $value ) || strpos( $value, '|' ) === false ) {
+			return array(
+				'desktop' => $value ? $value : $default,
+				'tablet'  => '',
+				'mobile'  => '',
+			);
+		}
+
+		$parts   = explode( '|', $value );
+		$desktop = isset( $parts[0] ) ? $parts[0] : $default;
+		$tablet  = isset( $parts[1] ) ? $parts[1] : '';
+		$mobile  = isset( $parts[2] ) ? $parts[2] : '';
+
+		return array(
+			'desktop' => $desktop,
+			'tablet'  => $tablet,
+			'mobile'  => $mobile,
+		);
+	}
+
+	/**
 	 * Render the map.
 	 *
 	 * @since 1.0.0
@@ -84,32 +118,42 @@ class Clear_Map_Renderer {
 		$show_subway_lines   = $this->get_setting( $atts, 'show_subway_lines', 'clear_map_show_subway_lines', 0 );
 		$show_filters        = $this->get_setting( $atts, 'show_filters', 'clear_map_show_filters', 1 );
 
-		// Filter panel appearance settings.
-		$filters_width            = $this->get_setting( $atts, 'filters_width', 'clear_map_filters_width', '320px' );
-		$filters_height           = $this->get_setting( $atts, 'filters_height', 'clear_map_filters_height', 'auto' );
+		// Filter panel appearance settings (responsive values from WPBakery).
+		$filters_width_raw        = $this->get_setting( $atts, 'filters_width', 'clear_map_filters_width', '320px' );
+		$filters_height_raw       = $this->get_setting( $atts, 'filters_height', 'clear_map_filters_height', 'auto' );
 		$filters_bg_color         = $this->get_setting( $atts, 'filters_bg_color', 'clear_map_filters_bg_color', '#FBF8F1' );
-		$filters_bg_transparent   = $this->get_setting( $atts, 'filters_bg_transparent', 'clear_map_filters_bg_transparent', 0 );
-		$filters_frosted          = $this->get_setting( $atts, 'filters_frosted', 'clear_map_filters_frosted', 0 );
-		$filters_show_header      = $this->get_setting( $atts, 'filters_show_header', 'clear_map_filters_show_header', 1 );
-		$filters_style            = $this->get_setting( $atts, 'filters_style', 'clear_map_filters_style', 'list' );
+		$filters_bg_transparent_raw = $this->get_setting( $atts, 'filters_bg_transparent', 'clear_map_filters_bg_transparent', 0 );
+		$filters_frosted_raw      = $this->get_setting( $atts, 'filters_frosted', 'clear_map_filters_frosted', 0 );
+		$filters_show_header_raw  = $this->get_setting( $atts, 'filters_show_header', 'clear_map_filters_show_header', 1 );
+		$filters_style_raw        = $this->get_setting( $atts, 'filters_style', 'clear_map_filters_style', 'list' );
 		$filters_pill_border      = $this->get_setting( $atts, 'filters_pill_border', 'clear_map_filters_pill_border', 'category' );
 		$filters_pill_border_color = $this->get_setting( $atts, 'filters_pill_border_color', 'clear_map_filters_pill_border_color', '#666666' );
 		$filters_pill_bg          = $this->get_setting( $atts, 'filters_pill_bg', 'clear_map_filters_pill_bg', 'transparent' );
 		$filters_pill_bg_color    = $this->get_setting( $atts, 'filters_pill_bg_color', 'clear_map_filters_pill_bg_color', '#ffffff' );
-		$filters_show_items       = $this->get_setting( $atts, 'filters_show_items', 'clear_map_filters_show_items', 1 );
+		$filters_show_items_raw   = $this->get_setting( $atts, 'filters_show_items', 'clear_map_filters_show_items', 1 );
+		$show_filters_raw         = $this->get_setting( $atts, 'show_filters', 'clear_map_show_filters', 1 );
 
-		// Mobile settings.
-		$mobile_filters        = $this->get_setting( $atts, 'mobile_filters', 'clear_map_mobile_filters', 'below' );
-		$mobile_filters_height = $this->get_setting( $atts, 'mobile_filters_height', 'clear_map_mobile_filters_height', 'auto' );
-		$mobile_filters_style  = $this->get_setting( $atts, 'mobile_filters_style', 'clear_map_mobile_filters_style', 'inherit' );
+		// Parse responsive values.
+		$filters_width          = $this->parse_responsive_value( $filters_width_raw, '320px' );
+		$filters_height         = $this->parse_responsive_value( $filters_height_raw, 'auto' );
+		$filters_bg_transparent = $this->parse_responsive_value( $filters_bg_transparent_raw, '0' );
+		$filters_frosted        = $this->parse_responsive_value( $filters_frosted_raw, '0' );
+		$filters_show_header    = $this->parse_responsive_value( $filters_show_header_raw, '1' );
+		$filters_style          = $this->parse_responsive_value( $filters_style_raw, 'list' );
+		$filters_show_items     = $this->parse_responsive_value( $filters_show_items_raw, '1' );
+		$show_filters           = $this->parse_responsive_value( $show_filters_raw, '1' );
 
-		// Convert string values to proper types for boolean comparisons.
-		$show_subway_lines      = 1 === (int) $show_subway_lines;
-		$show_filters           = 1 === (int) $show_filters;
-		$filters_bg_transparent = 1 === (int) $filters_bg_transparent;
-		$filters_frosted        = 1 === (int) $filters_frosted;
-		$filters_show_header    = 1 === (int) $filters_show_header;
-		$filters_show_items     = 1 === (int) $filters_show_items;
+		// Mobile settings (non-responsive).
+		$mobile_filters       = $this->get_setting( $atts, 'mobile_filters', 'clear_map_mobile_filters', 'below' );
+		$mobile_filters_style = $this->get_setting( $atts, 'mobile_filters_style', 'clear_map_mobile_filters_style', 'inherit' );
+
+		// Convert string values to proper types for boolean comparisons (desktop values for backward compat).
+		$show_subway_lines             = 1 === (int) $show_subway_lines;
+		$show_filters_desktop          = 1 === (int) $show_filters['desktop'];
+		$filters_bg_transparent_desktop = 1 === (int) $filters_bg_transparent['desktop'];
+		$filters_frosted_desktop       = 1 === (int) $filters_frosted['desktop'];
+		$filters_show_header_desktop   = 1 === (int) $filters_show_header['desktop'];
+		$filters_show_items_desktop    = 1 === (int) $filters_show_items['desktop'];
 
 		// Prepare data for JS.
 		$map_data = array(
@@ -132,14 +176,19 @@ class Clear_Map_Renderer {
 			'zoomThreshold'       => intval( $zoom_threshold ),
 			'showSubwayLines'     => $show_subway_lines,
 			'subwayDataUrl'       => CLEAR_MAP_PLUGIN_URL . 'assets/data/nyc-subway-lines.geojson',
-			// Filter panel settings for JS.
+			// Filter panel settings for JS (responsive).
+			'showFilters'         => $show_filters,
+			'filtersWidth'        => $filters_width,
+			'filtersHeight'       => $filters_height,
+			'filtersBgTransparent' => $filters_bg_transparent,
+			'filtersFrosted'      => $filters_frosted,
+			'filtersShowHeader'   => $filters_show_header,
 			'filtersStyle'        => $filters_style,
-			'showItems'           => $filters_show_items,
+			'filtersShowItems'    => $filters_show_items,
 			'pillBorderMode'      => $filters_pill_border,
 			'pillBorderColor'     => $filters_pill_border_color,
 			// Mobile settings for JS.
 			'mobileFilters'       => $mobile_filters,
-			'mobileFiltersHeight' => $mobile_filters_height,
 			'mobileFiltersStyle'  => $mobile_filters_style,
 		);
 
@@ -182,49 +231,49 @@ class Clear_Map_Renderer {
 			$wrapper_id = ' id="' . esc_attr( $atts['el_id'] ) . '"';
 		}
 
-		// Build filter panel classes.
+		// Build filter panel classes (use desktop values for initial render).
 		$filter_classes   = array( 'clear-map-filters' );
-		$filter_classes[] = 'filter-style-' . sanitize_html_class( $filters_style );
+		$filter_classes[] = 'filter-style-' . sanitize_html_class( $filters_style['desktop'] );
 
-		if ( $filters_frosted ) {
+		if ( $filters_frosted_desktop ) {
 			$filter_classes[] = 'filters-frosted';
 		}
 
-		if ( ! $filters_show_header ) {
+		if ( ! $filters_show_header_desktop ) {
 			$filter_classes[] = 'no-header';
 		}
 
-		if ( ! $filters_show_items ) {
+		if ( ! $filters_show_items_desktop ) {
 			$filter_classes[] = 'no-items';
 		}
 
 		// Add class for transparent background (to remove shadow).
-		if ( $filters_bg_transparent ) {
+		if ( $filters_bg_transparent_desktop ) {
 			$filter_classes[] = 'bg-transparent';
 		}
 
 		// Add class for frosted pill backgrounds.
-		if ( 'pills' === $filters_style && 'frosted' === $filters_pill_bg ) {
+		if ( 'pills' === $filters_style['desktop'] && 'frosted' === $filters_pill_bg ) {
 			$filter_classes[] = 'pills-frosted';
 		}
 
 		$filter_class = implode( ' ', $filter_classes );
 
-		// Build filter panel inline styles.
+		// Build filter panel inline styles (desktop values for initial render).
 		$filter_inline_style = '';
 
 		// Width.
-		if ( $filters_width ) {
-			$filter_inline_style .= 'width: ' . esc_attr( $filters_width ) . ';';
+		if ( $filters_width['desktop'] ) {
+			$filter_inline_style .= 'width: ' . esc_attr( $filters_width['desktop'] ) . ';';
 		}
 
 		// Height.
-		if ( $filters_height && 'auto' !== $filters_height ) {
-			$filter_inline_style .= 'height: ' . esc_attr( $filters_height ) . '; max-height: ' . esc_attr( $filters_height ) . ';';
+		if ( $filters_height['desktop'] && 'auto' !== $filters_height['desktop'] ) {
+			$filter_inline_style .= 'height: ' . esc_attr( $filters_height['desktop'] ) . '; max-height: ' . esc_attr( $filters_height['desktop'] ) . ';';
 		}
 
 		// Background color.
-		if ( $filters_bg_transparent ) {
+		if ( $filters_bg_transparent_desktop ) {
 			$filter_inline_style .= 'background-color: transparent;';
 		} elseif ( $filters_bg_color ) {
 			$filter_inline_style .= 'background-color: ' . esc_attr( $filters_bg_color ) . ';';
@@ -234,9 +283,9 @@ class Clear_Map_Renderer {
 		?>
 		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>" style="height: <?php echo esc_attr( $height ); ?>;">
 			<div id="<?php echo esc_attr( $map_id ); ?>" class="clear-map"></div>
-			<?php if ( $show_filters ) : ?>
+			<?php if ( $show_filters_desktop ) : ?>
 			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_inline_style ); ?>">
-				<?php if ( $filters_show_header ) : ?>
+				<?php if ( $filters_show_header_desktop ) : ?>
 				<div class="filters-header">
 					<h5><?php esc_html_e( 'The Area', 'clear-map' ); ?></h5>
 					<button class="toggle-filters" type="button">

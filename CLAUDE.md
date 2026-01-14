@@ -7,44 +7,63 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 1.7.0
+**Current Version**: 1.8.0
 
 ---
 
-## Recent Session Summary (Version 1.7.0)
+## Recent Session Summary (Version 1.8.0)
 
-### Latest Update - Mobile Filter Panel Settings
+### Latest Update - WPBakery Responsive Filter Panel Settings
+**Date**: 2026-01-14
+**Feature**: Device-specific settings (desktop/tablet/mobile) for WPBakery element
+
+**What Changed:**
+- Added responsive device toggles (desktop/tablet/mobile buttons) to Filter Panel settings in WPBakery
+- All Filter Panel settings now support per-breakpoint values
+- Added Mobile Filter Display and Mobile Filter Style fields to WPBakery element
+- Removed Mobile Filter Height from global admin (replaced by responsive Panel Height)
+- Values stored as pipe-separated format: `desktop|tablet|mobile`
+
+**Technical Implementation:**
+- Created custom WPBakery param types: `responsive_textfield`, `responsive_dropdown`
+- Device toggle buttons using WordPress dashicons
+- JavaScript handles switching between device inputs and updating combined value
+- Map renderer parses responsive values and passes to frontend
+- Frontend JS applies values based on viewport breakpoint with inheritance
+
+**New Files:**
+- `assets/css/wpbakery-admin.css` - Styling for device toggle buttons
+- `assets/js/wpbakery-admin.js` - Device toggle functionality
+
+**Files Modified:**
+- `includes/class-wpbakery.php` - Custom param types, responsive field rendering
+- `includes/class-map-renderer.php` - `parse_responsive_value()` method, responsive data to JS
+- `assets/js/map.js` - `getBreakpoint()`, `getResponsiveValue()`, `applyResponsiveStyles()`
+- `includes/class-admin.php` - Removed mobile_filters_height setting
+
+**Responsive Fields in WPBakery:**
+- Show Filter Panel, Panel Width, Panel Height
+- Transparent Background, Frosted Glass, Show Header
+- Button Style, Show Individual Items
+
+**Breakpoints:**
+- Desktop: >1024px
+- Tablet: 769-1024px
+- Mobile: ≤768px
+
+---
+
+## Previous Session Summary (Version 1.7.0)
+
+### Mobile Filter Panel Settings
 **Date**: 2026-01-14
 **Feature**: Mobile-specific settings for filter panel display and layout
-
-**Problem Solved:**
-- Filter panel was using `position: absolute` on mobile, causing it to overlap content below the map instead of pushing it down
 
 **What Changed:**
 - Added "Mobile Settings" card in admin settings
 - Mobile filter display modes: Below Map (default), Bottom Drawer, Hidden
-- Mobile filter height setting (for "below" mode)
 - Mobile filter style override (inherit/list/pills)
 - Fixed mobile layout to use CSS flexbox - filter panel now flows below the map
-- Categories start collapsed on mobile by default
-
-**Technical Implementation:**
-- New CSS flexbox layout for mobile (replaces absolute positioning)
-- Three mobile display modes with corresponding CSS classes
-- Mobile drawer mode preserved as option for overlay behavior
-- JavaScript detects mobile and applies appropriate classes
-
-**Files Modified:**
-- `includes/class-admin.php` - Mobile Settings card, 3 new settings registered
-- `includes/class-map-renderer.php` - Passes mobile settings to JavaScript
-- `assets/css/map.css` - Mobile flexbox layout, new mobile-specific classes
-- `assets/js/map.js` - Updated `setupMobileDrawer()` to handle mobile settings
-- `assets/css/admin.css` - Added `.settings-description` style
-
-**New Admin Settings:**
-- `clear_map_mobile_filters` - Display mode: `below` (default), `drawer`, `hidden`
-- `clear_map_mobile_filters_height` - Max height for "below" mode (default: `auto`)
-- `clear_map_mobile_filters_style` - Style override: `inherit` (default), `list`, `pills`
 
 **CSS Classes:**
 - `.mobile-filters-below` - Filter panel displays below map (new default)
