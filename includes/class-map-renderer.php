@@ -98,6 +98,11 @@ class Clear_Map_Renderer {
 		$filters_pill_bg_color    = $this->get_setting( $atts, 'filters_pill_bg_color', 'clear_map_filters_pill_bg_color', '#ffffff' );
 		$filters_show_items       = $this->get_setting( $atts, 'filters_show_items', 'clear_map_filters_show_items', 1 );
 
+		// Mobile settings.
+		$mobile_filters        = $this->get_setting( $atts, 'mobile_filters', 'clear_map_mobile_filters', 'below' );
+		$mobile_filters_height = $this->get_setting( $atts, 'mobile_filters_height', 'clear_map_mobile_filters_height', 'auto' );
+		$mobile_filters_style  = $this->get_setting( $atts, 'mobile_filters_style', 'clear_map_mobile_filters_style', 'inherit' );
+
 		// Convert string values to proper types for boolean comparisons.
 		$show_subway_lines      = 1 === (int) $show_subway_lines;
 		$show_filters           = 1 === (int) $show_filters;
@@ -132,6 +137,10 @@ class Clear_Map_Renderer {
 			'showItems'           => $filters_show_items,
 			'pillBorderMode'      => $filters_pill_border,
 			'pillBorderColor'     => $filters_pill_border_color,
+			// Mobile settings for JS.
+			'mobileFilters'       => $mobile_filters,
+			'mobileFiltersHeight' => $mobile_filters_height,
+			'mobileFiltersStyle'  => $mobile_filters_style,
 		);
 
 		// Enqueue assets.

@@ -7,13 +7,56 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 1.4.0
+**Current Version**: 1.7.0
 
 ---
 
-## Recent Session Summary (Version 1.4.0)
+## Recent Session Summary (Version 1.7.0)
 
-### Latest Update - Filter Panel Customization Settings
+### Latest Update - Mobile Filter Panel Settings
+**Date**: 2026-01-14
+**Feature**: Mobile-specific settings for filter panel display and layout
+
+**Problem Solved:**
+- Filter panel was using `position: absolute` on mobile, causing it to overlap content below the map instead of pushing it down
+
+**What Changed:**
+- Added "Mobile Settings" card in admin settings
+- Mobile filter display modes: Below Map (default), Bottom Drawer, Hidden
+- Mobile filter height setting (for "below" mode)
+- Mobile filter style override (inherit/list/pills)
+- Fixed mobile layout to use CSS flexbox - filter panel now flows below the map
+- Categories start collapsed on mobile by default
+
+**Technical Implementation:**
+- New CSS flexbox layout for mobile (replaces absolute positioning)
+- Three mobile display modes with corresponding CSS classes
+- Mobile drawer mode preserved as option for overlay behavior
+- JavaScript detects mobile and applies appropriate classes
+
+**Files Modified:**
+- `includes/class-admin.php` - Mobile Settings card, 3 new settings registered
+- `includes/class-map-renderer.php` - Passes mobile settings to JavaScript
+- `assets/css/map.css` - Mobile flexbox layout, new mobile-specific classes
+- `assets/js/map.js` - Updated `setupMobileDrawer()` to handle mobile settings
+- `assets/css/admin.css` - Added `.settings-description` style
+
+**New Admin Settings:**
+- `clear_map_mobile_filters` - Display mode: `below` (default), `drawer`, `hidden`
+- `clear_map_mobile_filters_height` - Max height for "below" mode (default: `auto`)
+- `clear_map_mobile_filters_style` - Style override: `inherit` (default), `list`, `pills`
+
+**CSS Classes:**
+- `.mobile-filters-below` - Filter panel displays below map (new default)
+- `.mobile-filters-hidden` - Hide filter panel on mobile
+- `.mobile-drawer-mode` - Container class for drawer mode
+- `.mobile-drawer` - Filter panel as slide-up drawer
+
+---
+
+## Previous Session Summary (Version 1.6.3)
+
+### Filter Panel Customization Settings
 **Date**: 2026-01-12
 **Feature**: Admin settings to customize filter panel appearance and behavior
 
@@ -379,6 +422,9 @@ Located in Settings page with button: "Run Geocoding on All POIs"
 - `clear_map_filters_pill_border` - Pill border mode (category or custom)
 - `clear_map_filters_pill_border_color` - Custom pill border color
 - `clear_map_filters_show_items` - Show individual items toggle
+- `clear_map_mobile_filters` - Mobile display mode (below/drawer/hidden)
+- `clear_map_mobile_filters_height` - Mobile filter panel max height
+- `clear_map_mobile_filters_style` - Mobile filter style (inherit/list/pills)
 
 ### AJAX Actions
 - `clear_map_import_kml_pois` - Handle KML file upload

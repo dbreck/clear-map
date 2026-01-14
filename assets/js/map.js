@@ -775,8 +775,35 @@ class ClearMap {
   setupMobileDrawer() {
     if (window.innerWidth <= 768) {
       const filtersEl = document.getElementById(this.containerId + "-filters")
-      if (filtersEl) {
+      const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
+      if (!filtersEl || !containerEl) return
+
+      const mobileMode = this.data.mobileFilters || "below"
+      const mobileHeight = this.data.mobileFiltersHeight || "auto"
+      const mobileStyle = this.data.mobileFiltersStyle || "inherit"
+
+      // Apply mobile display mode
+      if (mobileMode === "hidden") {
+        filtersEl.classList.add("mobile-filters-hidden")
+      } else if (mobileMode === "drawer") {
+        containerEl.classList.add("mobile-drawer-mode")
         filtersEl.classList.add("mobile-drawer")
+      } else {
+        // Default: "below" - filters display below map
+        filtersEl.classList.add("mobile-filters-below")
+
+        // Apply mobile height if set
+        if (mobileHeight && mobileHeight !== "auto") {
+          filtersEl.style.maxHeight = mobileHeight
+          filtersEl.style.overflowY = "auto"
+        }
+      }
+
+      // Apply mobile filter style override
+      if (mobileStyle !== "inherit") {
+        // Remove desktop style class and add mobile style
+        filtersEl.classList.remove("filter-style-list", "filter-style-pills")
+        filtersEl.classList.add("filter-style-" + mobileStyle)
       }
     }
   }

@@ -100,6 +100,11 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_filters_width');
         register_setting('clear_map_settings', 'clear_map_filters_height');
 
+        // Mobile settings.
+        register_setting('clear_map_settings', 'clear_map_mobile_filters');
+        register_setting('clear_map_settings', 'clear_map_mobile_filters_height');
+        register_setting('clear_map_settings', 'clear_map_mobile_filters_style');
+
         register_setting('clear_map_categories_pois', 'clear_map_categories');
         register_setting('clear_map_categories_pois', 'clear_map_pois');
     }
@@ -641,6 +646,81 @@ class Clear_Map_Admin
                                         <span class="help-tip" data-tooltip="When enabled, categories can be expanded to show individual POIs. When disabled, clicking a category toggles all its items on/off.">?</span>
                                     </span>
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Settings Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h2>
+                                <span class="dashicons dashicons-smartphone"></span>
+                                Mobile Settings
+                            </h2>
+                        </div>
+                        <div class="settings-card-body">
+                            <p class="settings-description">Configure how the filter panel appears on mobile devices (screens 768px and below).</p>
+
+                            <div class="settings-field">
+                                <label>
+                                    Mobile Filter Display
+                                    <span class="help-tip" data-tooltip="Choose how the filter panel is displayed on mobile devices.">?</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_mobile_filters" value="below"
+                                            <?php checked(get_option('clear_map_mobile_filters', 'below'), 'below'); ?> />
+                                        <span class="radio-option-label">Below Map</span>
+                                        <span class="radio-option-description">Filter panel displays below the map, pushing page content down</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_mobile_filters" value="drawer"
+                                            <?php checked(get_option('clear_map_mobile_filters', 'below'), 'drawer'); ?> />
+                                        <span class="radio-option-label">Bottom Drawer</span>
+                                        <span class="radio-option-description">Slide-up drawer overlay on the map (original behavior)</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="clear_map_mobile_filters" value="hidden"
+                                            <?php checked(get_option('clear_map_mobile_filters', 'below'), 'hidden'); ?> />
+                                        <span class="radio-option-label">Hidden</span>
+                                        <span class="radio-option-description">Hide filter panel completely on mobile</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-field conditional-field" data-show-when="clear_map_mobile_filters" data-show-value="below">
+                                <label for="clear_map_mobile_filters_height">
+                                    Mobile Filter Height
+                                    <span class="help-tip" data-tooltip="Set the maximum height of the filter panel on mobile. Use 'auto' to fit content.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_mobile_filters_height" name="clear_map_mobile_filters_height"
+                                    value="<?php echo esc_attr(get_option('clear_map_mobile_filters_height', 'auto')); ?>"
+                                    class="small-text" placeholder="auto" />
+                                <p class="description">e.g., auto, 300px, 40vh</p>
+                            </div>
+
+                            <div class="settings-field">
+                                <label>
+                                    Mobile Filter Style
+                                    <span class="help-tip" data-tooltip="Choose a different button style for mobile, or inherit from desktop settings.">?</span>
+                                </label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_mobile_filters_style" value="inherit"
+                                            <?php checked(get_option('clear_map_mobile_filters_style', 'inherit'), 'inherit'); ?> />
+                                        <span class="radio-text">Inherit from desktop</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_mobile_filters_style" value="list"
+                                            <?php checked(get_option('clear_map_mobile_filters_style', 'inherit'), 'list'); ?> />
+                                        <span class="radio-text">List (colored dots)</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="clear_map_mobile_filters_style" value="pills"
+                                            <?php checked(get_option('clear_map_mobile_filters_style', 'inherit'), 'pills'); ?> />
+                                        <span class="radio-text">Rounded Pills</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -410,13 +410,65 @@
     position: relative;
 }
 
-/* Mobile Responsive */
+/* ============================================
+   Mobile Responsive (max-width: 768px)
+   ============================================ */
 @media (max-width: 768px) {
+    /* Default mobile layout: filters below map */
     .clear-map-container {
+        display: flex;
+        flex-direction: column;
+        aspect-ratio: auto;
+        height: auto !important;
+        min-height: auto;
+    }
+
+    .clear-map {
+        flex: 0 0 auto;
         aspect-ratio: 16/11;
+        min-height: 300px;
+        width: 100%;
     }
 
     .clear-map-filters {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        max-width: 100%;
+        order: 2;
+        border-radius: 0;
+        max-height: none;
+        box-shadow: none;
+        border-top: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    /* Mobile filters below - explicitly show */
+    .clear-map-filters.mobile-filters-below {
+        display: flex;
+    }
+
+    /* Mobile filters hidden */
+    .clear-map-filters.mobile-filters-hidden {
+        display: none !important;
+    }
+
+    /* Mobile drawer mode - reverts to absolute positioning overlay */
+    .clear-map-container.mobile-drawer-mode {
+        display: block;
+        aspect-ratio: 16/11;
+        height: auto;
+        min-height: 400px;
+    }
+
+    .clear-map-container.mobile-drawer-mode .clear-map {
+        aspect-ratio: auto;
+        height: 100%;
+    }
+
+    .clear-map-container.mobile-drawer-mode .clear-map-filters {
         position: absolute;
         bottom: 0;
         left: 0;
@@ -425,17 +477,20 @@
         width: 100%;
         border-radius: 16px 16px 0 0;
         max-height: 50vh;
+        border-top: none;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     }
 
-    .clear-map-filters.mobile-drawer {
+    .clear-map-container.mobile-drawer-mode .clear-map-filters.mobile-drawer {
         transform: translateY(calc(100% - 70px));
         transition: transform 0.3s ease;
     }
 
-    .clear-map-filters.mobile-drawer.expanded {
+    .clear-map-container.mobile-drawer-mode .clear-map-filters.mobile-drawer.expanded {
         transform: translateY(0);
     }
 
+    /* Common mobile styles */
     .filters-header {
         padding: 16px 20px;
     }
@@ -476,8 +531,18 @@
 }
 
 @media (max-width: 480px) {
-    .clear-map-container {
+    /* Smaller map aspect ratio on very small screens */
+    .clear-map {
         aspect-ratio: 4/3;
+    }
+
+    /* Drawer mode keeps original aspect ratio on container */
+    .clear-map-container.mobile-drawer-mode {
+        aspect-ratio: 4/3;
+    }
+
+    .clear-map-container.mobile-drawer-mode .clear-map {
+        aspect-ratio: auto;
     }
 
     .filters-header h3 {
