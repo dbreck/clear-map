@@ -7,13 +7,62 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 1.8.0
+**Current Version**: 1.9.2
 
 ---
 
-## Recent Session Summary (Version 1.8.0)
+## Recent Session Summary (Version 1.9.2)
 
-### Latest Update - WPBakery Responsive Filter Panel Settings
+### Latest Update - Mobile Layout Fixes & Bug Fixes
+**Date**: 2026-01-15
+**Feature**: Fixed mobile height handling, cleaned up WPBakery options, added "Above Map" option
+
+**What Changed:**
+- **Fixed mobile height handling** - On mobile, container uses `height: auto`, map element gets explicit height
+- **Removed "Use Global Setting"** from all Filter Panel dropdown options in WPBakery
+- **Added "Above Map" option** to Mobile Filter Display dropdown
+- **Fixed `get_setting()` bug** - Was returning empty string instead of default when option_name was empty
+- **CSS flexbox ordering** - Map has `order: 1`, filters have `order: 2` (or `order: 0` for above)
+
+**Files Modified:**
+- `includes/class-map-renderer.php` - Fixed `get_setting()` to return default when no option name provided
+- `includes/class-wpbakery.php` - Removed "Use Global Setting" options, added "Above Map" option
+- `assets/css/map.css` - Restructured mobile layout with flexbox ordering
+- `assets/js/map.js` - Updated `applyResponsiveContainerHeight()` for mobile-specific height handling
+
+**Technical Details:**
+- Mobile layout uses CSS flexbox with explicit `order` properties
+- Map element: `order: 1`, Filters: `order: 2` (default), `order: 0` (above map)
+- `get_setting()` now checks if `$option_name` is empty and returns `$default` directly
+
+---
+
+## Known Issue - Deferred
+
+### WPBakery Dropdown Not Saving Non-Default Values
+**Status**: Deferred - workaround in place
+**Issue**: WPBakery's `mobile_filters` dropdown doesn't save "Above Map" selection to shortcode
+**Workaround**: Default value "Below Map" works correctly; "Above Map" feature is implemented but WPBakery may not save the selection
+
+---
+
+## Previous Session Summary (Version 1.9.0)
+
+### Settings Consolidation to WPBakery Only
+**Date**: 2026-01-15
+**Feature**: Consolidated all display settings to WPBakery element, removed from global admin
+
+**What Changed:**
+- **Map Height now responsive** - Added device toggles (desktop/tablet/mobile) to Map Height field
+- **Removed 19 display settings from global admin** - All map display settings now in WPBakery only
+- **Global admin simplified** - Now only contains API keys and building information
+- **Added `applyResponsiveContainerHeight()` method** - Map container resizes on viewport change
+
+---
+
+## Previous Session Summary (Version 1.8.0)
+
+### WPBakery Responsive Filter Panel Settings
 **Date**: 2026-01-14
 **Feature**: Device-specific settings (desktop/tablet/mobile) for WPBakery element
 
@@ -21,7 +70,6 @@
 - Added responsive device toggles (desktop/tablet/mobile buttons) to Filter Panel settings in WPBakery
 - All Filter Panel settings now support per-breakpoint values
 - Added Mobile Filter Display and Mobile Filter Style fields to WPBakery element
-- Removed Mobile Filter Height from global admin (replaced by responsive Panel Height)
 - Values stored as pipe-separated format: `desktop|tablet|mobile`
 
 **Technical Implementation:**
@@ -35,13 +83,8 @@
 - `assets/css/wpbakery-admin.css` - Styling for device toggle buttons
 - `assets/js/wpbakery-admin.js` - Device toggle functionality
 
-**Files Modified:**
-- `includes/class-wpbakery.php` - Custom param types, responsive field rendering
-- `includes/class-map-renderer.php` - `parse_responsive_value()` method, responsive data to JS
-- `assets/js/map.js` - `getBreakpoint()`, `getResponsiveValue()`, `applyResponsiveStyles()`
-- `includes/class-admin.php` - Removed mobile_filters_height setting
-
 **Responsive Fields in WPBakery:**
+- Map Height (NEW in 1.9.0)
 - Show Filter Panel, Panel Width, Panel Height
 - Transparent Background, Frosted Glass, Show Header
 - Button Style, Show Individual Items
@@ -73,178 +116,17 @@
 
 ---
 
-## Previous Session Summary (Version 1.6.3)
-
-### Filter Panel Customization Settings
-**Date**: 2026-01-12
-**Feature**: Admin settings to customize filter panel appearance and behavior
-
-**What Changed:**
-- Added "Filter Panel Appearance" settings card in admin
-- Background color picker with transparent option
-- Frosted glass effect toggle (backdrop-filter blur)
-- Show/hide header toggle
-- Button style: List (default) vs Pills
-- Pill border color: Category color or custom color
-- Show individual items toggle (controls expand/collapse)
-
-**Technical Implementation:**
-- 8 new settings registered in `class-admin.php`
-- Settings card with modern UI (color pickers, toggles, radio groups)
-- Conditional field display using data attributes
-- CSS custom properties for dynamic pill border colors
-- JavaScript reads settings and conditionally enables expand behavior
-- "filtered" class added to category element for pills styling
-- Mobile-responsive pills style
-
-**Files Modified:**
-- `includes/class-admin.php` - New settings registration and UI card
-- `includes/class-map-renderer.php` - Passes settings to JS, builds CSS classes
-- `assets/css/map.css` - Pills style, frosted glass, no-header/no-items classes
-- `assets/js/map.js` - Reads settings, conditional expand behavior
-- `assets/css/admin.css` - Color field, radio group, conditional field styles
-- `assets/js/admin.js` - Conditional field visibility, color picker init
-
-**New Admin Settings:**
-- `clear_map_filters_bg_color` - Background color
-- `clear_map_filters_bg_transparent` - Transparent toggle
-- `clear_map_filters_frosted` - Frosted glass effect
-- `clear_map_filters_show_header` - Show header toggle
-- `clear_map_filters_style` - List or pills
-- `clear_map_filters_pill_border` - Category or custom
-- `clear_map_filters_pill_border_color` - Custom border color
-- `clear_map_filters_show_items` - Show individual items
-
----
-
-## Previous Session Summary (Version 1.3.0)
-
-### WPBakery Page Builder Integration & GitHub Auto-Updates
-**Date**: 2026-01-12
-
-**What Changed:**
-- Added Clear Map as WPBakery Page Builder element
-- Added GitHub auto-update functionality
-- WordPress Coding Standards compliance
-
-**New Files:**
-- `includes/class-wpbakery.php` - WPBakery element registration
-- `includes/class-github-updater.php` - Auto-update from GitHub releases
-
----
-
-## Previous Session Summary (Version 1.2.0)
-
-### Enhanced Category Filtering with Visual Feedback
-**Date**: 2025-01-04
-**Feature**: Toggle-based category filtering with visual indicators and auto-expand/collapse
-
-**What Changed:**
-- Category clicks now toggle filtering on/off (click to filter, click again to clear)
-- Visual feedback: Category icon changes from colored circle to X when filtered
-- POI lists automatically expand when filter is applied
-- POI lists automatically collapse when filter is removed
-- Switching categories auto-collapses previous and expands new one
-- Expand button remains independent for browsing without filtering
-- Smooth animations and transitions between states
-
----
-
-## Previous Session Summary (Version 1.1.1)
-
-### POI Photo & Description Display
-**Date**: Previous Session
-**Feature**: Added clickable POI popups with photo and description display
-
-**What Changed:**
-- POIs now display full details when clicked (not just hovered)
-- Photos and descriptions (saved in admin) now visible on the map
-- Smart viewport-aware popup positioning (above, below, left, or right of pin)
-- Popups include: name, photo, address, description, and website link
-
-**Technical Implementation:**
-- Added `photo` field to GeoJSON properties in `poisToGeoJSON()` method
-- Added click handler for `unclustered-point` layer
-- Created new `showPoiPopup()` method with intelligent positioning logic
-- Popup calculates viewport space and positions itself optimally
-- Uses Mapbox GL JS Popup API with custom HTML content
-
-**Files Modified:**
-- `assets/js/map.js` - Lines 254, 305-314, 456-521
-
----
-
-## Previous Session Summary (Version 1.1.0)
-
-### Major Improvements - Location-Agnostic & Production Ready
-This session focused on making the plugin truly portable and fixing critical bugs that prevented it from working outside NYC.
-
-**5 Critical Fixes Implemented:**
-
-1. **Removed NYC-Specific Constraints** ✅
-   - Removed proximity bias to NYC center
-   - Removed bounding box validation (40.47-40.91 lat, -74.25 to -73.70 lng)
-   - Removed coordinate validation that rejected non-NYC addresses
-   - Simplified address cleaning to just trim whitespace
-   - Plugin now works for ANY geographic location worldwide
-
-2. **Fixed Geocoding Failure Caching** ✅
-   - Previous: Failed geocoding was cached for 24 hours, preventing retries
-   - Now: Only successful geocoding results are cached
-   - Failed addresses will retry on next attempt
-   - Fixes persistent "Skipped X POIs without valid coordinates" errors
-
-3. **Removed Unwanted Default Categories** ✅
-   - Previous: Plugin created 5 default categories on activation and import
-   - Now: Starts with empty categories array
-   - Categories are created only from KML folder structure
-   - Prevents unwanted categories (Restaurants, Shopping, Fitness, Services, General)
-
-4. **Fixed POI Data Loss on Category Edit** ✅ CRITICAL BUG
-   - Previous: Editing category names stripped all POI coordinates
-   - Root cause: Form didn't include hidden fields for lat/lng and geocoding metadata
-   - Now: All coordinate data preserved as hidden inputs
-   - Users can safely rename categories without losing POI locations
-
-5. **Added Building Icon Geocoding** ✅
-   - Previous: Building icon wouldn't display (coordinates never set)
-   - Added: Manual "Geocode Now" button in Settings
-   - Added: Auto-geocode hook when building address is saved
-   - Building icon now displays correctly with custom SVG/PNG
-
-### Performance Improvements
-- Removed geocoding from map renderer (was running on every page load)
-- Geocoding now only happens during import or manual trigger
-- Building address geocodes once when saved in admin
-- Eliminates hundreds of unnecessary API calls
-
-### Current Status - Production Ready
-- **Location Support**: ✅ Works for any location worldwide (tested: NYC, Sarasota FL)
-- **KML Import**: ✅ Coordinates extracted and preserved
-- **Geocoding**: ✅ Forward and reverse geocoding working
-- **Category Management**: ✅ Edit categories without losing POI data
-- **Building Icon**: ✅ Displays with manual geocoding button
-- **Performance**: ✅ Optimized - no geocoding on page load
-- **Default Categories**: ✅ Removed - cleaner setup
-
-### GitHub Repository
-- **Repo**: https://github.com/dbreck/clear-map
-- **Version**: 1.4.0
-- **Status**: All features committed and pushed
-
----
-
 ## Plugin Architecture
 
 ### Core Files
 - **`clear-map.php`** - Main plugin file, AJAX handlers, initialization
-- **`includes/class-admin.php`** - WordPress admin interface and settings pages
+- **`includes/class-admin.php`** - WordPress admin interface (API keys & building info only)
 - **`includes/class-frontend.php`** - Frontend shortcode registration
 - **`includes/class-map-renderer.php`** - Renders map HTML and enqueues assets
 - **`includes/class-api-handler.php`** - Handles geocoding (forward & reverse) via Mapbox/Google APIs
 - **`includes/class-kml-parser.php`** - Parses KML/KMZ files and extracts POIs with coordinates
 - **`includes/class-assets.php`** - Asset management
-- **`includes/class-wpbakery.php`** - WPBakery Page Builder integration
+- **`includes/class-wpbakery.php`** - WPBakery Page Builder integration (ALL display settings)
 - **`includes/class-github-updater.php`** - GitHub auto-update functionality
 
 ### Frontend Assets
@@ -252,319 +134,221 @@ This session focused on making the plugin truly portable and fixing critical bug
 - **`assets/css/map.css`** - Map and UI styles
 - **`assets/js/admin.js`** - Admin page JavaScript (AJAX handlers, UI interactions)
 - **`assets/css/admin.css`** - Admin page styles
-
-### Key Features
-- **KML/KMZ Import** - Imports POIs from Google My Maps exports
-- **Auto-categorization** - Detects categories from KML folder structure
-- **Forward Geocoding** - Converts addresses → coordinates (Mapbox primary, Google fallback)
-- **Reverse Geocoding** - Converts coordinates → addresses (Mapbox primary, Google fallback)
-- **Manual Geocoding Button** - Runs reverse geocoding on demand
-- **Interactive Map** - Mapbox GL JS with clustering, category filtering, POI tooltips and popups
-- **POI Details Display** - Click POIs to see photos, descriptions, and website links
-- **Smart Popup Positioning** - Viewport-aware popups that adapt to available space
-- **Shortcodes** - `[clear_map]` and `[the_andrea_map]` (backwards compatibility)
+- **`assets/js/wpbakery-admin.js`** - WPBakery responsive field toggles
+- **`assets/css/wpbakery-admin.css`** - WPBakery admin styling
 
 ---
 
-## Data Structure
+## WPBakery Element Settings (v1.9.0)
 
-### POI Structure (stored in `clear_map_pois` option)
-```php
-array(
-    'category_key' => array(
-        array(
-            'name' => 'POI Name',
-            'address' => '123 Street, City, State ZIP',
-            'description' => 'Description text',
-            'website' => 'https://example.com',
-            'photo' => 'https://example.com/photo.jpg',
-            'lat' => 40.7479925,
-            'lng' => -74.0047649,
-            'coordinate_source' => 'kml|geocoded|reverse_geocoded',
-            'reverse_geocoded' => true|false,
-            'needs_geocoding' => true|false
-        )
-    )
-)
+### General Group
+- **Map Height** - `responsive_textfield` - Height of map container (default: 60vh)
+- **Element ID** - `el_id` - Custom element ID
+- **Extra CSS Class** - `el_class` - Custom CSS classes
+
+### Map Position Group
+- **Center Latitude** - `textfield` - Initial map center lat (default: 40.7451)
+- **Center Longitude** - `textfield` - Initial map center lng (default: -74.0011)
+- **Initial Zoom Level** - `dropdown` - Zoom level 3-18 (default: 14)
+
+### Map Display Group
+- **Cluster Distance** - `textfield` - Pixel distance for clustering (default: 50)
+- **Cluster Minimum Points** - `textfield` - Min POIs for cluster (default: 3)
+- **Zoom Threshold** - `textfield` - Zoom level for clusters to expand (default: 15)
+- **Show Subway Lines** - `dropdown` - NYC subway overlay (default: No)
+
+### Filter Panel Group
+- **Show Filter Panel** - `responsive_dropdown` - Show/hide filter panel
+- **Panel Width** - `responsive_textfield` - Width of filter panel (default: 320px)
+- **Panel Height** - `responsive_textfield` - Height of filter panel (default: auto)
+- **Background Color** - `colorpicker` - Panel background color (default: #FBF8F1)
+- **Transparent Background** - `responsive_dropdown` - Make panel transparent
+- **Frosted Glass Effect** - `responsive_dropdown` - Backdrop blur effect
+- **Show Header** - `responsive_dropdown` - Show "The Area" header
+- **Button Style** - `responsive_dropdown` - List or Pills style
+- **Pill Border Color** - `dropdown` - Category color or custom (pills only)
+- **Custom Pill Border Color** - `colorpicker` - Custom border color
+- **Pill Background** - `dropdown` - Transparent, color, or frosted (pills only)
+- **Pill Background Color** - `colorpicker` - Custom background color
+- **Show Individual Items** - `responsive_dropdown` - Expandable POI lists
+- **Mobile Filter Display** - `dropdown` - Below/Drawer/Hidden
+- **Mobile Filter Style** - `dropdown` - Inherit/List/Pills
+
+### Design Options Group
+- **CSS Editor** - `css_editor` - Custom CSS via WPBakery
+
+---
+
+## Data Flow for Responsive Settings
+
+### 1. WPBakery Editor (Admin)
+```
+User clicks device toggles → wpbakery-admin.js updates hidden input
+Value stored as: "desktop_value|tablet_value|mobile_value"
 ```
 
-### Categories Structure (stored in `clear_map_categories` option)
+### 2. Map Renderer (PHP)
 ```php
-array(
-    'category_key' => array(
-        'name' => 'Display Name',
-        'color' => '#HEX'
-    )
-)
+// Parse responsive value
+$height = $this->parse_responsive_value($atts['height'], '60vh');
+// Returns: ['desktop' => '60vh', 'tablet' => '', 'mobile' => '50vh']
+
+// Pass to JavaScript
+$map_data = array(
+    'mapHeight' => $height,
+    'filtersWidth' => $filters_width,
+    // etc...
+);
+```
+
+### 3. Frontend JavaScript
+```javascript
+// Get breakpoint
+getBreakpoint() {
+    const width = window.innerWidth
+    if (width <= 768) return "mobile"
+    if (width <= 1024) return "tablet"
+    return "desktop"
+}
+
+// Get value for current breakpoint with inheritance
+getResponsiveValue(values, defaultValue) {
+    const breakpoint = this.getBreakpoint()
+    const desktop = values.desktop || defaultValue
+    const tablet = values.tablet || desktop  // Inherit from desktop
+    const mobile = values.mobile || tablet   // Inherit from tablet
+    // Return appropriate value
+}
+
+// Apply to DOM
+applyResponsiveContainerHeight() {
+    const height = this.getResponsiveValue(this.data.mapHeight, "60vh")
+    containerEl.style.height = height
+    this.map.resize()
+}
 ```
 
 ---
 
-## Known Issues & Next Steps
-
-### ✅ POI Display Issue - RESOLVED
-**Problem**: POI descriptions and photos were being saved but not displayed on the map
-**Root Cause**: Frontend JavaScript only showed name/address in hover tooltips
-**Solution**: Added click handler that displays full POI details in a Mapbox popup
-**Status**: Completed in current session (commit: 34d5a92)
-
-### 📋 Future Enhancements
-Potential improvements for future versions:
-- Click-to-call phone numbers in popups
-- Directions link from building to POI
-- Photo gallery support (multiple photos per POI)
-- Social media links in POI data
-- Custom popup styling per category
-- POI search/filter functionality
-
----
-
-## API Configuration
-
-### Required API Keys
-- **Mapbox Access Token** - Required for map rendering and geocoding
-- **Google Geocoding API Key** - Optional fallback for geocoding
-
-### API Usage
-- **Mapbox Geocoding**: 100,000 free requests/month
-- **Mapbox Maps**: 50,000 free loads/month
-- **Google Geocoding**: User disabled billing to avoid unexpected charges
-
----
-
-## Geocoding Flow
-
-### Forward Geocoding (Address → Coordinates)
-1. User has POI with address but no coordinates
-2. `Clear_Map_API_Handler::geocode_pois()` called
-3. Tries Mapbox first, falls back to Google
-4. Coordinates saved to POI with `coordinate_source: 'geocoded'`
-
-### Reverse Geocoding (Coordinates → Address)
-1. User imports KML with coordinates but no addresses
-2. `Clear_Map_API_Handler::reverse_geocode_pois()` called automatically during import
-3. OR user clicks "Run Geocoding on All POIs" button manually
-4. Tries Mapbox first, falls back to Google
-5. Address saved to POI with `reverse_geocoded: true`
-
----
-
-## Important Code Sections
-
-### KML Import Process
-**File**: `clear-map.php` lines 144-320
-**Function**: `save_imported_pois()`
-**Key Logic**: Detects if POIs need forward or reverse geocoding, runs appropriate method
-
-### Manual Geocoding Button Handler
-**File**: `clear-map.php` lines 423-463
-**Function**: `run_manual_geocoding()`
-**Does**: Reverse geocodes all POIs with coordinates but no addresses
-
-### Map Tooltip & Popup Display
-**File**: `assets/js/map.js`
-**Hover Tooltip**: Lines 443-467 - `showPoiTooltip(e)` and `hidePoiTooltip()`
-**Click Popup**: Lines 456-521 - `showPoiPopup(poi, coordinates)`
-**Popup Logic**: Calculates viewport space to position popup optimally (above/below/left/right)
-**CSS**: `assets/css/map.css` lines 198-226 (class: `.clear-map-tooltip`)
-
-### Reverse Geocoding Implementation
-**File**: `includes/class-api-handler.php` lines 235-368
-**Functions**:
-- `reverse_geocode_pois()` - Main method for batch reverse geocoding
-- `reverse_geocode()` - Routes to Mapbox or Google
-- `reverse_geocode_mapbox()` - Mapbox reverse geocoding API
-- `reverse_geocode_google()` - Google reverse geocoding API
-
----
-
-## Testing Data
-
-### Test KML File
-**Location**: `/wp-content/plugins/clear-map/280 8th Avenue Neighborhood.kml`
-**Contains**: 95 POIs across 6 categories (Parks, Schools, Transportation, Museums & Entertainment, Grocery & Shopping, Bars/Cafes & Dining)
-**Structure**: Google My Maps export with KML folders containing placemarks with coordinates
-
-### Test Scripts (for debugging)
-- `/check-pois.php` - View POI data structure
-- `/check-single-poi.php` - View first POI complete data
-- `/test-kml-parse.php` - Test KML parser with debug log
-
----
-
-## Plugin Settings
+## Global Admin Settings (v1.9.0)
 
 ### Settings Location
 WordPress Admin → Clear Map → Settings
 
-### Available Settings
-- Mapbox Access Token (required)
-- Google Geocoding API Key (optional)
-- Building Icon Width
-- Cluster Distance
-- Cluster Min Points
-- Zoom Threshold
-- Show Subway Lines (toggle)
-- Building Address
-- Building Icon (SVG/PNG upload)
+### Available Settings (API & Building Only)
+- **Mapbox Access Token** (required) - For map rendering and geocoding
+- **Google Geocoding API Key** (optional) - Fallback for geocoding
+- **Building Icon SVG** - Custom SVG icon for building marker
+- **Building Icon PNG** - Alternative PNG icon
+- **Building Icon Width** - Size of building marker
+- **Building Address** - Address with "Geocode Now" button
+- **Building Phone** - Contact phone number
+- **Building Email** - Contact email address
+- **Building Description** - Building description text
 
-### Manual Geocoding Section
-Located in Settings page with button: "Run Geocoding on All POIs"
-**Purpose**: Reverse geocode POIs that have coordinates but no addresses
-**Feedback**: Spinner, status messages, detailed statistics, 20-second refresh delay
+### Geocoding Tools
+- **Run Geocoding on All POIs** button - Reverse geocode POIs missing addresses
 
 ---
 
-## WordPress Integration
+## Key JavaScript Methods (map.js)
 
-### Shortcodes
-- `[clear_map]` - Primary shortcode
-- `[the_andrea_map]` - Backwards compatibility (from previous plugin name)
+### Responsive Methods
+- `getBreakpoint()` - Returns 'desktop', 'tablet', or 'mobile' based on viewport
+- `getResponsiveValue(values, default)` - Gets value for current breakpoint with inheritance
+- `applyResponsiveContainerHeight()` - Applies responsive map height, calls map.resize()
+- `applyResponsiveStyles()` - Applies responsive filter panel styles (width, height, style)
+- `updateMobileMode()` - Applies mobile-specific display mode and style
 
-### Options Stored in Database
-- `clear_map_pois` - All POI data
-- `clear_map_categories` - Category definitions
-- `clear_map_mapbox_token` - Mapbox access token
-- `clear_map_google_api_key` - Google API key
-- `clear_map_building_icon_width` - Icon width setting
-- `clear_map_cluster_distance` - Clustering distance
-- `clear_map_cluster_min_points` - Min POIs for cluster
-- `clear_map_zoom_threshold` - Zoom level threshold
-- `clear_map_show_subway_lines` - Subway layer toggle
-- `clear_map_show_filters` - Show filter panel toggle
-- `clear_map_activity` - Activity log (last 20 actions)
-- `clear_map_filters_bg_color` - Filter panel background color
-- `clear_map_filters_bg_transparent` - Transparent background toggle
-- `clear_map_filters_frosted` - Frosted glass effect toggle
-- `clear_map_filters_show_header` - Show header toggle
-- `clear_map_filters_style` - Button style (list or pills)
-- `clear_map_filters_pill_border` - Pill border mode (category or custom)
-- `clear_map_filters_pill_border_color` - Custom pill border color
-- `clear_map_filters_show_items` - Show individual items toggle
-- `clear_map_mobile_filters` - Mobile display mode (below/drawer/hidden)
-- `clear_map_mobile_filters_height` - Mobile filter panel max height
-- `clear_map_mobile_filters_style` - Mobile filter style (inherit/list/pills)
+### Called On Init
+```javascript
+init() {
+    this.createMap()
+    this.setupFilters()
+    this.addBuildingMarker()
+    this.setupMobileDrawer()  // Calls applyResponsiveContainerHeight() and applyResponsiveStyles()
+}
+```
 
-### AJAX Actions
-- `clear_map_import_kml_pois` - Handle KML file upload
-- `clear_map_save_imported_pois` - Save imported POIs to database
-- `clear_map_run_geocoding` - Manual reverse geocoding button
-- `clear_map_geocode_cache` - Clear geocoding cache
-- `clear_map_clear_all_pois` - Clear all POIs and categories
-
----
-
-## Mapbox GL JS Integration
-
-### Map Initialization
-**File**: `assets/js/map.js`
-**Class**: `ClearMap`
-**Creates**: Custom map style with Mapbox raster tiles, adds controls, sets up POI sources
-
-### POI Clustering
-Uses Mapbox GL JS built-in clustering with configurable distance and min points
-
-### Layers
-- **clusters** - Clustered POI markers
-- **cluster-count** - Cluster count labels
-- **unclustered-point** - Individual POI markers
-- **subway-lines** - NYC subway lines (optional)
-- **subway-lines-labels** - Subway line labels
+### Called On Resize
+```javascript
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout)
+    resizeTimeout = setTimeout(() => {
+        this.applyResponsiveContainerHeight()
+        this.applyResponsiveStyles()
+        this.updateMobileMode()
+    }, 150)
+})
+```
 
 ---
 
 ## CSS Class Structure
 
 ### Map Container
-- `.clear-map-container` - Main container
+- `.clear-map-container` - Main container (height set via JS)
 - `.clear-map` - Mapbox map instance
 
 ### Filters Panel
 - `.clear-map-filters` - Filter sidebar
-- `.filters-header` - Header with toggle
-- `.filters-content` - Scrollable content
-- `.filter-category` - Category row
-- `.category-header` - Category name/color
-- `.category-pois` - POI list
-- `.poi-item` - Individual POI in list
+- `.filter-style-list` - List button style
+- `.filter-style-pills` - Pills button style
+- `.filters-frosted` - Frosted glass effect
+- `.bg-transparent` - Transparent background
+- `.no-header` - Header hidden
+- `.no-items` - Individual items hidden
+- `.pills-frosted` - Frosted pill backgrounds
 
-### Tooltips & Popups
-- `.clear-map-tooltip` - Hover tooltip container
-- `.tooltip-name` - Tooltip POI name
-- `.tooltip-address` - Tooltip POI address
-- `.poi-popup` - Click popup container (Mapbox GL JS managed)
-- `.poi-popup-name` - Popup POI name
-- `.poi-popup-photo` - Popup photo container
-- `.poi-popup-address` - Popup address
-- `.poi-popup-description` - Popup description text
-- `.poi-popup-website` - Popup website link
-
----
-
-## Migration Notes
-
-### Plugin Rename
-Renamed from "The Andrea Map" to "Clear Map"
-**Migration script**: `migrate-data.php` (activated by defining `CLEAR_MAP_MIGRATE` in wp-config.php)
-**Changes all option names**: `andrea_map_*` → `clear_map_*`
-
----
-
-## Git Repository Preparation
-
-### Files to Include
-- All plugin files in `/wp-content/plugins/clear-map/`
-- README.md (needs to be created)
-- LICENSE file (GPL v2 or later)
-
-### Files to Exclude (.gitignore)
-- Test KML files (user's specific data)
-- Test/debug PHP scripts (`check-*.php`, `test-*.php`)
-- `migrate-data.php` (legacy migration script)
-- Any client-specific customizations
-
----
-
-## Developer Notes
-
-### Code Style
-- WordPress Coding Standards
-- Class names: `Clear_Map_ClassName`
-- Function names: `snake_case`
-- JavaScript: ES6 classes, jQuery for admin
-
-### Error Logging
-- All geocoding operations log to WordPress error log
-- Activity log in admin dashboard tracks major actions
-
-### Caching
-- Geocoding results cached in WordPress transients (24 hours)
-- Cache key format: `clear_map_geocode_mapbox_{md5(address)}` or `clear_map_reverse_geocode_mapbox_{md5(lat,lng)}`
-
-### Performance
-- POI limit: 30 per category (configurable in code)
-- Activity log: Last 20 actions
-- Transient cache: 24 hours for geocoding, 1 hour for import data
+### Mobile Classes
+- `.mobile-filters-below` - Filter panel below map (flexbox layout)
+- `.mobile-filters-hidden` - Hide filter panel on mobile
+- `.mobile-drawer-mode` - Container class for drawer mode
+- `.mobile-drawer` - Filter panel as slide-up drawer
 
 ---
 
 ## Recent Commits
 
-### Version 1.4.0 - Filter Panel Customization
-- Added filter panel appearance settings (background, frosted glass, header, style)
-- Pills button style with category or custom border colors
-- Conditional expand behavior based on show items setting
-- Admin UI with color pickers, toggles, radio groups
+### Version 1.9.2 - Mobile Layout Fixes (2026-01-15)
+- Fix mobile height handling (map element gets explicit height)
+- Remove "Use Global Setting" from WPBakery dropdowns
+- Add "Above Map" option to Mobile Filter Display
+- Fix `get_setting()` default value bug
 
-### Version 1.3.0 - WPBakery & Auto-Updates
-- WPBakery Page Builder element integration
-- GitHub auto-update functionality
-- WordPress Coding Standards compliance
+### Version 1.9.0 - Settings Consolidation (2026-01-15)
+- Add responsive device toggles to Map Height
+- Remove display settings from global admin
+- Keep only API keys and building info in global admin
+- All display settings now configured per-element in WPBakery
+
+### Version 1.8.0 - WPBakery Responsive Settings (2026-01-14)
+- Add responsive device toggles to Filter Panel settings
+- Custom WPBakery param types for responsive fields
+- Mobile Filter Display and Style fields
+
+### Version 1.7.0 - Mobile Filter Settings (2026-01-14)
+- Mobile filter display modes (below/drawer/hidden)
+- Mobile filter style override
+- CSS flexbox layout for mobile
+
+---
+
+## Git Workflow Reminder
+
+When committing changes, always create a GitHub release for plugin auto-updates:
+
+```bash
+# After committing
+git tag v1.x.x
+git push origin v1.x.x
+gh release create v1.x.x --title "v1.x.x - Title" --notes "Release notes..."
+```
 
 ---
 
 ## End of Context
 
-**Current Version**: 1.4.0
-**Current Status**: Filter panel customization complete and pushed to GitHub
-**Ready for**: Testing filter panel settings, further enhancements
+**Current Version**: 1.9.2
+**Current Status**: Production ready
+**Known Issue**: WPBakery "Above Map" option may not save (deferred)

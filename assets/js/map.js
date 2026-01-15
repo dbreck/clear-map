@@ -803,18 +803,53 @@ class ClearMap {
   }
 
   /**
-   * Apply responsive container height to the map wrapper.
+   * Apply responsive height to the map.
+   * On desktop/tablet: applies to container
+   * On mobile: applies to .clear-map element (container is flex auto)
    */
   applyResponsiveContainerHeight() {
     const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
-    if (!containerEl || !this.data.mapHeight) return
+    const mapEl = document.getElementById(this.containerId)
+    if (!containerEl) return
 
-    const height = this.getResponsiveValue(this.data.mapHeight, "60vh")
-    containerEl.style.height = height
+    const breakpoint = this.getBreakpoint()
+    const mapHeight = this.data.mapHeight || {}
 
-    // Resize map to fit new container
+    // Get the appropriate height value for current breakpoint
+    const desktop = mapHeight.desktop || "60vh"
+    const tablet = mapHeight.tablet || desktop
+    const mobile = mapHeight.mobile || "50vh" // Default mobile height
+
+    let height
+    if (breakpoint === "mobile") {
+      height = mobile
+    } else if (breakpoint === "tablet") {
+      height = tablet
+    } else {
+      height = desktop
+    }
+
+    console.log("Clear Map: Applying height", height, "for breakpoint", breakpoint)
+
+    // On mobile, apply height to the map element (container is flex auto)
+    // On desktop/tablet, apply height to the container
+    if (breakpoint === "mobile") {
+      containerEl.style.height = "" // Let CSS handle container (auto)
+      if (mapEl) {
+        mapEl.style.height = height
+      }
+    } else {
+      containerEl.style.height = height
+      if (mapEl) {
+        mapEl.style.height = "" // Let CSS handle (100%)
+      }
+    }
+
+    // Resize map to fit new dimensions
     if (this.map) {
-      this.map.resize()
+      setTimeout(() => {
+        this.map.resize()
+      }, 50)
     }
   }
 
@@ -829,9 +864,34 @@ class ClearMap {
     const breakpoint = this.getBreakpoint()
 
     // Get responsive values
+    const showFilters = this.getResponsiveValue(this.data.showFilters, "1")
     const width = this.getResponsiveValue(this.data.filtersWidth, "320px")
     const height = this.getResponsiveValue(this.data.filtersHeight, "auto")
     const style = this.getResponsiveValue(this.data.filtersStyle, "list")
+    const bgTransparent = this.getResponsiveValue(this.data.filtersBgTransparent, "0")
+    const frosted = this.getResponsiveValue(this.data.filtersFrosted, "0")
+    const showHeader = this.getResponsiveValue(this.data.filtersShowHeader, "1")
+    const showItems = this.getResponsiveValue(this.data.filtersShowItems, "1")
+
+    // Debug log
+    console.log("Clear Map applyResponsiveStyles:", {
+      breakpoint,
+      showFilters,
+      width,
+      height,
+      style,
+      frosted,
+      showHeader,
+      showItems
+    })
+
+    // Apply show/hide filter panel
+    if (showFilters === "0" || showFilters === 0) {
+      filtersEl.style.display = "none"
+      return // Don't apply other styles if hidden
+    } else {
+      filtersEl.style.display = ""
+    }
 
     // Apply width (only on desktop/tablet, mobile is 100%)
     if (breakpoint !== "mobile" && width) {
@@ -852,16 +912,49 @@ class ClearMap {
     // Apply style class
     filtersEl.classList.remove("filter-style-list", "filter-style-pills")
     filtersEl.classList.add("filter-style-" + style)
+
+    // Apply transparent background
+    if (bgTransparent === "1" || bgTransparent === 1) {
+      filtersEl.classList.add("bg-transparent")
+    } else {
+      filtersEl.classList.remove("bg-transparent")
+    }
+
+    // Apply frosted glass effect
+    if (frosted === "1" || frosted === 1) {
+      filtersEl.classList.add("filters-frosted")
+    } else {
+      filtersEl.classList.remove("filters-frosted")
+    }
+
+    // Apply show/hide header
+    if (showHeader === "0" || showHeader === 0) {
+      filtersEl.classList.add("no-header")
+    } else {
+      filtersEl.classList.remove("no-header")
+    }
+
+    // Apply show/hide individual items
+    if (showItems === "0" || showItems === 0) {
+      filtersEl.classList.add("no-items")
+    } else {
+      filtersEl.classList.remove("no-items")
+    }
   }
 
   setupMobileDrawer() {
     const filtersEl = document.getElementById(this.containerId + "-filters")
     const containerEl = document.querySelector(`[data-map-id="${this.containerId}"]`)
-    if (!filtersEl || !containerEl) return
+    if (!containerEl) return
 
-    // Apply responsive container height and styles
+    // Apply responsive container height (always)
     this.applyResponsiveContainerHeight()
-    this.applyResponsiveStyles()
+
+    // Apply filter styles if filter panel exists
+    if (filtersEl) {
+      this.applyResponsiveStyles()
+      this.updateMobileMode()
+    }
 
     // Add resize listener for responsive updates
     let resizeTimeout
@@ -869,13 +962,12 @@ class ClearMap {
       clearTimeout(resizeTimeout)
       resizeTimeout = setTimeout(() => {
         this.applyResponsiveContainerHeight()
-        this.applyResponsiveStyles()
-        this.updateMobileMode()
+        if (filtersEl) {
+          this.applyResponsiveStyles()
+          this.updateMobileMode()
+        }
       }, 150)
     })
-
-    // Apply mobile-specific mode
-    this.updateMobileMode()
   }
 
   /**
@@ -889,7 +981,7 @@ class ClearMap {
     const breakpoint = this.getBreakpoint()
 
     // Remove all mobile mode classes first
-    filtersEl.classList.remove("mobile-filters-hidden", "mobile-filters-below", "mobile-drawer")
+    filtersEl.classList.remove("mobile-filters-hidden", "mobile-filters-below", "mobile-filters-above", "mobile-drawer")
     containerEl.classList.remove("mobile-drawer-mode")
 
     // Only apply mobile modes on mobile breakpoint
@@ -897,7 +989,8 @@ class ClearMap {
 
     const mobileMode = this.data.mobileFilters || "below"
     const mobileStyle = this.data.mobileFiltersStyle || "inherit"
-    const mobileHeight = this.getResponsiveValue(this.data.filtersHeight, "auto")
+
+    console.log("Clear Map: Mobile mode =", mobileMode)
 
     // Apply mobile display mode
     if (mobileMode === "hidden") {
@@ -905,15 +998,11 @@ class ClearMap {
     } else if (mobileMode === "drawer") {
       containerEl.classList.add("mobile-drawer-mode")
       filtersEl.classList.add("mobile-drawer")
+    } else if (mobileMode === "above") {
+      filtersEl.classList.add("mobile-filters-above")
     } else {
       // Default: "below" - filters display below map
       filtersEl.classList.add("mobile-filters-below")
-
-      // Apply mobile height if set
-      if (mobileHeight && mobileHeight !== "auto") {
-        filtersEl.style.maxHeight = mobileHeight
-        filtersEl.style.overflowY = "auto"
-      }
     }
 
     // Apply mobile filter style override

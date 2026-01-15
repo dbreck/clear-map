@@ -2,7 +2,7 @@
 .clear-map-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 16/10;
+    height: 60vh; /* Default height, overridden by JS for responsive values */
     min-height: 400px;
     background: #f5f5f0;
     font-family: 'Area Normal', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -414,22 +414,24 @@
    Mobile Responsive (max-width: 768px)
    ============================================ */
 @media (max-width: 768px) {
-    /* Default mobile layout: filters below map */
+    /* Mobile layout: stacked flex column */
     .clear-map-container {
         display: flex;
         flex-direction: column;
-        aspect-ratio: auto;
-        height: auto !important;
+        height: auto !important; /* Container auto, map element gets height */
         min-height: auto;
     }
 
+    /* Map element gets explicit height on mobile (set via JS) */
     .clear-map {
         flex: 0 0 auto;
-        aspect-ratio: 16/11;
-        min-height: 300px;
         width: 100%;
+        height: 50vh; /* Default mobile height, overridden by JS */
+        min-height: 250px;
+        order: 1; /* Explicit order for flexbox positioning */
     }
 
+    /* Filters flow naturally below map */
     .clear-map-filters {
         position: relative;
         top: auto;
@@ -438,16 +440,32 @@
         bottom: auto;
         width: 100%;
         max-width: 100%;
-        order: 2;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important; /* Allow POI lists to expand */
+        order: 2; /* Below map by default */
         border-radius: 0;
-        max-height: none;
         box-shadow: none;
         border-top: 1px solid rgba(212, 165, 116, 0.2);
+        border-bottom: none;
     }
 
-    /* Mobile filters below - explicitly show */
+    /* Allow filters content to expand naturally on mobile */
+    .clear-map-filters .filters-content {
+        max-height: none;
+        overflow: visible;
+    }
+
+    /* Mobile filters above map */
+    .clear-map-filters.mobile-filters-above {
+        order: 0; /* Before map (which has order: 1) */
+        border-top: none;
+        border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    /* Mobile filters below map (default) */
     .clear-map-filters.mobile-filters-below {
-        display: flex;
+        order: 2;
     }
 
     /* Mobile filters hidden */
@@ -455,17 +473,16 @@
         display: none !important;
     }
 
-    /* Mobile drawer mode - reverts to absolute positioning overlay */
+    /* Mobile drawer mode - overlay on map */
     .clear-map-container.mobile-drawer-mode {
         display: block;
-        aspect-ratio: 16/11;
-        height: auto;
+        height: auto !important;
         min-height: 400px;
     }
 
     .clear-map-container.mobile-drawer-mode .clear-map {
-        aspect-ratio: auto;
         height: 100%;
+        min-height: 400px;
     }
 
     .clear-map-container.mobile-drawer-mode .clear-map-filters {
@@ -476,7 +493,7 @@
         top: auto;
         width: 100%;
         border-radius: 16px 16px 0 0;
-        max-height: 50vh;
+        max-height: 50vh !important;
         border-top: none;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     }

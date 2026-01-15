@@ -40,6 +40,10 @@ class Clear_Map_Renderer {
 		if ( isset( $atts[ $attr_name ] ) && '' !== $atts[ $attr_name ] ) {
 			return $atts[ $attr_name ];
 		}
+		// If no global option name provided (WPBakery-only settings), use default.
+		if ( empty( $option_name ) ) {
+			return $default;
+		}
 		// Otherwise fall back to global option.
 		return get_option( $option_name, $default );
 	}
@@ -151,6 +155,10 @@ class Clear_Map_Renderer {
 		// Convert string values to proper types for boolean comparisons (desktop values for backward compat).
 		$show_subway_lines             = 1 === (int) $show_subway_lines;
 		$show_filters_desktop          = 1 === (int) $show_filters['desktop'];
+		// Render filter panel if ANY breakpoint shows it (JS will handle show/hide dynamically).
+		$show_filters_any_breakpoint   = $show_filters_desktop
+			|| 1 === (int) $show_filters['tablet']
+			|| 1 === (int) $show_filters['mobile'];
 		$filters_bg_transparent_desktop = 1 === (int) $filters_bg_transparent['desktop'];
 		$filters_frosted_desktop       = 1 === (int) $filters_frosted['desktop'];
 		$filters_show_header_desktop   = 1 === (int) $filters_show_header['desktop'];
@@ -284,9 +292,9 @@ class Clear_Map_Renderer {
 
 		ob_start();
 		?>
-		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>" style="height: <?php echo esc_attr( $height['desktop'] ); ?>;">
+		<div<?php echo $wrapper_id; ?> class="<?php echo esc_attr( $wrapper_class ); ?>" data-map-id="<?php echo esc_attr( $map_id ); ?>" data-js-var="<?php echo esc_attr( $js_var_name ); ?>">
 			<div id="<?php echo esc_attr( $map_id ); ?>" class="clear-map"></div>
-			<?php if ( $show_filters_desktop ) : ?>
+			<?php if ( $show_filters_any_breakpoint ) : ?>
 			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_inline_style ); ?>">
 				<?php if ( $filters_show_header_desktop ) : ?>
 				<div class="filters-header">
