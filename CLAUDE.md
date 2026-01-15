@@ -334,16 +334,33 @@ window.addEventListener("resize", () => {
 
 ---
 
-## Git Workflow Reminder
+## Git Workflow & Release SOP
 
 When committing changes, always create a GitHub release for plugin auto-updates:
 
 ```bash
 # After committing
 git tag v1.x.x
+git push origin main
 git push origin v1.x.x
-gh release create v1.x.x --title "v1.x.x - Title" --notes "Release notes..."
+
+# Create release zip (from parent directory)
+cd "/Users/dannybreckenridge/Documents/Clear ph/Clear pH Custom WP Plugins"
+rm -f clear-map.zip
+zip -r clear-map.zip clear-map \
+  -x "clear-map/.git/*" -x "clear-map/.claude/*" -x "clear-map/.gitignore" \
+  -x "clear-map/*.kml" -x "clear-map/check-*.php" -x "clear-map/test-*.php" \
+  -x "clear-map/view-*.php" -x "clear-map/migrate-data.php" \
+  -x "clear-map/MIGRATION.md" -x "clear-map/clear-map.zip" \
+  -x "clear-map/Subway_Lines_NYC.geojson" -x "clear-map/CLAUDE.md" \
+  -x "clear-map/screenshots/*" -x "*.DS_Store"
+
+# Create release with zip attached
+cd clear-map
+gh release create v1.x.x --title "v1.x.x - Title" --notes "Release notes..." "../clear-map.zip"
 ```
+
+**IMPORTANT**: Always attach `clear-map.zip` to releases. Do NOT use GitHub's auto-generated source archives (they have version numbers in the folder name).
 
 ---
 
