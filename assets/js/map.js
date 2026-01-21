@@ -31,9 +31,9 @@ class ClearMap {
   }
 
   createMap() {
-    // Always center on the building's geocoded coordinates if available
-    const centerLng = this.data.buildingCoords && this.data.buildingCoords.lng ? this.data.buildingCoords.lng : this.data.centerLng
-    const centerLat = this.data.buildingCoords && this.data.buildingCoords.lat ? this.data.buildingCoords.lat : this.data.centerLat
+    // Use WPBakery center settings; building marker is placed independently
+    const centerLng = this.data.centerLng
+    const centerLat = this.data.centerLat
 
     this.map = new mapboxgl.Map({
       container: this.containerId,
