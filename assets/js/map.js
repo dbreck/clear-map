@@ -259,6 +259,7 @@ class ClearMap {
             address: poi.address || "",
             description: poi.description || "",
             photo: poi.photo || "",
+            logo: poi.logo || "",
             website: poi.website || "",
             category: category,
             color: categoryColor,
