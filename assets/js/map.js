@@ -722,11 +722,16 @@ class ClearMap {
         // Mark UI
         filtersEl.querySelectorAll(".poi-item").forEach((el) => el.classList.toggle("inactive", el !== poiEl))
         this.updateMap()
-        // Center map on POI
+        // Center map on POI and show popup
         const [catKey, idx] = poiId.split("-")
         const poi = this.data.pois[catKey]?.[parseInt(idx, 10)]
         if (poi && poi.lng && poi.lat) {
-          this.map.easeTo({ center: [poi.lng, poi.lat], zoom: Math.max(this.data.zoom, 16) })
+          const coordinates = [poi.lng, poi.lat]
+          this.map.easeTo({ center: coordinates, zoom: Math.max(this.data.zoom, 16) })
+          // Show popup after animation completes
+          this.map.once("moveend", () => {
+            this.showPoiPopup(poi, coordinates)
+          })
         }
       })
     })
