@@ -398,8 +398,26 @@ class Clear_Map_Renderer {
 
 							<?php if ( $filters_show_items ) : ?>
 							<div class="category-pois" style="display: none;" aria-expanded="false">
-								<?php if ( isset( $pois[ $cat_key ] ) ) : ?>
-									<?php foreach ( $pois[ $cat_key ] as $index => $poi ) : ?>
+								<?php
+								if ( isset( $pois[ $cat_key ] ) ) :
+									// Sort POIs alphabetically while preserving original index.
+									$sorted_pois = array();
+									foreach ( $pois[ $cat_key ] as $index => $poi ) {
+										$sorted_pois[] = array(
+											'index' => $index,
+											'poi'   => $poi,
+										);
+									}
+									usort(
+										$sorted_pois,
+										function ( $a, $b ) {
+											return strcasecmp( $a['poi']['name'], $b['poi']['name'] );
+										}
+									);
+									foreach ( $sorted_pois as $item ) :
+										$index = $item['index'];
+										$poi   = $item['poi'];
+										?>
 										<div class="poi-item" data-poi="<?php echo esc_attr( $cat_key . '-' . $index ); ?>">
 											<span class="poi-dot" style="background-color: <?php echo esc_attr( $category['color'] ); ?>"></span>
 											<span class="poi-name"><?php echo esc_html( $poi['name'] ); ?></span>
