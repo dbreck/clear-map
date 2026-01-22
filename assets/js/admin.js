@@ -834,6 +834,688 @@ jQuery(document).ready(function ($) {
     $(this).closest(".radio-option").addClass("selected")
   })
 
+  // ========================================
+  // MANAGE PAGE - POI & CATEGORY MANAGEMENT
+  // ========================================
+
+  // Only initialize on manage page
+  if ($(".clear-map-manage-page").length) {
+    initManagePage()
+  }
+
+  function initManagePage() {
+    // POI Modal handlers
+    initPoiModal()
+
+    // Category Modal handlers
+    initCategoryModal()
+
+    // Export Modal handlers
+    initExportModal()
+
+    // Category sorting (drag & drop)
+    initCategorySorting()
+
+    // Bulk actions
+    initBulkActions()
+  }
+
+  // ========================================
+  // POI MODAL
+  // ========================================
+
+  function initPoiModal() {
+    const $modal = $("#poi-modal")
+    const $form = $("#poi-edit-form")
+
+    // Open modal for new POI
+    $("#add-new-poi-btn").on("click", function (e) {
+      e.preventDefault()
+      openPoiModal(null)
+    })
+
+    // Open modal for editing from table
+    $(document).on("click", ".poi-edit-link", function (e) {
+      e.preventDefault()
+      const poiId = $(this).data("poi-id")
+      openPoiModal(poiId)
+    })
+
+    // Delete POI from table
+    $(document).on("click", ".poi-delete-link", function (e) {
+      e.preventDefault()
+      const poiId = $(this).data("poi-id")
+      if (confirm(clearMapAdmin.strings.confirmDelete)) {
+        deletePoi(poiId)
+      }
+    })
+
+    // Close modal handlers
+    $modal.on("click", ".modal-close, .modal-backdrop, #poi-cancel-btn", function () {
+      closePoiModal()
+    })
+
+    // Save POI
+    $("#poi-save-btn").on("click", function () {
+      savePoi()
+    })
+
+    // Delete POI from modal
+    $("#poi-delete-btn").on("click", function () {
+      const poiId = $("#poi-id").val()
+      if (confirm(clearMapAdmin.strings.confirmDelete)) {
+        deletePoi(poiId)
+      }
+    })
+
+    // Section toggle
+    $modal.on("click", ".section-toggle", function () {
+      const $section = $(this).closest(".modal-section")
+      const $content = $section.find(".section-content")
+      const $icon = $(this).find(".dashicons")
+
+      $content.slideToggle(200)
+      $section.toggleClass("modal-section-collapsed")
+      $icon.toggleClass("dashicons-arrow-down-alt2 dashicons-arrow-up-alt2")
+    })
+
+    // Media upload buttons
+    $modal.on("click", ".media-upload-btn", function (e) {
+      e.preventDefault()
+      const targetId = $(this).data("target")
+      openMediaUploader(targetId)
+    })
+
+    // Media remove buttons
+    $modal.on("click", ".media-remove-btn", function (e) {
+      e.preventDefault()
+      const targetId = $(this).data("target")
+      removeMedia(targetId)
+    })
+
+    // Close on escape key
+    $(document).on("keydown", function (e) {
+      if (e.key === "Escape" && $modal.is(":visible")) {
+        closePoiModal()
+      }
+    })
+  }
+
+  function openPoiModal(poiId) {
+    const $modal = $("#poi-modal")
+    const isNew = !poiId
+
+    // Reset form
+    $("#poi-edit-form")[0].reset()
+    resetMediaPreviews()
+
+    if (isNew) {
+      $("#poi-modal-title").text("Add New POI")
+      $("#poi-id").val("")
+      $("#poi-is-new").val("true")
+      $("#poi-delete-btn").hide()
+
+      // Set defaults
+      $("#poi-lat, #poi-lng, #poi-coordinate-source").val("")
+
+      $modal.fadeIn(200)
+      $("#poi-name").focus()
+    } else {
+      $("#poi-modal-title").text("Edit POI")
+      $("#poi-id").val(poiId)
+      $("#poi-is-new").val("false")
+      $("#poi-delete-btn").show()
+
+      // Load POI data
+      $.post(
+        clearMapAdmin.ajaxurl,
+        {
+          action: "clear_map_get_poi",
+          nonce: clearMapAdmin.managePoisNonce,
+          poi_id: poiId,
+        },
+        function (response) {
+          if (response.success) {
+            populatePoiForm(response.data)
+            $modal.fadeIn(200)
+            $("#poi-name").focus()
+          } else {
+            alert("Error loading POI: " + (response.data || "Unknown error"))
+          }
+        }
+      ).fail(function () {
+        alert("Network error loading POI")
+      })
+    }
+  }
+
+  function populatePoiForm(poi) {
+    $("#poi-name").val(poi.name || "")
+    $("#poi-category").val(poi.category || "")
+    $("#poi-address").val(poi.address || "")
+    $("#poi-description").val(poi.description || "")
+    $("#poi-website").val(poi.website || "")
+    $("#poi-lat").val(poi.lat || "")
+    $("#poi-lng").val(poi.lng || "")
+    $("#poi-coordinate-source").val(poi.coordinate_source || "")
+    $("#poi-needs-geocoding").val(poi.needs_geocoding || "")
+    $("#poi-reverse-geocoded").val(poi.reverse_geocoded || "")
+    $("#poi-geocoded-address").val(poi.geocoded_address || "")
+    $("#poi-geocoding-precision").val(poi.geocoding_precision || "")
+
+    // Set media previews
+    if (poi.photo) {
+      $("#poi-photo").val(poi.photo)
+      $("#poi-photo-preview").html('<img src="' + poi.photo + '" alt="" />')
+      $(".media-remove-btn[data-target='poi-photo']").show()
+    }
+
+    if (poi.logo) {
+      $("#poi-logo").val(poi.logo)
+      $("#poi-logo-preview").html('<img src="' + poi.logo + '" alt="" />')
+      $(".media-remove-btn[data-target='poi-logo']").show()
+    }
+  }
+
+  function resetMediaPreviews() {
+    $("#poi-photo").val("")
+    $("#poi-logo").val("")
+    $("#poi-photo-preview").html('<span class="dashicons dashicons-format-image no-media"></span>')
+    $("#poi-logo-preview").html('<span class="dashicons dashicons-store no-media"></span>')
+    $(".media-remove-btn").hide()
+  }
+
+  function closePoiModal() {
+    $("#poi-modal").fadeOut(200)
+  }
+
+  function savePoi() {
+    const $saveBtn = $("#poi-save-btn")
+    const originalText = $saveBtn.text()
+
+    // Basic validation
+    const name = $("#poi-name").val().trim()
+    if (!name) {
+      alert("POI name is required")
+      $("#poi-name").focus()
+      return
+    }
+
+    $saveBtn.prop("disabled", true).text(clearMapAdmin.strings.saving)
+
+    const formData = {
+      action: "clear_map_save_poi",
+      nonce: clearMapAdmin.managePoisNonce,
+      poi_id: $("#poi-id").val(),
+      is_new: $("#poi-is-new").val(),
+      name: name,
+      category: $("#poi-category").val(),
+      address: $("#poi-address").val(),
+      description: $("#poi-description").val(),
+      website: $("#poi-website").val(),
+      photo: $("#poi-photo").val(),
+      logo: $("#poi-logo").val(),
+      lat: $("#poi-lat").val(),
+      lng: $("#poi-lng").val(),
+      coordinate_source: $("#poi-coordinate-source").val(),
+      needs_geocoding: $("#poi-needs-geocoding").val(),
+      reverse_geocoded: $("#poi-reverse-geocoded").val(),
+      geocoded_address: $("#poi-geocoded-address").val(),
+      geocoding_precision: $("#poi-geocoding-precision").val(),
+    }
+
+    $.post(clearMapAdmin.ajaxurl, formData, function (response) {
+      if (response.success) {
+        closePoiModal()
+        // Refresh the page to show updated data
+        window.location.reload()
+      } else {
+        alert("Error saving POI: " + (response.data || "Unknown error"))
+      }
+    })
+      .fail(function () {
+        alert("Network error saving POI")
+      })
+      .always(function () {
+        $saveBtn.prop("disabled", false).text(originalText)
+      })
+  }
+
+  function deletePoi(poiId) {
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_delete_poi",
+        nonce: clearMapAdmin.managePoisNonce,
+        poi_id: poiId,
+      },
+      function (response) {
+        if (response.success) {
+          closePoiModal()
+          window.location.reload()
+        } else {
+          alert("Error deleting POI: " + (response.data || "Unknown error"))
+        }
+      }
+    ).fail(function () {
+      alert("Network error deleting POI")
+    })
+  }
+
+  function openMediaUploader(targetId) {
+    const frame = wp.media({
+      title: targetId === "poi-photo" ? "Select POI Photo" : "Select POI Logo",
+      button: { text: "Use this image" },
+      multiple: false,
+      library: { type: "image" },
+    })
+
+    frame.on("select", function () {
+      const attachment = frame.state().get("selection").first().toJSON()
+      const thumbnailUrl =
+        attachment.sizes && attachment.sizes.thumbnail
+          ? attachment.sizes.thumbnail.url
+          : attachment.url
+
+      $("#" + targetId).val(attachment.url)
+      $("#" + targetId + "-preview").html('<img src="' + thumbnailUrl + '" alt="" />')
+      $(".media-remove-btn[data-target='" + targetId + "']").show()
+    })
+
+    frame.open()
+  }
+
+  function removeMedia(targetId) {
+    $("#" + targetId).val("")
+    const icon = targetId === "poi-photo" ? "dashicons-format-image" : "dashicons-store"
+    $("#" + targetId + "-preview").html('<span class="dashicons ' + icon + ' no-media"></span>')
+    $(".media-remove-btn[data-target='" + targetId + "']").hide()
+  }
+
+  // ========================================
+  // CATEGORY MODAL
+  // ========================================
+
+  function initCategoryModal() {
+    const $modal = $("#category-modal")
+
+    // Open modal for new category
+    $("#add-new-category-btn, #add-first-category").on("click", function (e) {
+      e.preventDefault()
+      openCategoryModal(null)
+    })
+
+    // Open modal for editing
+    $(document).on("click", ".category-edit-btn", function () {
+      const categoryKey = $(this).data("category-key")
+      openCategoryModal(categoryKey)
+    })
+
+    // Delete category
+    $(document).on("click", ".category-delete-btn", function () {
+      const categoryKey = $(this).data("category-key")
+      if (confirm(clearMapAdmin.strings.confirmCatDelete)) {
+        deleteCategory(categoryKey)
+      }
+    })
+
+    // Close modal handlers
+    $modal.on("click", ".modal-close, .modal-backdrop, #category-cancel-btn", function () {
+      closeCategoryModal()
+    })
+
+    // Save category
+    $("#category-save-btn").on("click", function () {
+      saveCategory()
+    })
+
+    // Initialize color picker when modal opens
+    $(document).on("modalOpen", "#category-modal", function () {
+      if (!$("#category-color").data("wpColorPicker")) {
+        $("#category-color").wpColorPicker()
+      }
+    })
+
+    // Close on escape key
+    $(document).on("keydown", function (e) {
+      if (e.key === "Escape" && $modal.is(":visible")) {
+        closeCategoryModal()
+      }
+    })
+  }
+
+  function openCategoryModal(categoryKey) {
+    const $modal = $("#category-modal")
+    const isNew = !categoryKey
+
+    // Reset form
+    $("#category-edit-form")[0].reset()
+
+    // Initialize color picker if not already
+    if (!$("#category-color").data("wpColorPicker")) {
+      $("#category-color").wpColorPicker()
+    }
+
+    if (isNew) {
+      $("#category-modal-title").text("Add New Category")
+      $("#category-key").val("")
+      $("#category-is-new").val("true")
+      $("#category-name").val("")
+      $("#category-color").wpColorPicker("color", "#D4A574")
+
+      $modal.fadeIn(200)
+      $modal.trigger("modalOpen")
+      setTimeout(() => $("#category-name").focus(), 100)
+    } else {
+      $("#category-modal-title").text("Edit Category")
+      $("#category-key").val(categoryKey)
+      $("#category-is-new").val("false")
+
+      // Get category data from the page
+      const $card = $('.category-card[data-category-key="' + categoryKey + '"]')
+      const name = $card.find(".category-name").text()
+      const color = $card.find(".category-color-swatch").css("background-color")
+
+      $("#category-name").val(name)
+
+      // Convert RGB to hex if needed
+      const hexColor = rgbToHex(color) || "#D4A574"
+      $("#category-color").wpColorPicker("color", hexColor)
+
+      $modal.fadeIn(200)
+      $modal.trigger("modalOpen")
+      setTimeout(() => $("#category-name").focus(), 100)
+    }
+  }
+
+  function rgbToHex(rgb) {
+    if (!rgb || rgb.indexOf("rgb") === -1) return rgb
+
+    const matches = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/)
+    if (!matches) return rgb
+
+    function hex(x) {
+      return ("0" + parseInt(x).toString(16)).slice(-2)
+    }
+
+    return "#" + hex(matches[1]) + hex(matches[2]) + hex(matches[3])
+  }
+
+  function closeCategoryModal() {
+    $("#category-modal").fadeOut(200)
+  }
+
+  function saveCategory() {
+    const $saveBtn = $("#category-save-btn")
+    const originalText = $saveBtn.text()
+
+    const name = $("#category-name").val().trim()
+    if (!name) {
+      alert("Category name is required")
+      $("#category-name").focus()
+      return
+    }
+
+    $saveBtn.prop("disabled", true).text(clearMapAdmin.strings.saving)
+
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_save_category",
+        nonce: clearMapAdmin.managePoisNonce,
+        category_key: $("#category-key").val(),
+        is_new: $("#category-is-new").val(),
+        name: name,
+        color: $("#category-color").wpColorPicker("color"),
+      },
+      function (response) {
+        if (response.success) {
+          closeCategoryModal()
+          window.location.reload()
+        } else {
+          alert("Error saving category: " + (response.data || "Unknown error"))
+        }
+      }
+    )
+      .fail(function () {
+        alert("Network error saving category")
+      })
+      .always(function () {
+        $saveBtn.prop("disabled", false).text(originalText)
+      })
+  }
+
+  function deleteCategory(categoryKey) {
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_delete_category",
+        nonce: clearMapAdmin.managePoisNonce,
+        category_key: categoryKey,
+      },
+      function (response) {
+        if (response.success) {
+          window.location.reload()
+        } else {
+          alert("Error deleting category: " + (response.data || "Unknown error"))
+        }
+      }
+    ).fail(function () {
+      alert("Network error deleting category")
+    })
+  }
+
+  // ========================================
+  // CATEGORY SORTING
+  // ========================================
+
+  function initCategorySorting() {
+    if ($.fn.sortable && $("#categories-sortable").length) {
+      $("#categories-sortable").sortable({
+        handle: ".category-drag-handle",
+        placeholder: "category-card-placeholder",
+        tolerance: "pointer",
+        update: function () {
+          const order = []
+          $(".category-card").each(function () {
+            order.push($(this).data("category-key"))
+          })
+
+          $.post(clearMapAdmin.ajaxurl, {
+            action: "clear_map_reorder_categories",
+            nonce: clearMapAdmin.managePoisNonce,
+            order: order,
+          })
+        },
+      })
+    }
+  }
+
+  // ========================================
+  // BULK ACTIONS
+  // ========================================
+
+  function initBulkActions() {
+    // Handle bulk action form submission
+    $("#pois-filter-form").on("submit", function (e) {
+      const action = $("#bulk-action-selector-top").val()
+      if (action === "-1") return true // Normal form submit for filters
+
+      e.preventDefault()
+
+      const selectedPois = []
+      $('input[name="poi_ids[]"]:checked').each(function () {
+        selectedPois.push($(this).val())
+      })
+
+      if (selectedPois.length === 0) {
+        alert(clearMapAdmin.strings.noSelection)
+        return
+      }
+
+      if (action === "delete") {
+        if (!confirm(clearMapAdmin.strings.confirmBulkDelete)) {
+          return
+        }
+      }
+
+      executeBulkAction(action, selectedPois)
+    })
+
+    // Also handle the Apply button click
+    $(document).on("click", "#doaction, #doaction2", function (e) {
+      const actionSelector =
+        $(this).attr("id") === "doaction"
+          ? "#bulk-action-selector-top"
+          : "#bulk-action-selector-bottom"
+      const action = $(actionSelector).val()
+
+      if (action === "-1") return
+
+      e.preventDefault()
+
+      const selectedPois = []
+      $('input[name="poi_ids[]"]:checked').each(function () {
+        selectedPois.push($(this).val())
+      })
+
+      if (selectedPois.length === 0) {
+        alert(clearMapAdmin.strings.noSelection)
+        return
+      }
+
+      if (action === "delete") {
+        if (!confirm(clearMapAdmin.strings.confirmBulkDelete)) {
+          return
+        }
+      }
+
+      executeBulkAction(action, selectedPois)
+    })
+  }
+
+  function executeBulkAction(action, poiIds) {
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_bulk_action",
+        nonce: clearMapAdmin.managePoisNonce,
+        bulk_action: action,
+        poi_ids: poiIds,
+      },
+      function (response) {
+        if (response.success) {
+          window.location.reload()
+        } else {
+          alert("Error: " + (response.data || "Unknown error"))
+        }
+      }
+    ).fail(function () {
+      alert("Network error")
+    })
+  }
+
+  // ========================================
+  // EXPORT MODAL
+  // ========================================
+
+  function initExportModal() {
+    const $modal = $("#export-modal")
+
+    // Open export modal
+    $(document).on("click", "#export-pois-btn", function () {
+      openExportModal()
+    })
+
+    // Close modal handlers
+    $modal.on("click", ".modal-close, .modal-backdrop, #export-cancel-btn", function () {
+      closeExportModal()
+    })
+
+    // Confirm export
+    $("#export-confirm-btn").on("click", function () {
+      executeExport()
+    })
+
+    // Close on escape key
+    $(document).on("keydown", function (e) {
+      if (e.key === "Escape" && $modal.is(":visible")) {
+        closeExportModal()
+      }
+    })
+  }
+
+  function openExportModal() {
+    const selectedCount = $('input[name="poi_ids[]"]:checked').length
+
+    if (selectedCount > 0) {
+      $("#export-selection-count").text(selectedCount + " selected POI(s) will be exported.")
+    } else {
+      $("#export-selection-count").text("All POIs will be exported.")
+    }
+
+    $("#export-modal").fadeIn(200)
+  }
+
+  function closeExportModal() {
+    $("#export-modal").fadeOut(200)
+  }
+
+  function executeExport() {
+    const format = $('input[name="export_format"]:checked').val()
+    const selectedPois = []
+
+    $('input[name="poi_ids[]"]:checked').each(function () {
+      selectedPois.push($(this).val())
+    })
+
+    const $btn = $("#export-confirm-btn")
+    const originalHtml = $btn.html()
+    $btn.prop("disabled", true).html('<span class="dashicons dashicons-update spin"></span> Exporting...')
+
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_export_pois",
+        nonce: clearMapAdmin.managePoisNonce,
+        format: format,
+        poi_ids: selectedPois,
+      },
+      function (response) {
+        if (response.success) {
+          downloadFile(response.data.data, response.data.filename, response.data.format)
+          closeExportModal()
+        } else {
+          alert("Export error: " + (response.data || "Unknown error"))
+        }
+      }
+    )
+      .fail(function () {
+        alert("Network error during export")
+      })
+      .always(function () {
+        $btn.prop("disabled", false).html(originalHtml)
+      })
+  }
+
+  function downloadFile(data, filename, format) {
+    let blob
+    if (format === "json") {
+      blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
+    } else {
+      blob = new Blob([data], { type: "text/csv" })
+    }
+
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   // Handle conditional field visibility based on data attributes
   function updateConditionalFields() {
     $(".conditional-field[data-show-when]").each(function () {

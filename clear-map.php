@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 1.9.7
+ * Version: 2.0.0
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '1.9.4');
+define('CLEAR_MAP_VERSION', '2.0.0');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -33,7 +33,7 @@ if (is_admin()) {
 }
 
 class ClearMap {
-    
+
     public function __construct() {
         add_action('plugins_loaded', array($this, 'init'));
         add_action('wp_ajax_clear_map_geocode_cache', array($this, 'clear_geocode_cache'));
@@ -43,6 +43,19 @@ class ClearMap {
         add_action('wp_ajax_clear_map_run_geocoding', array($this, 'run_manual_geocoding'));
         add_action('wp_ajax_clear_map_geocode_building', array($this, 'ajax_geocode_building'));
         add_action('update_option_clear_map_building_address', array($this, 'geocode_building_address'), 10, 2);
+
+        // POI management AJAX endpoints.
+        add_action('wp_ajax_clear_map_get_poi', array($this, 'ajax_get_poi'));
+        add_action('wp_ajax_clear_map_save_poi', array($this, 'ajax_save_poi'));
+        add_action('wp_ajax_clear_map_delete_poi', array($this, 'ajax_delete_poi'));
+        add_action('wp_ajax_clear_map_bulk_action', array($this, 'ajax_bulk_action'));
+        add_action('wp_ajax_clear_map_export_pois', array($this, 'ajax_export_pois'));
+
+        // Category management AJAX endpoints.
+        add_action('wp_ajax_clear_map_save_category', array($this, 'ajax_save_category'));
+        add_action('wp_ajax_clear_map_delete_category', array($this, 'ajax_delete_category'));
+        add_action('wp_ajax_clear_map_reorder_categories', array($this, 'ajax_reorder_categories'));
+
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
     }
@@ -514,6 +527,575 @@ class ClearMap {
             $error_message = isset( $result['message'] ) ? $result['message'] : 'Unknown error';
             wp_send_json_error( 'Geocoding failed: ' . $error_message );
         }
+    }
+
+    /**
+     * AJAX: Get single POI data.
+     */
+    public function ajax_get_poi() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $poi_id = isset( $_POST['poi_id'] ) ? sanitize_text_field( wp_unslash( $_POST['poi_id'] ) ) : '';
+
+        if ( empty( $poi_id ) ) {
+            wp_send_json_error( 'POI ID is required' );
+        }
+
+        // Parse unique_id format: category_key|index.
+        $parts = explode( '|', $poi_id );
+        if ( count( $parts ) !== 2 ) {
+            wp_send_json_error( 'Invalid POI ID format' );
+        }
+
+        $category_key = $parts[0];
+        $index        = intval( $parts[1] );
+
+        $pois = get_option( 'clear_map_pois', array() );
+
+        if ( ! isset( $pois[ $category_key ][ $index ] ) ) {
+            wp_send_json_error( 'POI not found' );
+        }
+
+        $poi               = $pois[ $category_key ][ $index ];
+        $poi['category']   = $category_key;
+        $poi['poi_index']  = $index;
+        $poi['unique_id']  = $poi_id;
+
+        wp_send_json_success( $poi );
+    }
+
+    /**
+     * AJAX: Save single POI.
+     */
+    public function ajax_save_poi() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $poi_id       = isset( $_POST['poi_id'] ) ? sanitize_text_field( wp_unslash( $_POST['poi_id'] ) ) : '';
+        $new_category = isset( $_POST['category'] ) ? sanitize_text_field( wp_unslash( $_POST['category'] ) ) : '';
+        $is_new       = isset( $_POST['is_new'] ) && 'true' === $_POST['is_new'];
+
+        // Sanitize POI data.
+        $poi_data = array(
+            'name'               => isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '',
+            'address'            => isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : '',
+            'description'        => isset( $_POST['description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['description'] ) ) : '',
+            'website'            => isset( $_POST['website'] ) ? esc_url_raw( wp_unslash( $_POST['website'] ) ) : '',
+            'photo'              => isset( $_POST['photo'] ) ? esc_url_raw( wp_unslash( $_POST['photo'] ) ) : '',
+            'logo'               => isset( $_POST['logo'] ) ? esc_url_raw( wp_unslash( $_POST['logo'] ) ) : '',
+            'lat'                => isset( $_POST['lat'] ) ? floatval( $_POST['lat'] ) : '',
+            'lng'                => isset( $_POST['lng'] ) ? floatval( $_POST['lng'] ) : '',
+            'coordinate_source'  => isset( $_POST['coordinate_source'] ) ? sanitize_text_field( wp_unslash( $_POST['coordinate_source'] ) ) : '',
+            'needs_geocoding'    => isset( $_POST['needs_geocoding'] ) ? sanitize_text_field( wp_unslash( $_POST['needs_geocoding'] ) ) : '',
+            'reverse_geocoded'   => isset( $_POST['reverse_geocoded'] ) ? sanitize_text_field( wp_unslash( $_POST['reverse_geocoded'] ) ) : '',
+            'geocoded_address'   => isset( $_POST['geocoded_address'] ) ? sanitize_text_field( wp_unslash( $_POST['geocoded_address'] ) ) : '',
+            'geocoding_precision'=> isset( $_POST['geocoding_precision'] ) ? sanitize_text_field( wp_unslash( $_POST['geocoding_precision'] ) ) : '',
+        );
+
+        // Validate required fields.
+        if ( empty( $poi_data['name'] ) ) {
+            wp_send_json_error( 'POI name is required' );
+        }
+
+        if ( empty( $new_category ) ) {
+            wp_send_json_error( 'Category is required' );
+        }
+
+        $pois       = get_option( 'clear_map_pois', array() );
+        $categories = get_option( 'clear_map_categories', array() );
+
+        // Verify category exists.
+        if ( ! isset( $categories[ $new_category ] ) ) {
+            wp_send_json_error( 'Invalid category' );
+        }
+
+        // Ensure category array exists.
+        if ( ! isset( $pois[ $new_category ] ) ) {
+            $pois[ $new_category ] = array();
+        }
+
+        if ( $is_new ) {
+            // Add new POI.
+            $pois[ $new_category ][] = $poi_data;
+            $new_index               = count( $pois[ $new_category ] ) - 1;
+            $this->log_activity( 'POI added: ' . $poi_data['name'] . ' to ' . $categories[ $new_category ]['name'] );
+
+            update_option( 'clear_map_pois', $pois );
+
+            wp_send_json_success(
+                array(
+                    'message'   => 'POI added successfully',
+                    'poi_id'    => $new_category . '|' . $new_index,
+                    'action'    => 'added',
+                )
+            );
+        } else {
+            // Update existing POI.
+            $parts = explode( '|', $poi_id );
+            if ( count( $parts ) !== 2 ) {
+                wp_send_json_error( 'Invalid POI ID format' );
+            }
+
+            $old_category = $parts[0];
+            $old_index    = intval( $parts[1] );
+
+            if ( ! isset( $pois[ $old_category ][ $old_index ] ) ) {
+                wp_send_json_error( 'POI not found' );
+            }
+
+            // Check if category changed.
+            if ( $old_category !== $new_category ) {
+                // Remove from old category.
+                array_splice( $pois[ $old_category ], $old_index, 1 );
+
+                // Add to new category.
+                $pois[ $new_category ][] = $poi_data;
+                $new_index               = count( $pois[ $new_category ] ) - 1;
+
+                $this->log_activity( 'POI moved: ' . $poi_data['name'] . ' from ' . $categories[ $old_category ]['name'] . ' to ' . $categories[ $new_category ]['name'] );
+
+                update_option( 'clear_map_pois', $pois );
+
+                wp_send_json_success(
+                    array(
+                        'message'   => 'POI updated and moved successfully',
+                        'poi_id'    => $new_category . '|' . $new_index,
+                        'action'    => 'moved',
+                    )
+                );
+            } else {
+                // Update in place.
+                $pois[ $old_category ][ $old_index ] = $poi_data;
+
+                $this->log_activity( 'POI updated: ' . $poi_data['name'] );
+
+                update_option( 'clear_map_pois', $pois );
+
+                wp_send_json_success(
+                    array(
+                        'message'   => 'POI updated successfully',
+                        'poi_id'    => $poi_id,
+                        'action'    => 'updated',
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * AJAX: Delete single POI.
+     */
+    public function ajax_delete_poi() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $poi_id = isset( $_POST['poi_id'] ) ? sanitize_text_field( wp_unslash( $_POST['poi_id'] ) ) : '';
+
+        if ( empty( $poi_id ) ) {
+            wp_send_json_error( 'POI ID is required' );
+        }
+
+        $parts = explode( '|', $poi_id );
+        if ( count( $parts ) !== 2 ) {
+            wp_send_json_error( 'Invalid POI ID format' );
+        }
+
+        $category_key = $parts[0];
+        $index        = intval( $parts[1] );
+
+        $pois = get_option( 'clear_map_pois', array() );
+
+        if ( ! isset( $pois[ $category_key ][ $index ] ) ) {
+            wp_send_json_error( 'POI not found' );
+        }
+
+        $poi_name = $pois[ $category_key ][ $index ]['name'];
+
+        // Remove POI.
+        array_splice( $pois[ $category_key ], $index, 1 );
+
+        update_option( 'clear_map_pois', $pois );
+
+        $this->log_activity( 'POI deleted: ' . $poi_name );
+
+        wp_send_json_success(
+            array(
+                'message' => 'POI deleted successfully',
+            )
+        );
+    }
+
+    /**
+     * AJAX: Bulk action on POIs.
+     */
+    public function ajax_bulk_action() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $action  = isset( $_POST['bulk_action'] ) ? sanitize_text_field( wp_unslash( $_POST['bulk_action'] ) ) : '';
+        $poi_ids = isset( $_POST['poi_ids'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['poi_ids'] ) ) : array();
+
+        if ( empty( $action ) ) {
+            wp_send_json_error( 'Action is required' );
+        }
+
+        if ( empty( $poi_ids ) ) {
+            wp_send_json_error( 'No POIs selected' );
+        }
+
+        $pois       = get_option( 'clear_map_pois', array() );
+        $categories = get_option( 'clear_map_categories', array() );
+        $count      = 0;
+
+        if ( 'delete' === $action ) {
+            // Sort by index descending within each category to avoid index shift issues.
+            $grouped = array();
+            foreach ( $poi_ids as $poi_id ) {
+                $parts = explode( '|', $poi_id );
+                if ( count( $parts ) === 2 ) {
+                    $cat   = $parts[0];
+                    $idx   = intval( $parts[1] );
+                    if ( ! isset( $grouped[ $cat ] ) ) {
+                        $grouped[ $cat ] = array();
+                    }
+                    $grouped[ $cat ][] = $idx;
+                }
+            }
+
+            foreach ( $grouped as $cat => $indices ) {
+                rsort( $indices ); // Delete from highest index first.
+                foreach ( $indices as $idx ) {
+                    if ( isset( $pois[ $cat ][ $idx ] ) ) {
+                        array_splice( $pois[ $cat ], $idx, 1 );
+                        $count++;
+                    }
+                }
+            }
+
+            update_option( 'clear_map_pois', $pois );
+            $this->log_activity( "Bulk deleted $count POIs" );
+
+            wp_send_json_success(
+                array(
+                    'message' => sprintf( '%d POI(s) deleted successfully', $count ),
+                    'count'   => $count,
+                )
+            );
+        } elseif ( strpos( $action, 'move_to_' ) === 0 ) {
+            // Move to category.
+            $target_category = str_replace( 'move_to_', '', $action );
+
+            if ( ! isset( $categories[ $target_category ] ) ) {
+                wp_send_json_error( 'Invalid target category' );
+            }
+
+            if ( ! isset( $pois[ $target_category ] ) ) {
+                $pois[ $target_category ] = array();
+            }
+
+            // Group by category and sort indices descending.
+            $grouped = array();
+            foreach ( $poi_ids as $poi_id ) {
+                $parts = explode( '|', $poi_id );
+                if ( count( $parts ) === 2 ) {
+                    $cat   = $parts[0];
+                    $idx   = intval( $parts[1] );
+                    if ( ! isset( $grouped[ $cat ] ) ) {
+                        $grouped[ $cat ] = array();
+                    }
+                    $grouped[ $cat ][] = $idx;
+                }
+            }
+
+            foreach ( $grouped as $cat => $indices ) {
+                if ( $cat === $target_category ) {
+                    continue; // Skip POIs already in target category.
+                }
+
+                rsort( $indices );
+                foreach ( $indices as $idx ) {
+                    if ( isset( $pois[ $cat ][ $idx ] ) ) {
+                        $poi_data = $pois[ $cat ][ $idx ];
+                        $pois[ $target_category ][] = $poi_data;
+                        array_splice( $pois[ $cat ], $idx, 1 );
+                        $count++;
+                    }
+                }
+            }
+
+            update_option( 'clear_map_pois', $pois );
+            $this->log_activity( "Bulk moved $count POIs to " . $categories[ $target_category ]['name'] );
+
+            wp_send_json_success(
+                array(
+                    'message' => sprintf( '%d POI(s) moved to %s', $count, $categories[ $target_category ]['name'] ),
+                    'count'   => $count,
+                )
+            );
+        } else {
+            wp_send_json_error( 'Unknown action' );
+        }
+    }
+
+    /**
+     * AJAX: Export POIs.
+     */
+    public function ajax_export_pois() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $format  = isset( $_POST['format'] ) ? sanitize_text_field( wp_unslash( $_POST['format'] ) ) : 'csv';
+        $poi_ids = isset( $_POST['poi_ids'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['poi_ids'] ) ) : array();
+
+        $pois       = get_option( 'clear_map_pois', array() );
+        $categories = get_option( 'clear_map_categories', array() );
+
+        // Flatten POIs.
+        $export_data = array();
+        foreach ( $pois as $cat_key => $cat_pois ) {
+            $cat_name = isset( $categories[ $cat_key ]['name'] ) ? $categories[ $cat_key ]['name'] : $cat_key;
+
+            foreach ( $cat_pois as $idx => $poi ) {
+                $unique_id = $cat_key . '|' . $idx;
+
+                // If specific POIs selected, filter.
+                if ( ! empty( $poi_ids ) && ! in_array( $unique_id, $poi_ids, true ) ) {
+                    continue;
+                }
+
+                $export_data[] = array(
+                    'name'           => $poi['name'] ?? '',
+                    'category'       => $cat_name,
+                    'address'        => $poi['address'] ?? '',
+                    'description'    => $poi['description'] ?? '',
+                    'website'        => $poi['website'] ?? '',
+                    'photo'          => $poi['photo'] ?? '',
+                    'logo'           => $poi['logo'] ?? '',
+                    'lat'            => $poi['lat'] ?? '',
+                    'lng'            => $poi['lng'] ?? '',
+                );
+            }
+        }
+
+        if ( 'json' === $format ) {
+            wp_send_json_success(
+                array(
+                    'format' => 'json',
+                    'data'   => $export_data,
+                    'filename' => 'clear-map-pois-' . gmdate( 'Y-m-d' ) . '.json',
+                )
+            );
+        } else {
+            // CSV format.
+            $csv_lines   = array();
+            $csv_lines[] = implode( ',', array( 'Name', 'Category', 'Address', 'Description', 'Website', 'Photo', 'Logo', 'Latitude', 'Longitude' ) );
+
+            foreach ( $export_data as $row ) {
+                $csv_lines[] = implode(
+                    ',',
+                    array(
+                        '"' . str_replace( '"', '""', $row['name'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['category'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['address'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['description'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['website'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['photo'] ) . '"',
+                        '"' . str_replace( '"', '""', $row['logo'] ) . '"',
+                        $row['lat'],
+                        $row['lng'],
+                    )
+                );
+            }
+
+            wp_send_json_success(
+                array(
+                    'format'   => 'csv',
+                    'data'     => implode( "\n", $csv_lines ),
+                    'filename' => 'clear-map-pois-' . gmdate( 'Y-m-d' ) . '.csv',
+                )
+            );
+        }
+    }
+
+    /**
+     * AJAX: Save category.
+     */
+    public function ajax_save_category() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $category_key = isset( $_POST['category_key'] ) ? sanitize_key( wp_unslash( $_POST['category_key'] ) ) : '';
+        $name         = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+        $color        = isset( $_POST['color'] ) ? sanitize_hex_color( wp_unslash( $_POST['color'] ) ) : '#999999';
+        $is_new       = isset( $_POST['is_new'] ) && 'true' === $_POST['is_new'];
+
+        if ( empty( $name ) ) {
+            wp_send_json_error( 'Category name is required' );
+        }
+
+        $categories = get_option( 'clear_map_categories', array() );
+
+        if ( $is_new ) {
+            // Generate unique key.
+            $base_key = sanitize_key( str_replace( ' ', '_', strtolower( $name ) ) );
+            $key      = $base_key;
+            $counter  = 1;
+
+            while ( isset( $categories[ $key ] ) ) {
+                $key = $base_key . '_' . $counter;
+                $counter++;
+            }
+
+            $categories[ $key ] = array(
+                'name'  => $name,
+                'color' => $color,
+            );
+
+            // Initialize empty POIs array for new category.
+            $pois = get_option( 'clear_map_pois', array() );
+            if ( ! isset( $pois[ $key ] ) ) {
+                $pois[ $key ] = array();
+                update_option( 'clear_map_pois', $pois );
+            }
+
+            update_option( 'clear_map_categories', $categories );
+            $this->log_activity( 'Category added: ' . $name );
+
+            wp_send_json_success(
+                array(
+                    'message'      => 'Category added successfully',
+                    'category_key' => $key,
+                    'category'     => $categories[ $key ],
+                )
+            );
+        } else {
+            if ( empty( $category_key ) || ! isset( $categories[ $category_key ] ) ) {
+                wp_send_json_error( 'Category not found' );
+            }
+
+            $categories[ $category_key ] = array(
+                'name'  => $name,
+                'color' => $color,
+            );
+
+            update_option( 'clear_map_categories', $categories );
+            $this->log_activity( 'Category updated: ' . $name );
+
+            wp_send_json_success(
+                array(
+                    'message'      => 'Category updated successfully',
+                    'category_key' => $category_key,
+                    'category'     => $categories[ $category_key ],
+                )
+            );
+        }
+    }
+
+    /**
+     * AJAX: Delete category.
+     */
+    public function ajax_delete_category() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $category_key = isset( $_POST['category_key'] ) ? sanitize_key( wp_unslash( $_POST['category_key'] ) ) : '';
+
+        if ( empty( $category_key ) ) {
+            wp_send_json_error( 'Category key is required' );
+        }
+
+        $categories = get_option( 'clear_map_categories', array() );
+        $pois       = get_option( 'clear_map_pois', array() );
+
+        if ( ! isset( $categories[ $category_key ] ) ) {
+            wp_send_json_error( 'Category not found' );
+        }
+
+        $cat_name  = $categories[ $category_key ]['name'];
+        $poi_count = isset( $pois[ $category_key ] ) ? count( $pois[ $category_key ] ) : 0;
+
+        // Remove category.
+        unset( $categories[ $category_key ] );
+        update_option( 'clear_map_categories', $categories );
+
+        // Remove POIs in category.
+        if ( isset( $pois[ $category_key ] ) ) {
+            unset( $pois[ $category_key ] );
+            update_option( 'clear_map_pois', $pois );
+        }
+
+        $this->log_activity( "Category deleted: $cat_name ($poi_count POIs removed)" );
+
+        wp_send_json_success(
+            array(
+                'message'          => sprintf( 'Category "%s" deleted (%d POIs removed)', $cat_name, $poi_count ),
+                'pois_removed'     => $poi_count,
+            )
+        );
+    }
+
+    /**
+     * AJAX: Reorder categories.
+     */
+    public function ajax_reorder_categories() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $order = isset( $_POST['order'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['order'] ) ) : array();
+
+        if ( empty( $order ) ) {
+            wp_send_json_error( 'Order is required' );
+        }
+
+        $categories     = get_option( 'clear_map_categories', array() );
+        $new_categories = array();
+
+        foreach ( $order as $key ) {
+            if ( isset( $categories[ $key ] ) ) {
+                $new_categories[ $key ] = $categories[ $key ];
+            }
+        }
+
+        // Add any categories that weren't in the order (shouldn't happen, but safety).
+        foreach ( $categories as $key => $cat ) {
+            if ( ! isset( $new_categories[ $key ] ) ) {
+                $new_categories[ $key ] = $cat;
+            }
+        }
+
+        update_option( 'clear_map_categories', $new_categories );
+        $this->log_activity( 'Categories reordered' );
+
+        wp_send_json_success(
+            array(
+                'message' => 'Categories reordered successfully',
+            )
+        );
     }
 }
 

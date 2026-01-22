@@ -13,6 +13,20 @@ class Clear_Map_Admin
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_action('wp_ajax_clear_map_import_kml_pois', array($this, 'handle_kml_import'));
+
+        // Add screen options for POI list.
+        add_filter('set-screen-option', array($this, 'set_screen_option'), 10, 3);
+    }
+
+    /**
+     * Set screen option value.
+     */
+    public function set_screen_option($status, $option, $value)
+    {
+        if ('clear_map_pois_per_page' === $option) {
+            return $value;
+        }
+        return $status;
     }
 
     public function add_admin_menu()
@@ -58,8 +72,8 @@ class Clear_Map_Admin
             array($this, 'import_page')
         );
 
-        // Categories & POIs submenu
-        add_submenu_page(
+        // Categories & POIs submenu - use hook for screen options.
+        $manage_hook = add_submenu_page(
             'clear-map',
             'Categories & POIs',
             'Categories & POIs',
@@ -67,6 +81,26 @@ class Clear_Map_Admin
             'clear-map-manage',
             array($this, 'manage_page')
         );
+
+        // Add screen options for POI list.
+        add_action("load-$manage_hook", array($this, 'add_manage_screen_options'));
+    }
+
+    /**
+     * Add screen options for manage page.
+     */
+    public function add_manage_screen_options()
+    {
+        $option = 'per_page';
+        $args   = array(
+            'label'   => 'POIs per page',
+            'default' => 20,
+            'option'  => 'clear_map_pois_per_page',
+        );
+        add_screen_option($option, $args);
+
+        // Load WP_List_Table class.
+        require_once CLEAR_MAP_PLUGIN_PATH . 'includes/class-poi-list-table.php';
     }
 
     public function register_settings()
@@ -97,6 +131,11 @@ class Clear_Map_Admin
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_media();
 
+        // Add jQuery UI for sortable (category reordering).
+        if (strpos($hook, 'clear-map-manage') !== false) {
+            wp_enqueue_script('jquery-ui-sortable');
+        }
+
         wp_enqueue_script(
             'clear-map-admin',
             CLEAR_MAP_PLUGIN_URL . 'assets/js/admin.js',
@@ -105,13 +144,27 @@ class Clear_Map_Admin
             true
         );
 
+        // Get categories for the frontend.
+        $categories = get_option('clear_map_categories', array());
+
         // Localize script with AJAX data
         wp_localize_script('clear-map-admin', 'clearMapAdmin', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'clearCacheNonce' => wp_create_nonce('clear_map_geocode_cache'),
-            'clearAllPoisNonce' => wp_create_nonce('clear_map_clear_all_pois'),
-            'importKmlNonce' => wp_create_nonce('clear_map_import_kml_pois'),
-            'runGeocodingNonce' => wp_create_nonce('clear_map_run_geocoding')
+            'ajaxurl'            => admin_url('admin-ajax.php'),
+            'clearCacheNonce'    => wp_create_nonce('clear_map_geocode_cache'),
+            'clearAllPoisNonce'  => wp_create_nonce('clear_map_clear_all_pois'),
+            'importKmlNonce'     => wp_create_nonce('clear_map_import_kml_pois'),
+            'runGeocodingNonce'  => wp_create_nonce('clear_map_run_geocoding'),
+            'managePoisNonce'    => wp_create_nonce('clear_map_manage_pois'),
+            'categories'         => $categories,
+            'strings'            => array(
+                'confirmDelete'       => __('Are you sure you want to delete this POI?', 'clear-map'),
+                'confirmBulkDelete'   => __('Are you sure you want to delete the selected POIs?', 'clear-map'),
+                'confirmCatDelete'    => __('Are you sure you want to delete this category? This will also delete all POIs in this category.', 'clear-map'),
+                'noSelection'         => __('Please select at least one POI.', 'clear-map'),
+                'saving'              => __('Saving...', 'clear-map'),
+                'deleting'            => __('Deleting...', 'clear-map'),
+                'exportSuccess'       => __('Export successful! Downloading file...', 'clear-map'),
+            ),
         ));
 
         wp_enqueue_style(
@@ -527,28 +580,346 @@ class Clear_Map_Admin
 
     public function manage_page()
     {
-    ?>
-        <div class="wrap clear-map-admin">
-            <h1>Manage Categories & POIs</h1>
+        // Determine active tab.
+        $active_tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'pois';
 
-            <form method="post" action="options.php">
-                <?php settings_fields('clear_map_categories_pois'); ?>
+        // Get stats.
+        $categories = get_option('clear_map_categories', array());
+        $pois       = get_option('clear_map_pois', array());
+        $total_pois = 0;
+        foreach ($pois as $cat_pois) {
+            $total_pois += count($cat_pois);
+        }
+        ?>
+        <div class="wrap clear-map-admin clear-map-manage-page">
+            <h1 class="wp-heading-inline">Categories & POIs</h1>
+            <a href="#" class="page-title-action" id="add-new-poi-btn">Add New POI</a>
+            <hr class="wp-header-end">
 
-                <h2>Categories</h2>
-                <div id="categories-container">
-                    <?php $this->render_categories(); ?>
-                </div>
-                <button type="button" id="add-category" class="button">Add Category</button>
+            <!-- Stats summary -->
+            <div class="manage-stats">
+                <span class="stat-badge"><strong><?php echo esc_html($total_pois); ?></strong> POIs</span>
+                <span class="stat-badge"><strong><?php echo count($categories); ?></strong> Categories</span>
+            </div>
 
-                <h2>Points of Interest</h2>
-                <div id="pois-container">
-                    <?php $this->render_pois(); ?>
-                </div>
+            <!-- Tabs navigation -->
+            <nav class="nav-tab-wrapper wp-clearfix">
+                <a href="<?php echo esc_url(admin_url('admin.php?page=clear-map-manage&tab=pois')); ?>"
+                   class="nav-tab <?php echo 'pois' === $active_tab ? 'nav-tab-active' : ''; ?>">
+                    <span class="dashicons dashicons-location" style="vertical-align: text-bottom;"></span>
+                    POIs
+                </a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=clear-map-manage&tab=categories')); ?>"
+                   class="nav-tab <?php echo 'categories' === $active_tab ? 'nav-tab-active' : ''; ?>">
+                    <span class="dashicons dashicons-category" style="vertical-align: text-bottom;"></span>
+                    Categories
+                </a>
+            </nav>
 
-                <?php submit_button('Save Categories & POIs'); ?>
-            </form>
+            <div class="tab-content">
+                <?php if ('pois' === $active_tab) : ?>
+                    <?php $this->render_pois_tab(); ?>
+                <?php else : ?>
+                    <?php $this->render_categories_tab(); ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- POI Edit Modal -->
+            <?php $this->render_poi_modal(); ?>
+
+            <!-- Category Edit Modal -->
+            <?php $this->render_category_modal(); ?>
+
+            <!-- Export Modal -->
+            <?php $this->render_export_modal(); ?>
         </div>
-<?php
+        <?php
+    }
+
+    /**
+     * Render the POIs tab with WP_List_Table.
+     */
+    private function render_pois_tab()
+    {
+        // Create and prepare the table.
+        $poi_table = new Clear_Map_POI_List_Table();
+        $poi_table->prepare_items();
+        ?>
+        <form method="get" id="pois-filter-form">
+            <input type="hidden" name="page" value="clear-map-manage" />
+            <input type="hidden" name="tab" value="pois" />
+            <?php
+            $poi_table->search_box('Search POIs', 'poi-search');
+            $poi_table->display();
+            ?>
+        </form>
+        <?php
+    }
+
+    /**
+     * Render the Categories tab.
+     */
+    private function render_categories_tab()
+    {
+        $categories = get_option('clear_map_categories', array());
+        $pois       = get_option('clear_map_pois', array());
+        ?>
+        <div class="categories-header">
+            <button type="button" class="button button-primary" id="add-new-category-btn">
+                <span class="dashicons dashicons-plus-alt2" style="vertical-align: text-bottom;"></span>
+                Add New Category
+            </button>
+            <p class="description">Drag and drop to reorder categories. Changes are saved automatically.</p>
+        </div>
+
+        <div class="categories-grid" id="categories-sortable">
+            <?php foreach ($categories as $key => $category) :
+                $poi_count = isset($pois[$key]) ? count($pois[$key]) : 0;
+                ?>
+                <div class="category-card" data-category-key="<?php echo esc_attr($key); ?>">
+                    <div class="category-card-header">
+                        <span class="category-drag-handle dashicons dashicons-move"></span>
+                        <span class="category-color-swatch" style="background-color: <?php echo esc_attr($category['color']); ?>;"></span>
+                        <h3 class="category-name"><?php echo esc_html($category['name']); ?></h3>
+                        <span class="category-poi-count" title="POIs in this category"><?php echo esc_html($poi_count); ?></span>
+                    </div>
+                    <div class="category-card-body">
+                        <div class="category-meta">
+                            <span class="category-key">Key: <code><?php echo esc_html($key); ?></code></span>
+                        </div>
+                    </div>
+                    <div class="category-card-actions">
+                        <button type="button" class="button category-edit-btn" data-category-key="<?php echo esc_attr($key); ?>">
+                            <span class="dashicons dashicons-edit" style="vertical-align: text-bottom;"></span> Edit
+                        </button>
+                        <button type="button" class="button category-delete-btn" data-category-key="<?php echo esc_attr($key); ?>">
+                            <span class="dashicons dashicons-trash" style="vertical-align: text-bottom;"></span> Delete
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <?php if (empty($categories)) : ?>
+                <div class="no-categories-notice">
+                    <p>No categories found. <a href="#" id="add-first-category">Add your first category</a> to get started.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the POI edit modal.
+     */
+    private function render_poi_modal()
+    {
+        $categories = get_option('clear_map_categories', array());
+        ?>
+        <div id="poi-modal" class="clear-map-modal" style="display:none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="poi-modal-title">Edit POI</h2>
+                    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="poi-edit-form">
+                        <input type="hidden" id="poi-id" name="poi_id" value="" />
+                        <input type="hidden" id="poi-is-new" name="is_new" value="false" />
+
+                        <!-- Basic Info Section -->
+                        <div class="modal-section">
+                            <h3>Basic Information</h3>
+                            <div class="modal-field">
+                                <label for="poi-name">Name <span class="required">*</span></label>
+                                <input type="text" id="poi-name" name="name" required />
+                            </div>
+                            <div class="modal-field">
+                                <label for="poi-category">Category <span class="required">*</span></label>
+                                <select id="poi-category" name="category" required>
+                                    <?php foreach ($categories as $key => $cat) : ?>
+                                        <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($cat['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="modal-field">
+                                <label for="poi-address">Address</label>
+                                <input type="text" id="poi-address" name="address" />
+                            </div>
+                            <div class="modal-field">
+                                <label for="poi-description">Description</label>
+                                <textarea id="poi-description" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="modal-field">
+                                <label for="poi-website">Website</label>
+                                <input type="url" id="poi-website" name="website" placeholder="https://" />
+                            </div>
+                        </div>
+
+                        <!-- Media Section -->
+                        <div class="modal-section">
+                            <h3>Media</h3>
+                            <div class="modal-field-row">
+                                <div class="modal-field modal-field-half">
+                                    <label>Photo</label>
+                                    <div class="media-upload-field">
+                                        <input type="hidden" id="poi-photo" name="photo" value="" />
+                                        <div class="media-preview" id="poi-photo-preview">
+                                            <span class="dashicons dashicons-format-image no-media"></span>
+                                        </div>
+                                        <button type="button" class="button media-upload-btn" data-target="poi-photo">Select Photo</button>
+                                        <button type="button" class="button media-remove-btn" data-target="poi-photo" style="display:none;">Remove</button>
+                                    </div>
+                                </div>
+                                <div class="modal-field modal-field-half">
+                                    <label>Logo</label>
+                                    <div class="media-upload-field">
+                                        <input type="hidden" id="poi-logo" name="logo" value="" />
+                                        <div class="media-preview" id="poi-logo-preview">
+                                            <span class="dashicons dashicons-store no-media"></span>
+                                        </div>
+                                        <button type="button" class="button media-upload-btn" data-target="poi-logo">Select Logo</button>
+                                        <button type="button" class="button media-remove-btn" data-target="poi-logo" style="display:none;">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Section (Read-only) -->
+                        <div class="modal-section modal-section-collapsed">
+                            <h3 class="section-toggle">
+                                Location Data
+                                <span class="dashicons dashicons-arrow-down-alt2"></span>
+                            </h3>
+                            <div class="section-content" style="display:none;">
+                                <div class="modal-field-row">
+                                    <div class="modal-field modal-field-half">
+                                        <label for="poi-lat">Latitude</label>
+                                        <input type="text" id="poi-lat" name="lat" readonly class="readonly-field" />
+                                    </div>
+                                    <div class="modal-field modal-field-half">
+                                        <label for="poi-lng">Longitude</label>
+                                        <input type="text" id="poi-lng" name="lng" readonly class="readonly-field" />
+                                    </div>
+                                </div>
+                                <div class="modal-field">
+                                    <label for="poi-coordinate-source">Coordinate Source</label>
+                                    <input type="text" id="poi-coordinate-source" name="coordinate_source" readonly class="readonly-field" />
+                                </div>
+                                <!-- Hidden fields for geocoding metadata -->
+                                <input type="hidden" id="poi-needs-geocoding" name="needs_geocoding" />
+                                <input type="hidden" id="poi-reverse-geocoded" name="reverse_geocoded" />
+                                <input type="hidden" id="poi-geocoded-address" name="geocoded_address" />
+                                <input type="hidden" id="poi-geocoding-precision" name="geocoding_precision" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-left">
+                        <button type="button" class="button button-link-delete" id="poi-delete-btn" style="display:none;">
+                            Delete POI
+                        </button>
+                    </div>
+                    <div class="modal-footer-right">
+                        <button type="button" class="button" id="poi-cancel-btn">Cancel</button>
+                        <button type="button" class="button button-primary" id="poi-save-btn">Save POI</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the Category edit modal.
+     */
+    private function render_category_modal()
+    {
+        ?>
+        <div id="category-modal" class="clear-map-modal" style="display:none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content modal-content-sm">
+                <div class="modal-header">
+                    <h2 id="category-modal-title">Edit Category</h2>
+                    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="category-edit-form">
+                        <input type="hidden" id="category-key" name="category_key" value="" />
+                        <input type="hidden" id="category-is-new" name="is_new" value="false" />
+
+                        <div class="modal-field">
+                            <label for="category-name">Name <span class="required">*</span></label>
+                            <input type="text" id="category-name" name="name" required />
+                        </div>
+                        <div class="modal-field">
+                            <label for="category-color">Color</label>
+                            <input type="text" id="category-color" name="color" class="color-picker" value="#D4A574" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-left"></div>
+                    <div class="modal-footer-right">
+                        <button type="button" class="button" id="category-cancel-btn">Cancel</button>
+                        <button type="button" class="button button-primary" id="category-save-btn">Save Category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the export modal.
+     */
+    private function render_export_modal()
+    {
+        ?>
+        <div id="export-modal" class="clear-map-modal" style="display:none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content modal-content-sm">
+                <div class="modal-header">
+                    <h2>Export POIs</h2>
+                    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Choose export format:</p>
+                    <div class="export-options">
+                        <label class="export-option">
+                            <input type="radio" name="export_format" value="csv" checked />
+                            <span class="export-option-label">
+                                <strong>CSV</strong>
+                                <small>Spreadsheet compatible</small>
+                            </span>
+                        </label>
+                        <label class="export-option">
+                            <input type="radio" name="export_format" value="json" />
+                            <span class="export-option-label">
+                                <strong>JSON</strong>
+                                <small>Developer friendly</small>
+                            </span>
+                        </label>
+                    </div>
+                    <p class="export-note">
+                        <span class="dashicons dashicons-info"></span>
+                        <span id="export-selection-count">All POIs will be exported.</span>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-left"></div>
+                    <div class="modal-footer-right">
+                        <button type="button" class="button" id="export-cancel-btn">Cancel</button>
+                        <button type="button" class="button button-primary" id="export-confirm-btn">
+                            <span class="dashicons dashicons-download" style="vertical-align: text-bottom;"></span>
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 
     private function render_categories()
