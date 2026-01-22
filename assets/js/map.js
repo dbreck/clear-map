@@ -727,7 +727,14 @@ class ClearMap {
         const poi = this.data.pois[catKey]?.[parseInt(idx, 10)]
         if (poi && poi.lng && poi.lat) {
           const coordinates = [poi.lng, poi.lat]
-          this.map.easeTo({ center: coordinates, zoom: Math.max(this.data.zoom, 16) })
+          // Offset to position POI in lower third of viewport, giving popup room above
+          const mapContainer = this.map.getContainer()
+          const offsetY = mapContainer.offsetHeight * 0.2 // Push POI down 20% from center
+          this.map.easeTo({
+            center: coordinates,
+            zoom: Math.max(this.data.zoom, 16),
+            offset: [0, -offsetY] // Negative Y shifts the center point up, so POI appears lower
+          })
           // Show popup after animation completes
           this.map.once("moveend", () => {
             this.showPoiPopup(poi, coordinates)
