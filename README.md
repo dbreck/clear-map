@@ -2,20 +2,25 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 1.9.0
+**Version:** 2.1.3
 
 ## Features
 
 - **Interactive Mapbox Maps** - Beautiful, customizable maps powered by Mapbox GL JS
-- **POI Management** - Add, edit, and organize points of interest by category
+- **POI Management** - Add, edit, and organize points of interest by category with modern WP_List_Table UI
+- **WPBakery Integration** - Full Page Builder support with responsive settings
 - **KML Import** - Import locations from KML files with automatic categorization
 - **Geocoding** - Automatic address-to-coordinate conversion using Mapbox Geocoding API
 - **Reverse Geocoding** - Convert coordinates to addresses automatically
 - **Category Filtering** - Toggle POI categories on/off with custom colors
+- **Frosted Glass Effects** - Apply backdrop blur to filter panel and/or buttons
+- **Responsive Settings** - Per-device settings (desktop/tablet/mobile) for all display options
+- **Center On POI** - Select any POI as the map center point
 - **Clustering** - Automatic marker clustering for better performance
-- **Location-Agnostic** - Works for any location worldwide (not limited to specific regions)
+- **Location-Agnostic** - Works for any location worldwide
 - **Building Icon** - Custom SVG/PNG icon to highlight your building location
-- **Performance Optimized** - Geocoding happens only during import, not on every page load
+- **Export** - Export POIs as CSV or JSON
+- **Auto-Updates** - GitHub-based automatic updates
 
 ## Requirements
 
@@ -37,17 +42,43 @@ A WordPress plugin for creating interactive Mapbox maps with customizable Points
 
 1. Go to **Clear Map > Settings** in WordPress admin
 2. Add your **Mapbox Token** - Get one at [mapbox.com](https://www.mapbox.com/)
-3. Add your **Google Maps API Key** - Get one at [Google Cloud Console](https://console.cloud.google.com/)
+3. Optionally add your **Google Maps API Key** for geocoding fallback
 
-### Map Settings
+### WPBakery Element Settings
 
-- **Building Icon Width** - Size of your building marker (default: 40px)
-- **Cluster Distance** - How close points need to be to cluster (default: 50)
-- **Cluster Min Points** - Minimum points to form a cluster (default: 3)
-- **Zoom Threshold** - Zoom level where clusters break apart (default: 15)
-- **Show Subway Lines** - Toggle NYC subway line overlay
+All display settings are configured per-element in WPBakery Page Builder:
+
+**Map Position:**
+- Center On - Select a POI as map center or use custom coordinates
+- Center Latitude/Longitude - Manual coordinates
+- Zoom Level - 3-18
+
+**Map Display:**
+- Cluster Distance, Min Points, Zoom Threshold
+- Show Subway Lines (NYC)
+
+**Filter Panel:**
+- Show/Hide Filter Panel (responsive)
+- Panel Width, Height (responsive)
+- Background Color, Transparent Background
+- Frosted Glass Effect - None/Panel/Buttons/Both (responsive)
+- Button Style - List or Pills (responsive)
+- Pill Border Color, Background
+- Show Header, Show Individual Items (responsive)
+- Mobile Filter Display - Below/Above/Drawer/Hidden
+- Mobile Filter Style - Inherit/List/Pills
 
 ## Usage
+
+### Managing POIs
+
+1. Go to **Clear Map > Manage POIs**
+2. Use the tabbed interface:
+   - **POIs tab** - View, search, filter, and edit POIs
+   - **Categories tab** - Manage categories with drag-drop reordering
+3. Click any POI row to edit via modal
+4. Use bulk actions for delete or move to category
+5. Export selected or all POIs as CSV/JSON
 
 ### Importing POIs from KML
 
@@ -58,24 +89,19 @@ A WordPress plugin for creating interactive Mapbox maps with customizable Points
    - Extract coordinates and addresses
    - Organize by folder structure (categories)
    - Geocode missing coordinates
-   - Reverse geocode missing addresses
-
-### Managing Categories
-
-1. Go to **Clear Map > Categories**
-2. Add, edit, or delete categories
-3. Assign custom colors to each category
-4. Categories are filterable on the frontend map
 
 ### Displaying the Map
 
-Add the map to any page or post using the shortcode:
+Add the map using WPBakery Page Builder or shortcode:
 
 ```
 [clear_map]
 ```
 
-The map will display with all active POIs and category filters.
+Or with parameters:
+```
+[clear_map height="500px" zoom="15" center_on="category_key|poi_index"]
+```
 
 ## Data Structure
 
@@ -92,7 +118,10 @@ Each POI contains:
 - **Address** - Street address
 - **Lat/Lng** - Coordinates
 - **Category** - Assigned category
-- **Coordinate Source** - Origin of coordinates (kml, geocoded, etc.)
+- **Photo** - Image URL
+- **Logo** - Logo image URL
+- **Description** - Location description
+- **Website** - URL link
 
 ## Development
 
@@ -100,179 +129,102 @@ Each POI contains:
 
 ```
 clear-map/
-├── clear-map.php           # Main plugin file
+├── clear-map.php              # Main plugin file, AJAX handlers
 ├── includes/
-│   ├── class-admin.php     # Admin interface
-│   ├── class-frontend.php  # Frontend display
-│   ├── class-map-renderer.php  # Map rendering
-│   ├── class-api-handler.php   # API integrations
-│   ├── class-assets.php    # Asset management
-│   └── class-kml-parser.php    # KML file parsing
+│   ├── class-admin.php        # Admin interface (settings, POI management)
+│   ├── class-poi-list-table.php  # WP_List_Table for POIs
+│   ├── class-frontend.php     # Shortcode registration
+│   ├── class-map-renderer.php # Map HTML rendering
+│   ├── class-api-handler.php  # Geocoding API integrations
+│   ├── class-wpbakery.php     # WPBakery Page Builder integration
+│   ├── class-assets.php       # Asset management
+│   ├── class-kml-parser.php   # KML file parsing
+│   └── class-github-updater.php  # Auto-update functionality
 ├── assets/
 │   ├── js/
-│   │   ├── map.js         # Frontend map functionality
-│   │   └── admin.js       # Admin interface JS
+│   │   ├── map.js            # Frontend map functionality
+│   │   ├── admin.js          # Admin interface JS (modals, bulk actions)
+│   │   └── wpbakery-admin.js # WPBakery responsive toggles
 │   ├── css/
-│   │   ├── map.css        # Frontend styles
-│   │   └── admin.css      # Admin styles
+│   │   ├── map.css           # Frontend styles
+│   │   ├── admin.css         # Admin styles
+│   │   └── wpbakery-admin.css # WPBakery admin styles
 │   └── data/
 │       └── nyc-subway-lines.geojson  # NYC subway data
-└── migrate-data.php        # Data migration utilities
 ```
 
-### Hooks & Filters
+### AJAX Actions
 
-The plugin provides several WordPress actions and filters for customization:
+**POI Management:**
+- `clear_map_get_poi` - Get single POI for editing
+- `clear_map_save_poi` - Save POI changes
+- `clear_map_delete_poi` - Delete single POI
+- `clear_map_bulk_action` - Bulk delete or move
+- `clear_map_export_pois` - Export as CSV/JSON
 
-**AJAX Actions:**
-- `wp_ajax_clear_map_geocode_cache` - Clear geocoding cache
-- `wp_ajax_clear_map_clear_all_pois` - Delete all POIs
-- `wp_ajax_clear_map_import_kml_pois` - Import KML file
-- `wp_ajax_clear_map_save_imported_pois` - Save imported POIs
-- `wp_ajax_clear_map_run_geocoding` - Run manual geocoding
-- `wp_ajax_clear_map_geocode_building` - Geocode building address
+**Category Management:**
+- `clear_map_save_category` - Save category
+- `clear_map_delete_category` - Delete category
+- `clear_map_reorder_categories` - Reorder via drag-drop
+
+**Import & Geocoding:**
+- `clear_map_import_kml_pois` - Import KML file
+- `clear_map_save_imported_pois` - Save imported POIs
+- `clear_map_run_geocoding` - Run manual geocoding
+- `clear_map_geocode_building` - Geocode building address
 
 ## Changelog
 
+### Version 2.1.3 (2026-01-22)
+- POIs in filter panel sorted alphabetically (case-insensitive)
+
+### Version 2.1.2 (2026-01-22)
+- POI positioned in lower third of viewport when clicked from filter panel
+- Popup card fully visible above marker
+
+### Version 2.1.1 (2026-01-22)
+- Clicking POI in filter panel now opens popup card after zooming
+
+### Version 2.1.0 (2026-01-22)
+- New "Frosted Glass Effect" setting (None/Panel/Buttons/Both)
+- Responsive support via device toggles
+- Removed redundant "Frosted Glass" from Pill Background dropdown
+
+### Version 2.0.2 (2026-01-22)
+- Fixed Center On POI not working (missing from shortcode_atts)
+- Sorted POI dropdown alphabetically in WPBakery
+
+### Version 2.0.1 (2026-01-22)
+- Added "Center On" POI dropdown in WPBakery Map Position group
+- Centered popup logo images
+
+### Version 2.0.0 (2026-01-22)
+- **Major admin interface redesign**
+- WP_List_Table for POI management
+- Tabbed interface (POIs / Categories)
+- Modal dialogs for editing via AJAX
+- Bulk actions (delete, move to category)
+- Search and category filtering
+- Pagination with per-page settings
+- CSV/JSON export functionality
+- Category drag-drop reordering
+
+### Version 1.9.x (2026-01-15)
+- Consolidated all display settings to WPBakery element
+- Responsive device toggles for all Filter Panel settings
+- Mobile filter display modes (Below/Above/Drawer/Hidden)
+
 ### Version 1.4.0 (2026-01-12)
-
-**Filter Panel Customization Settings**
-
-- **Background Appearance**:
-  - Custom background color picker
-  - Transparent background option
-  - Frosted glass effect (backdrop blur) toggle
-
-- **Header & Layout**:
-  - Show/hide header ("The Area" title) toggle
-  - Show individual items toggle (controls expand/collapse behavior)
-
-- **Button Styles**:
-  - List style (default) - colored dots with chevron arrows
-  - Pills style - rounded transparent pill buttons with borders
-
-- **Pill Border Options** (when pills style is selected):
-  - Use category color for each pill border
-  - Custom color for all pill borders
-
-- **Technical Implementation**:
-  - 8 new admin settings with modern card-based UI
-  - Conditional field display based on selected options
-  - CSS custom properties for dynamic pill border colors
-  - JavaScript conditional expand behavior based on settings
-  - Mobile-responsive pills style
+- Filter panel customization (colors, transparency, frosted glass)
+- Button styles (List, Pills)
+- Show/hide header and items toggles
 
 ### Version 1.3.0 (2026-01-12)
+- WPBakery Page Builder integration
+- GitHub auto-updates
 
-**WPBakery Page Builder Integration & GitHub Auto-Updates**
-
-- **WPBakery Element**:
-  - Added Clear Map as a WPBakery Page Builder element
-  - Configurable parameters: height, center coordinates, zoom level
-  - Design options: custom CSS class, element ID, CSS editor support
-  - Located in Content category with map pin icon
-
-- **GitHub Auto-Updates**:
-  - Automatic update checks from GitHub releases
-  - Seamless WordPress update integration
-  - Version comparison and changelog display
-
-- **New Files**:
-  - `includes/class-wpbakery.php` - WPBakery integration
-  - `includes/class-github-updater.php` - Auto-update functionality
-
-### Version 1.2.0 (2025-01-04)
-
-**Enhanced Category Filtering with Visual Feedback**
-
-- **Toggle-Based Category Filtering**:
-  - Click category to apply filter (shows only that category's POIs)
-  - Click again to remove filter (shows all POIs)
-  - Switch between categories by clicking different ones
-  - Single filter at a time (exclusive filtering maintained)
-
-- **Visual Filter Indicator**:
-  - Category icon changes from colored circle to X when filtered
-  - X icon uses same color as category for consistency
-  - Smooth transitions between states
-
-- **Auto Expand/Collapse POI Lists**:
-  - POI list automatically expands when filter is applied
-  - POI list automatically collapses when filter is removed
-  - POI list collapses when switching to different category
-  - Expand button remains independent for browsing without filtering
-
-- **User Experience Improvements**:
-  - Clear visual feedback for active filters
-  - Intuitive toggle behavior (click to filter, click again to clear)
-  - Smooth animations using GSAP
-  - Maintains accessibility attributes (aria-expanded)
-
-**Technical Implementation**:
-- Updated category HTML template with dual icon support
-- Added CSS filtered state with opacity transitions
-- Refactored JavaScript filter logic for toggle behavior
-- New `updateCategoryIcon()` helper method
-- Preserved backward compatibility with expand button
-
-### Version 1.1.1 (2025-01-XX)
-
-**POI Photo & Description Display**
-
-- **Clickable POI Popups**:
-  - POIs now display full details when clicked (not just hovered)
-  - Photos and descriptions (saved in admin) now visible on the map
-  - Smart viewport-aware popup positioning (above, below, left, or right of pin)
-  - Popups include: name, photo, address, description, and website link
-
-**Technical Implementation**:
-- Added `photo` field to GeoJSON properties in `poisToGeoJSON()` method
-- Added click handler for `unclustered-point` layer
-- Created new `showPoiPopup()` method with intelligent positioning logic
-
-### Version 1.1.0 (2025-01-XX)
-
-**Major Improvements - Location-Agnostic & Production Ready**
-
-- **Removed NYC-Specific Constraints**: Plugin now works for any geographic location worldwide
-  - Removed proximity bias to NYC center
-  - Removed bounding box validation that rejected non-NYC coordinates
-  - Removed NYC-specific address cleaning logic
-
-- **Fixed Critical Geocoding Issues**:
-  - Removed failure caching that prevented geocoding retries
-  - Only successful geocoding results are now cached
-  - Fixes persistent "Skipped X POIs without valid coordinates" errors
-
-- **Fixed POI Data Loss Bug**:
-  - Critical bug: Editing category names was stripping all POI coordinates
-  - Added hidden form fields to preserve coordinate data during category edits
-  - Users can now safely rename categories without losing POI locations
-
-- **Removed Default Categories**:
-  - No longer creates unwanted default categories on activation or import
-  - Categories are now created only from KML folder structure
-  - Cleaner setup experience
-
-- **Added Building Icon Geocoding**:
-  - New "Geocode Now" button in Settings for building address
-  - Auto-geocode hook when building address is saved
-  - Building icon now displays correctly with custom SVG/PNG
-
-- **Performance Optimizations**:
-  - Removed geocoding from map renderer (was running on every page load)
-  - Geocoding now only happens during import or manual trigger
-  - Eliminates hundreds of unnecessary API calls
-
-### Version 1.0.0 (2025-01-XX)
-
+### Version 1.0.0
 - Initial release
-- Interactive Mapbox maps with POI filtering
-- KML/KMZ import with automatic categorization
-- Mapbox and Google geocoding support
-- Category management with custom colors
-- Marker clustering
-- Subway line overlay (optional)
 
 ## License
 

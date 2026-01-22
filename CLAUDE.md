@@ -7,112 +7,64 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 1.9.2
+**Current Version**: 2.1.3
 
 ---
 
-## Recent Session Summary (Version 1.9.2)
+## Recent Session Summary (Version 2.1.x)
 
-### Latest Update - Mobile Layout Fixes & Bug Fixes
-**Date**: 2026-01-15
-**Feature**: Fixed mobile height handling, cleaned up WPBakery options, added "Above Map" option
+### v2.1.3 - Alphabetical POI Sorting (2026-01-22)
+- POIs in filter panel's expandable category lists now sorted alphabetically (case-insensitive)
+- Original index preserved for proper data-poi attribute references
 
-**What Changed:**
-- **Fixed mobile height handling** - On mobile, container uses `height: auto`, map element gets explicit height
-- **Removed "Use Global Setting"** from all Filter Panel dropdown options in WPBakery
-- **Added "Above Map" option** to Mobile Filter Display dropdown
-- **Fixed `get_setting()` bug** - Was returning empty string instead of default when option_name was empty
-- **CSS flexbox ordering** - Map has `order: 1`, filters have `order: 2` (or `order: 0` for above)
+### v2.1.2 - Better POI Popup Positioning (2026-01-22)
+- When clicking POI from filter panel, map positions POI in lower third of viewport
+- Offset 20% below center gives popup card room to display above marker
 
-**Files Modified:**
-- `includes/class-map-renderer.php` - Fixed `get_setting()` to return default when no option name provided
-- `includes/class-wpbakery.php` - Removed "Use Global Setting" options, added "Above Map" option
-- `assets/css/map.css` - Restructured mobile layout with flexbox ordering
-- `assets/js/map.js` - Updated `applyResponsiveContainerHeight()` for mobile-specific height handling
+### v2.1.1 - POI Popup on Filter Click (2026-01-22)
+- Clicking a POI in filter panel now opens its popup card after zooming
+- Uses `map.once("moveend")` to show popup after animation completes
 
-**Technical Details:**
-- Mobile layout uses CSS flexbox with explicit `order` properties
-- Map element: `order: 1`, Filters: `order: 2` (default), `order: 0` (above map)
-- `get_setting()` now checks if `$option_name` is empty and returns `$default` directly
+### v2.1.0 - Frosted Glass Effect (2026-01-22)
+- New responsive WPBakery setting: "Frosted Glass Effect"
+- Options: None / Panel Only / Buttons Only / Panel & Buttons
+- Removed "Frosted Glass" from Pill Background dropdown (unified in new setting)
+- CSS: `.filters-frosted` class for panel blur effect
 
 ---
 
-## Known Issue - Deferred
+## Previous Session Summary (Version 2.0.x)
 
-### WPBakery Dropdown Not Saving Non-Default Values
-**Status**: Deferred - workaround in place
-**Issue**: WPBakery's `mobile_filters` dropdown doesn't save "Above Map" selection to shortcode
-**Workaround**: Default value "Below Map" works correctly; "Above Map" feature is implemented but WPBakery may not save the selection
+### v2.0.2 - Fix Center On POI (2026-01-22)
+- Fixed `center_on` not working (was missing from shortcode_atts whitelist)
+- Sorted POI dropdown alphabetically in WPBakery element
 
----
+### v2.0.1 - Center On POI Feature (2026-01-22)
+- Added "Center On" dropdown in WPBakery Map Position group
+- Select a POI as map center instead of manual lat/lng coordinates
+- Added `margin: auto` to popup logo images
 
-## Previous Session Summary (Version 1.9.0)
+### v2.0.0 - Admin Interface Redesign (2026-01-22)
+- **New admin UI** using WP_List_Table for POI management
+- Tabbed interface: POIs tab / Categories tab
+- Modal dialogs for editing POIs and categories via AJAX
+- Bulk actions: delete, move to category
+- Search and category filtering
+- Pagination with per-page settings (stored in user meta)
+- CSV/JSON export functionality
+- Category management with card-based layout and drag-drop reordering
 
-### Settings Consolidation to WPBakery Only
-**Date**: 2026-01-15
-**Feature**: Consolidated all display settings to WPBakery element, removed from global admin
+**New File:** `includes/class-poi-list-table.php`
 
-**What Changed:**
-- **Map Height now responsive** - Added device toggles (desktop/tablet/mobile) to Map Height field
-- **Removed 19 display settings from global admin** - All map display settings now in WPBakery only
-- **Global admin simplified** - Now only contains API keys and building information
-- **Added `applyResponsiveContainerHeight()` method** - Map container resizes on viewport change
-
----
-
-## Previous Session Summary (Version 1.8.0)
-
-### WPBakery Responsive Filter Panel Settings
-**Date**: 2026-01-14
-**Feature**: Device-specific settings (desktop/tablet/mobile) for WPBakery element
-
-**What Changed:**
-- Added responsive device toggles (desktop/tablet/mobile buttons) to Filter Panel settings in WPBakery
-- All Filter Panel settings now support per-breakpoint values
-- Added Mobile Filter Display and Mobile Filter Style fields to WPBakery element
-- Values stored as pipe-separated format: `desktop|tablet|mobile`
-
-**Technical Implementation:**
-- Created custom WPBakery param types: `responsive_textfield`, `responsive_dropdown`
-- Device toggle buttons using WordPress dashicons
-- JavaScript handles switching between device inputs and updating combined value
-- Map renderer parses responsive values and passes to frontend
-- Frontend JS applies values based on viewport breakpoint with inheritance
-
-**New Files:**
-- `assets/css/wpbakery-admin.css` - Styling for device toggle buttons
-- `assets/js/wpbakery-admin.js` - Device toggle functionality
-
-**Responsive Fields in WPBakery:**
-- Map Height (NEW in 1.9.0)
-- Show Filter Panel, Panel Width, Panel Height
-- Transparent Background, Frosted Glass, Show Header
-- Button Style, Show Individual Items
-
-**Breakpoints:**
-- Desktop: >1024px
-- Tablet: 769-1024px
-- Mobile: ≤768px
-
----
-
-## Previous Session Summary (Version 1.7.0)
-
-### Mobile Filter Panel Settings
-**Date**: 2026-01-14
-**Feature**: Mobile-specific settings for filter panel display and layout
-
-**What Changed:**
-- Added "Mobile Settings" card in admin settings
-- Mobile filter display modes: Below Map (default), Bottom Drawer, Hidden
-- Mobile filter style override (inherit/list/pills)
-- Fixed mobile layout to use CSS flexbox - filter panel now flows below the map
-
-**CSS Classes:**
-- `.mobile-filters-below` - Filter panel displays below map (new default)
-- `.mobile-filters-hidden` - Hide filter panel on mobile
-- `.mobile-drawer-mode` - Container class for drawer mode
-- `.mobile-drawer` - Filter panel as slide-up drawer
+**New AJAX Endpoints:**
+- `clear_map_get_poi` - Get single POI data for modal
+- `clear_map_save_poi` - Save single POI (AJAX)
+- `clear_map_delete_poi` - Delete single POI
+- `clear_map_bulk_action` - Bulk delete/category change
+- `clear_map_export_pois` - CSV/JSON export
+- `clear_map_save_category` - Save category
+- `clear_map_delete_category` - Delete category
+- `clear_map_reorder_categories` - Drag-drop reorder
 
 ---
 
@@ -120,7 +72,8 @@
 
 ### Core Files
 - **`clear-map.php`** - Main plugin file, AJAX handlers, initialization
-- **`includes/class-admin.php`** - WordPress admin interface (API keys & building info only)
+- **`includes/class-admin.php`** - WordPress admin interface (settings, POI/category management)
+- **`includes/class-poi-list-table.php`** - WP_List_Table for POI list (NEW in 2.0.0)
 - **`includes/class-frontend.php`** - Frontend shortcode registration
 - **`includes/class-map-renderer.php`** - Renders map HTML and enqueues assets
 - **`includes/class-api-handler.php`** - Handles geocoding (forward & reverse) via Mapbox/Google APIs
@@ -132,14 +85,14 @@
 ### Frontend Assets
 - **`assets/js/map.js`** - Map initialization, POI rendering, clustering, filters, popups (class: `ClearMap`)
 - **`assets/css/map.css`** - Map and UI styles
-- **`assets/js/admin.js`** - Admin page JavaScript (AJAX handlers, UI interactions)
+- **`assets/js/admin.js`** - Admin page JavaScript (AJAX handlers, modals, bulk actions)
 - **`assets/css/admin.css`** - Admin page styles
 - **`assets/js/wpbakery-admin.js`** - WPBakery responsive field toggles
 - **`assets/css/wpbakery-admin.css`** - WPBakery admin styling
 
 ---
 
-## WPBakery Element Settings (v1.9.0)
+## WPBakery Element Settings (v2.1.x)
 
 ### General Group
 - **Map Height** - `responsive_textfield` - Height of map container (default: 60vh)
@@ -147,6 +100,7 @@
 - **Extra CSS Class** - `el_class` - Custom CSS classes
 
 ### Map Position Group
+- **Center On** - `dropdown` - Select POI as map center or use custom coordinates
 - **Center Latitude** - `textfield` - Initial map center lat (default: 40.7451)
 - **Center Longitude** - `textfield` - Initial map center lng (default: -74.0011)
 - **Initial Zoom Level** - `dropdown` - Zoom level 3-18 (default: 14)
@@ -163,15 +117,15 @@
 - **Panel Height** - `responsive_textfield` - Height of filter panel (default: auto)
 - **Background Color** - `colorpicker` - Panel background color (default: #FBF8F1)
 - **Transparent Background** - `responsive_dropdown` - Make panel transparent
-- **Frosted Glass Effect** - `responsive_dropdown` - Backdrop blur effect
+- **Frosted Glass Effect** - `responsive_dropdown` - None/Panel/Buttons/Both (NEW in 2.1.0)
 - **Show Header** - `responsive_dropdown` - Show "The Area" header
 - **Button Style** - `responsive_dropdown` - List or Pills style
 - **Pill Border Color** - `dropdown` - Category color or custom (pills only)
 - **Custom Pill Border Color** - `colorpicker` - Custom border color
-- **Pill Background** - `dropdown` - Transparent, color, or frosted (pills only)
+- **Pill Background** - `dropdown` - Transparent or Solid Color (pills only)
 - **Pill Background Color** - `colorpicker` - Custom background color
 - **Show Individual Items** - `responsive_dropdown` - Expandable POI lists
-- **Mobile Filter Display** - `dropdown` - Below/Drawer/Hidden
+- **Mobile Filter Display** - `dropdown` - Below/Above/Drawer/Hidden
 - **Mobile Filter Style** - `dropdown` - Inherit/List/Pills
 
 ### Design Options Group
@@ -179,58 +133,61 @@
 
 ---
 
-## Data Flow for Responsive Settings
+## Key JavaScript Methods (map.js)
 
-### 1. WPBakery Editor (Admin)
-```
-User clicks device toggles → wpbakery-admin.js updates hidden input
-Value stored as: "desktop_value|tablet_value|mobile_value"
-```
+### POI Filter Panel Interactions
+When clicking a POI in the filter panel:
+1. Sets active POI and updates UI
+2. Zooms to POI with offset (lower third of viewport)
+3. Shows popup after animation completes
 
-### 2. Map Renderer (PHP)
-```php
-// Parse responsive value
-$height = $this->parse_responsive_value($atts['height'], '60vh');
-// Returns: ['desktop' => '60vh', 'tablet' => '', 'mobile' => '50vh']
-
-// Pass to JavaScript
-$map_data = array(
-    'mapHeight' => $height,
-    'filtersWidth' => $filters_width,
-    // etc...
-);
-```
-
-### 3. Frontend JavaScript
 ```javascript
-// Get breakpoint
-getBreakpoint() {
-    const width = window.innerWidth
-    if (width <= 768) return "mobile"
-    if (width <= 1024) return "tablet"
-    return "desktop"
-}
-
-// Get value for current breakpoint with inheritance
-getResponsiveValue(values, defaultValue) {
-    const breakpoint = this.getBreakpoint()
-    const desktop = values.desktop || defaultValue
-    const tablet = values.tablet || desktop  // Inherit from desktop
-    const mobile = values.mobile || tablet   // Inherit from tablet
-    // Return appropriate value
-}
-
-// Apply to DOM
-applyResponsiveContainerHeight() {
-    const height = this.getResponsiveValue(this.data.mapHeight, "60vh")
-    containerEl.style.height = height
-    this.map.resize()
-}
+// POI click in filter panel
+const offsetY = mapContainer.offsetHeight * 0.2
+this.map.easeTo({
+  center: coordinates,
+  zoom: Math.max(this.data.zoom, 16),
+  offset: [0, -offsetY] // Position POI in lower third
+})
+this.map.once("moveend", () => {
+  this.showPoiPopup(poi, coordinates)
+})
 ```
+
+### Responsive Methods
+- `getBreakpoint()` - Returns 'desktop', 'tablet', or 'mobile' based on viewport
+- `getResponsiveValue(values, default)` - Gets value for current breakpoint with inheritance
+- `applyResponsiveContainerHeight()` - Applies responsive map height, calls map.resize()
+- `applyResponsiveStyles()` - Applies responsive filter panel styles including frosted glass
+- `updateMobileMode()` - Applies mobile-specific display mode and style
 
 ---
 
-## Global Admin Settings (v1.9.0)
+## CSS Class Structure
+
+### Map Container
+- `.clear-map-container` - Main container (height set via JS)
+- `.clear-map` - Mapbox map instance
+
+### Filters Panel
+- `.clear-map-filters` - Filter sidebar
+- `.filter-style-list` - List button style
+- `.filter-style-pills` - Pills button style
+- `.filters-frosted` - Frosted glass panel effect (NEW in 2.1.0)
+- `.bg-transparent` - Transparent background
+- `.no-header` - Header hidden
+- `.no-items` - Individual items hidden
+- `.pills-frosted` - Frosted pill backgrounds
+
+### Mobile Classes
+- `.mobile-filters-below` - Filter panel below map (flexbox layout)
+- `.mobile-filters-hidden` - Hide filter panel on mobile
+- `.mobile-drawer-mode` - Container class for drawer mode
+- `.mobile-drawer` - Filter panel as slide-up drawer
+
+---
+
+## Global Admin Settings
 
 ### Settings Location
 WordPress Admin → Clear Map → Settings
@@ -251,86 +208,27 @@ WordPress Admin → Clear Map → Settings
 
 ---
 
-## Key JavaScript Methods (map.js)
+## Admin Interface (v2.0.0+)
 
-### Responsive Methods
-- `getBreakpoint()` - Returns 'desktop', 'tablet', or 'mobile' based on viewport
-- `getResponsiveValue(values, default)` - Gets value for current breakpoint with inheritance
-- `applyResponsiveContainerHeight()` - Applies responsive map height, calls map.resize()
-- `applyResponsiveStyles()` - Applies responsive filter panel styles (width, height, style)
-- `updateMobileMode()` - Applies mobile-specific display mode and style
+### POIs Tab
+- WP_List_Table with columns: checkbox, photo, logo, name, category, address, status
+- Sortable by name, category, address
+- Search box filters by name and address
+- Category filter dropdown
+- Bulk actions: Delete, Move to Category
+- Per-page selector: 10, 20, 50, 100
+- Click row to edit via modal
 
-### Called On Init
-```javascript
-init() {
-    this.createMap()
-    this.setupFilters()
-    this.addBuildingMarker()
-    this.setupMobileDrawer()  // Calls applyResponsiveContainerHeight() and applyResponsiveStyles()
-}
-```
+### Categories Tab
+- Card-based layout with color swatches
+- POI count badge per category
+- Drag-drop reordering (jQuery UI Sortable)
+- AJAX save for each category
+- Add/Edit/Delete via modals
 
-### Called On Resize
-```javascript
-window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout)
-    resizeTimeout = setTimeout(() => {
-        this.applyResponsiveContainerHeight()
-        this.applyResponsiveStyles()
-        this.updateMobileMode()
-    }, 150)
-})
-```
-
----
-
-## CSS Class Structure
-
-### Map Container
-- `.clear-map-container` - Main container (height set via JS)
-- `.clear-map` - Mapbox map instance
-
-### Filters Panel
-- `.clear-map-filters` - Filter sidebar
-- `.filter-style-list` - List button style
-- `.filter-style-pills` - Pills button style
-- `.filters-frosted` - Frosted glass effect
-- `.bg-transparent` - Transparent background
-- `.no-header` - Header hidden
-- `.no-items` - Individual items hidden
-- `.pills-frosted` - Frosted pill backgrounds
-
-### Mobile Classes
-- `.mobile-filters-below` - Filter panel below map (flexbox layout)
-- `.mobile-filters-hidden` - Hide filter panel on mobile
-- `.mobile-drawer-mode` - Container class for drawer mode
-- `.mobile-drawer` - Filter panel as slide-up drawer
-
----
-
-## Recent Commits
-
-### Version 1.9.2 - Mobile Layout Fixes (2026-01-15)
-- Fix mobile height handling (map element gets explicit height)
-- Remove "Use Global Setting" from WPBakery dropdowns
-- Add "Above Map" option to Mobile Filter Display
-- Fix `get_setting()` default value bug
-
-### Version 1.9.0 - Settings Consolidation (2026-01-15)
-- Add responsive device toggles to Map Height
-- Remove display settings from global admin
-- Keep only API keys and building info in global admin
-- All display settings now configured per-element in WPBakery
-
-### Version 1.8.0 - WPBakery Responsive Settings (2026-01-14)
-- Add responsive device toggles to Filter Panel settings
-- Custom WPBakery param types for responsive fields
-- Mobile Filter Display and Style fields
-
-### Version 1.7.0 - Mobile Filter Settings (2026-01-14)
-- Mobile filter display modes (below/drawer/hidden)
-- Mobile filter style override
-- CSS flexbox layout for mobile
+### Export
+- Export selected or all POIs
+- Formats: CSV or JSON
 
 ---
 
@@ -340,9 +238,9 @@ When committing changes, always create a GitHub release for plugin auto-updates:
 
 ```bash
 # After committing
-git tag v1.x.x
+git tag vX.X.X
 git push origin main
-git push origin v1.x.x
+git push origin vX.X.X
 
 # Create release zip (from parent directory)
 cd "/Users/dannybreckenridge/Documents/Clear ph/Clear pH Custom WP Plugins"
@@ -357,7 +255,7 @@ zip -r clear-map.zip clear-map \
 
 # Create release with zip attached
 cd clear-map
-gh release create v1.x.x --title "v1.x.x - Title" --notes "Release notes..." "../clear-map.zip"
+gh release create vX.X.X --title "vX.X.X - Title" --notes "Release notes..." "../clear-map.zip"
 ```
 
 **IMPORTANT**: Always attach `clear-map.zip` to releases. Do NOT use GitHub's auto-generated source archives (they have version numbers in the folder name).
@@ -366,6 +264,6 @@ gh release create v1.x.x --title "v1.x.x - Title" --notes "Release notes..." "..
 
 ## End of Context
 
-**Current Version**: 1.9.2
+**Current Version**: 2.1.3
 **Current Status**: Production ready
-**Known Issue**: WPBakery "Above Map" option may not save (deferred)
+**Last Updated**: 2026-01-22
