@@ -943,6 +943,20 @@ class ClearMap {
     } else {
       filtersEl.classList.remove("no-items")
     }
+
+    // Apply frosted glass effect
+    const frostedGlass = this.getResponsiveValue(this.data.frostedGlass, "none")
+
+    // Remove all frosted classes first
+    filtersEl.classList.remove("filters-frosted", "pills-frosted")
+
+    // Apply based on setting
+    if (frostedGlass === "panel" || frostedGlass === "both") {
+      filtersEl.classList.add("filters-frosted")
+    }
+    if (frostedGlass === "buttons" || frostedGlass === "both") {
+      filtersEl.classList.add("pills-frosted")
+    }
   }
 
   setupMobileDrawer() {

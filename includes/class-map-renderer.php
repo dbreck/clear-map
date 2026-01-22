@@ -163,6 +163,7 @@ class Clear_Map_Renderer {
 		$filters_pill_bg_color      = $this->get_setting( $atts, 'filters_pill_bg_color', '', '#ffffff' );
 		$filters_show_items_raw     = $this->get_setting( $atts, 'filters_show_items', '', 1 );
 		$show_filters_raw           = $this->get_setting( $atts, 'show_filters', '', 1 );
+		$frosted_glass_raw          = $this->get_setting( $atts, 'frosted_glass', '', 'none' );
 
 		// Parse responsive values.
 		$filters_width          = $this->parse_responsive_value( $filters_width_raw, '320px' );
@@ -172,6 +173,7 @@ class Clear_Map_Renderer {
 		$filters_style          = $this->parse_responsive_value( $filters_style_raw, 'list' );
 		$filters_show_items     = $this->parse_responsive_value( $filters_show_items_raw, '1' );
 		$show_filters           = $this->parse_responsive_value( $show_filters_raw, '1' );
+		$frosted_glass          = $this->parse_responsive_value( $frosted_glass_raw, 'none' );
 
 		// Mobile settings (WPBakery only, no global fallback).
 		$mobile_filters       = $this->get_setting( $atts, 'mobile_filters', '', 'below' );
@@ -224,6 +226,8 @@ class Clear_Map_Renderer {
 			'mobileFiltersStyle'  => $mobile_filters_style,
 			// Map height (responsive).
 			'mapHeight'           => $height,
+			// Frosted glass (responsive).
+			'frostedGlass'        => $frosted_glass,
 		);
 
 		// Enqueue assets.
@@ -282,8 +286,12 @@ class Clear_Map_Renderer {
 			$filter_classes[] = 'bg-transparent';
 		}
 
-		// Add class for frosted pill backgrounds.
-		if ( 'pills' === $filters_style['desktop'] && 'frosted' === $filters_pill_bg ) {
+		// Add frosted glass classes based on setting.
+		$frosted_desktop = $frosted_glass['desktop'];
+		if ( 'panel' === $frosted_desktop || 'both' === $frosted_desktop ) {
+			$filter_classes[] = 'filters-frosted';
+		}
+		if ( 'buttons' === $frosted_desktop || 'both' === $frosted_desktop ) {
 			$filter_classes[] = 'pills-frosted';
 		}
 

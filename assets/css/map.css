@@ -51,6 +51,29 @@
     border-bottom: none;
 }
 
+/* Frosted glass panel effect */
+.clear-map-filters.filters-frosted {
+    background: rgba(251, 248, 241, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.clear-map-filters.filters-frosted .filters-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.clear-map-filters.filters-frosted .filter-category {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Frosted + transparent - allow custom bg color to show through */
+.clear-map-filters.filters-frosted.bg-transparent {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 .filters-header {
     display: flex;
     align-items: center;

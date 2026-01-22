@@ -423,6 +423,20 @@ class Clear_Map_WPBakery {
 					),
 					array(
 						'type'        => 'responsive_dropdown',
+						'heading'     => __( 'Frosted Glass Effect', 'clear-map' ),
+						'param_name'  => 'frosted_glass',
+						'value'       => array(
+							__( 'None', 'clear-map' )            => 'none',
+							__( 'Panel Only', 'clear-map' )      => 'panel',
+							__( 'Buttons Only', 'clear-map' )    => 'buttons',
+							__( 'Panel & Buttons', 'clear-map' ) => 'both',
+						),
+						'std'         => 'none',
+						'description' => __( 'Apply frosted glass (blur) effect to the filter panel and/or buttons.', 'clear-map' ),
+						'group'       => __( 'Filter Panel', 'clear-map' ),
+					),
+					array(
+						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Show Header', 'clear-map' ),
 						'param_name'  => 'filters_show_header',
 						'value'       => array(
@@ -478,12 +492,11 @@ class Clear_Map_WPBakery {
 						'heading'     => __( 'Pill Background', 'clear-map' ),
 						'param_name'  => 'filters_pill_bg',
 						'value'       => array(
-							__( 'Transparent', 'clear-map' )   => 'transparent',
-							__( 'Solid Color', 'clear-map' )   => 'color',
-							__( 'Frosted Glass', 'clear-map' ) => 'frosted',
+							__( 'Transparent', 'clear-map' ) => 'transparent',
+							__( 'Solid Color', 'clear-map' ) => 'color',
 						),
 						'std'         => 'transparent',
-						'description' => __( 'Background style for pill buttons.', 'clear-map' ),
+						'description' => __( 'Background style for pill buttons. Use Frosted Glass Effect setting for blur effect.', 'clear-map' ),
 						'dependency'  => array(
 							'element' => 'filters_style',
 							'value'   => array( 'pills' ),
