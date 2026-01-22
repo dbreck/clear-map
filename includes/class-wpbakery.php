@@ -178,6 +178,42 @@ class Clear_Map_WPBakery {
 	}
 
 	/**
+	 * Get POI options for the "Center On" dropdown.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array Options array with label => value format.
+	 */
+	private function get_center_on_options() {
+		$options = array(
+			__( 'Custom Coordinates', 'clear-map' ) => '',
+		);
+
+		$categories = get_option( 'clear_map_categories', array() );
+		$pois       = get_option( 'clear_map_pois', array() );
+
+		foreach ( $pois as $category_key => $category_pois ) {
+			$category_name = isset( $categories[ $category_key ]['name'] )
+				? $categories[ $category_key ]['name']
+				: $category_key;
+
+			foreach ( $category_pois as $index => $poi ) {
+				// Only include POIs that have coordinates.
+				if ( empty( $poi['lat'] ) || empty( $poi['lng'] ) ) {
+					continue;
+				}
+
+				$label = $poi['name'] . ' (' . $category_name . ')';
+				$value = $category_key . '|' . $index;
+
+				$options[ $label ] = $value;
+			}
+		}
+
+		return $options;
+	}
+
+	/**
 	 * Register the Clear Map element with WPBakery.
 	 *
 	 * @since 1.3.0
@@ -229,11 +265,24 @@ class Clear_Map_WPBakery {
 					// Map Position Group
 					// =====================
 					array(
+						'type'        => 'dropdown',
+						'heading'     => __( 'Center On', 'clear-map' ),
+						'param_name'  => 'center_on',
+						'value'       => $this->get_center_on_options(),
+						'std'         => '',
+						'description' => __( 'Center the map on a specific POI, or use custom coordinates below.', 'clear-map' ),
+						'group'       => __( 'Map Position', 'clear-map' ),
+					),
+					array(
 						'type'        => 'textfield',
 						'heading'     => __( 'Center Latitude', 'clear-map' ),
 						'param_name'  => 'center_lat',
 						'value'       => '',
 						'description' => __( 'Latitude for the initial map center. Leave blank for default (40.7451).', 'clear-map' ),
+						'dependency'  => array(
+							'element'  => 'center_on',
+							'is_empty' => true,
+						),
 						'group'       => __( 'Map Position', 'clear-map' ),
 					),
 					array(
@@ -242,6 +291,10 @@ class Clear_Map_WPBakery {
 						'param_name'  => 'center_lng',
 						'value'       => '',
 						'description' => __( 'Longitude for the initial map center. Leave blank for default (-74.0011).', 'clear-map' ),
+						'dependency'  => array(
+							'element'  => 'center_on',
+							'is_empty' => true,
+						),
 						'group'       => __( 'Map Position', 'clear-map' ),
 					),
 					array(

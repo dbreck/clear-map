@@ -114,8 +114,35 @@ class Clear_Map_Renderer {
 		// Get settings with shortcode overrides.
 		$height_raw          = $this->get_setting( $atts, 'height', '', '60vh' );
 		$height              = $this->parse_responsive_value( $height_raw, '60vh' );
-		$center_lat          = $this->get_setting( $atts, 'center_lat', '', 40.7451 );
-		$center_lng          = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
+
+		// Handle "Center On" POI option.
+		$center_on = $this->get_setting( $atts, 'center_on', '', '' );
+		if ( ! empty( $center_on ) && strpos( $center_on, '|' ) !== false ) {
+			// Format: category_key|index.
+			$center_parts = explode( '|', $center_on );
+			if ( count( $center_parts ) === 2 ) {
+				$cat_key   = $center_parts[0];
+				$poi_index = intval( $center_parts[1] );
+
+				if ( isset( $pois[ $cat_key ][ $poi_index ] ) ) {
+					$center_poi = $pois[ $cat_key ][ $poi_index ];
+					$center_lat = ! empty( $center_poi['lat'] ) ? $center_poi['lat'] : 40.7451;
+					$center_lng = ! empty( $center_poi['lng'] ) ? $center_poi['lng'] : -74.0011;
+				} else {
+					// POI not found, fall back to manual coordinates.
+					$center_lat = $this->get_setting( $atts, 'center_lat', '', 40.7451 );
+					$center_lng = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
+				}
+			} else {
+				$center_lat = $this->get_setting( $atts, 'center_lat', '', 40.7451 );
+				$center_lng = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
+			}
+		} else {
+			// Use manual coordinates.
+			$center_lat = $this->get_setting( $atts, 'center_lat', '', 40.7451 );
+			$center_lng = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
+		}
+
 		$zoom                = $this->get_setting( $atts, 'zoom', '', 14 );
 		// Display settings (WPBakery only, no global fallback).
 		$cluster_distance    = $this->get_setting( $atts, 'cluster_distance', '', 50 );
