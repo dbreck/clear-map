@@ -182,16 +182,14 @@ class Clear_Map_WPBakery {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @return array Options array with label => value format.
+	 * @return array Options array with label => value format, sorted alphabetically.
 	 */
 	private function get_center_on_options() {
-		$options = array(
-			__( 'Custom Coordinates', 'clear-map' ) => '',
-		);
-
 		$categories = get_option( 'clear_map_categories', array() );
 		$pois       = get_option( 'clear_map_pois', array() );
 
+		// Build POI options.
+		$poi_options = array();
 		foreach ( $pois as $category_key => $category_pois ) {
 			$category_name = isset( $categories[ $category_key ]['name'] )
 				? $categories[ $category_key ]['name']
@@ -206,11 +204,19 @@ class Clear_Map_WPBakery {
 				$label = $poi['name'] . ' (' . $category_name . ')';
 				$value = $category_key . '|' . $index;
 
-				$options[ $label ] = $value;
+				$poi_options[ $label ] = $value;
 			}
 		}
 
-		return $options;
+		// Sort alphabetically by label (key).
+		ksort( $poi_options, SORT_NATURAL | SORT_FLAG_CASE );
+
+		// Prepend "Custom Coordinates" option.
+		$options = array(
+			__( 'Custom Coordinates', 'clear-map' ) => '',
+		);
+
+		return array_merge( $options, $poi_options );
 	}
 
 	/**
