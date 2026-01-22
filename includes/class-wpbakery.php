@@ -364,18 +364,6 @@ class Clear_Map_WPBakery {
 					),
 					array(
 						'type'        => 'responsive_dropdown',
-						'heading'     => __( 'Frosted Glass Effect', 'clear-map' ),
-						'param_name'  => 'filters_frosted',
-						'value'       => array(
-							__( 'No', 'clear-map' )  => '0',
-							__( 'Yes', 'clear-map' ) => '1',
-						),
-						'std'         => '0',
-						'description' => __( 'Apply frosted glass blur effect to the panel.', 'clear-map' ),
-						'group'       => __( 'Filter Panel', 'clear-map' ),
-					),
-					array(
-						'type'        => 'responsive_dropdown',
 						'heading'     => __( 'Show Header', 'clear-map' ),
 						'param_name'  => 'filters_show_header',
 						'value'       => array(

@@ -64,7 +64,6 @@ class Clear_Map_Frontend {
 				'filters_height'           => '',
 				'filters_bg_color'         => '',
 				'filters_bg_transparent'   => '',
-				'filters_frosted'          => '',
 				'filters_show_header'      => '',
 				'filters_style'            => '',
 				'filters_pill_border'      => '',

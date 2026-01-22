@@ -593,6 +593,23 @@ class Clear_Map_Admin
         echo '<input type="url" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][website]" value="' . esc_attr($poi['website']) . '" placeholder="Website URL" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][photo]" value="' . esc_attr($poi['photo']) . '" class="poi-photo-url" />';
 
+        // Photo thumbnail preview.
+        $has_photo = ! empty( $poi['photo'] );
+        echo '<div class="poi-photo-preview' . ( $has_photo ? ' has-photo' : '' ) . '" title="Photo">';
+        if ( $has_photo ) {
+            echo '<img src="' . esc_url( $poi['photo'] ) . '" alt="" />';
+        }
+        echo '</div>';
+
+        // Logo field and preview.
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][logo]" value="' . esc_attr( $poi['logo'] ?? '' ) . '" class="poi-logo-url" />';
+        $has_logo = ! empty( $poi['logo'] );
+        echo '<div class="poi-logo-preview' . ( $has_logo ? ' has-photo' : '' ) . '" title="Logo">';
+        if ( $has_logo ) {
+            echo '<img src="' . esc_url( $poi['logo'] ) . '" alt="" />';
+        }
+        echo '</div>';
+
         // Preserve coordinate and geocoding data as hidden fields
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][lat]" value="' . esc_attr($poi['lat'] ?? '') . '" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][lng]" value="' . esc_attr($poi['lng'] ?? '') . '" />';
@@ -602,7 +619,8 @@ class Clear_Map_Admin
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoded_address]" value="' . esc_attr($poi['geocoded_address'] ?? '') . '" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoding_precision]" value="' . esc_attr($poi['geocoding_precision'] ?? '') . '" />';
 
-        echo '<button type="button" class="button upload-photo">Upload Photo</button>';
+        echo '<button type="button" class="button upload-photo">Photo</button>';
+        echo '<button type="button" class="button upload-logo">Logo</button>';
         echo '<button type="button" class="button remove-poi">Remove</button>';
         echo '</div>';
     }

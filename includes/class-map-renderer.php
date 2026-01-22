@@ -128,7 +128,6 @@ class Clear_Map_Renderer {
 		$filters_height_raw         = $this->get_setting( $atts, 'filters_height', '', 'auto' );
 		$filters_bg_color           = $this->get_setting( $atts, 'filters_bg_color', '', '#FBF8F1' );
 		$filters_bg_transparent_raw = $this->get_setting( $atts, 'filters_bg_transparent', '', 0 );
-		$filters_frosted_raw        = $this->get_setting( $atts, 'filters_frosted', '', 0 );
 		$filters_show_header_raw    = $this->get_setting( $atts, 'filters_show_header', '', 1 );
 		$filters_style_raw          = $this->get_setting( $atts, 'filters_style', '', 'list' );
 		$filters_pill_border        = $this->get_setting( $atts, 'filters_pill_border', '', 'category' );
@@ -142,7 +141,6 @@ class Clear_Map_Renderer {
 		$filters_width          = $this->parse_responsive_value( $filters_width_raw, '320px' );
 		$filters_height         = $this->parse_responsive_value( $filters_height_raw, 'auto' );
 		$filters_bg_transparent = $this->parse_responsive_value( $filters_bg_transparent_raw, '0' );
-		$filters_frosted        = $this->parse_responsive_value( $filters_frosted_raw, '0' );
 		$filters_show_header    = $this->parse_responsive_value( $filters_show_header_raw, '1' );
 		$filters_style          = $this->parse_responsive_value( $filters_style_raw, 'list' );
 		$filters_show_items     = $this->parse_responsive_value( $filters_show_items_raw, '1' );
@@ -160,7 +158,6 @@ class Clear_Map_Renderer {
 			|| 1 === (int) $show_filters['tablet']
 			|| 1 === (int) $show_filters['mobile'];
 		$filters_bg_transparent_desktop = 1 === (int) $filters_bg_transparent['desktop'];
-		$filters_frosted_desktop       = 1 === (int) $filters_frosted['desktop'];
 		$filters_show_header_desktop   = 1 === (int) $filters_show_header['desktop'];
 		$filters_show_items_desktop    = 1 === (int) $filters_show_items['desktop'];
 
@@ -190,7 +187,6 @@ class Clear_Map_Renderer {
 			'filtersWidth'        => $filters_width,
 			'filtersHeight'       => $filters_height,
 			'filtersBgTransparent' => $filters_bg_transparent,
-			'filtersFrosted'      => $filters_frosted,
 			'filtersShowHeader'   => $filters_show_header,
 			'filtersStyle'        => $filters_style,
 			'filtersShowItems'    => $filters_show_items,
@@ -245,10 +241,6 @@ class Clear_Map_Renderer {
 		// Build filter panel classes (use desktop values for initial render).
 		$filter_classes   = array( 'clear-map-filters' );
 		$filter_classes[] = 'filter-style-' . sanitize_html_class( $filters_style['desktop'] );
-
-		if ( $filters_frosted_desktop ) {
-			$filter_classes[] = 'filters-frosted';
-		}
 
 		if ( ! $filters_show_header_desktop ) {
 			$filter_classes[] = 'no-header';

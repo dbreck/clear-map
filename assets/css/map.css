@@ -278,13 +278,6 @@
    Filter Panel Appearance Variations
    ============================================ */
 
-/* Frosted Glass Effect */
-.clear-map-filters.filters-frosted {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    background: rgba(251, 248, 241, 0.85);
-}
-
 /* No Header */
 .clear-map-filters.no-header .filters-header {
     display: none;
@@ -688,23 +681,104 @@
     .subway-toggle-section {
         padding: 12px 20px;
     }
-    
+
     .subway-toggle-label {
         font-size: 13px;
         gap: 10px;
     }
-    
+
     .subway-toggle-switch {
         width: 40px;
         height: 22px;
     }
-    
+
     .subway-toggle-switch::before {
         width: 18px;
         height: 18px;
     }
-    
+
     .subway-toggle-checkbox:checked + .subway-toggle-switch::before {
         transform: translateX(18px);
     }
+}
+
+/* ============================================
+   POI Popup Styles
+   ============================================ */
+
+.mapboxgl-popup-content {
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.poi-popup {
+    font-family: 'Area Normal', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.poi-popup-photo {
+    width: 100%;
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.poi-popup-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.poi-popup-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.poi-popup-name {
+    font-size: 16px;
+    font-weight: 400;
+    color: #5a4a3a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.poi-popup-divider {
+    width: 40px;
+    height: 2px;
+    background: #5a4a3a;
+    margin: 0 auto 16px;
+}
+
+.poi-popup-logo {
+    margin-bottom: 16px;
+}
+
+.poi-popup-logo img {
+    max-width: 180px;
+    max-height: 80px;
+    height: auto;
+    display: inline-block;
+}
+
+.poi-popup-description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.poi-popup-website {
+    margin-top: 12px;
+}
+
+.poi-popup-website a {
+    color: #2271b1;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.poi-popup-website a:hover {
+    text-decoration: underline;
 }

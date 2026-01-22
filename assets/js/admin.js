@@ -2,6 +2,18 @@ jQuery(document).ready(function ($) {
   // Initialize color pickers
   $(".color-picker").wpColorPicker()
 
+  // Initialize photo/logo upload buttons for existing images
+  $(".poi-row").each(function () {
+    const photoUrl = $(this).find(".poi-photo-url").val()
+    if (photoUrl) {
+      $(this).find(".upload-photo").text("Change").addClass("has-photo")
+    }
+    const logoUrl = $(this).find(".poi-logo-url").val()
+    if (logoUrl) {
+      $(this).find(".upload-logo").text("Change").addClass("has-photo")
+    }
+  })
+
   // Copy to clipboard functionality
   $(".copy-shortcode").on("click", function () {
     const button = $(this)
@@ -486,7 +498,11 @@ jQuery(document).ready(function ($) {
                 <textarea name="clear_map_pois[${category}][${existingPois}][description]" placeholder="Description"></textarea>
                 <input type="url" name="clear_map_pois[${category}][${existingPois}][website]" value="" placeholder="Website URL" />
                 <input type="hidden" name="clear_map_pois[${category}][${existingPois}][photo]" value="" class="poi-photo-url" />
-                <button type="button" class="button upload-photo">Upload Photo</button>
+                <div class="poi-photo-preview" title="Photo"></div>
+                <input type="hidden" name="clear_map_pois[${category}][${existingPois}][logo]" value="" class="poi-logo-url" />
+                <div class="poi-logo-preview" title="Logo"></div>
+                <button type="button" class="button upload-photo">Photo</button>
+                <button type="button" class="button upload-logo">Logo</button>
                 <button type="button" class="button remove-poi">Remove</button>
             </div>
         `
@@ -509,7 +525,8 @@ jQuery(document).ready(function ($) {
     e.preventDefault()
 
     const button = $(this)
-    const hiddenInput = button.siblings(".poi-photo-url")
+    const row = button.closest(".poi-row")
+    const hiddenInput = row.find(".poi-photo-url")
 
     const mediaUploader = wp.media({
       title: "Select POI Photo",
@@ -524,8 +541,48 @@ jQuery(document).ready(function ($) {
 
     mediaUploader.on("select", function () {
       const attachment = mediaUploader.state().get("selection").first().toJSON()
+      const thumbnailUrl = attachment.sizes && attachment.sizes.thumbnail
+        ? attachment.sizes.thumbnail.url
+        : attachment.url
       hiddenInput.val(attachment.url)
-      button.text("Change Photo").addClass("has-photo")
+      button.text("Change").addClass("has-photo")
+      // Update thumbnail preview
+      const preview = row.find(".poi-photo-preview")
+      preview.addClass("has-photo").html('<img src="' + thumbnailUrl + '" alt="" />')
+    })
+
+    mediaUploader.open()
+  })
+
+  // Logo upload functionality
+  $(document).on("click", ".upload-logo", function (e) {
+    e.preventDefault()
+
+    const button = $(this)
+    const row = button.closest(".poi-row")
+    const hiddenInput = row.find(".poi-logo-url")
+
+    const mediaUploader = wp.media({
+      title: "Select POI Logo",
+      button: {
+        text: "Use this logo",
+      },
+      multiple: false,
+      library: {
+        type: "image",
+      },
+    })
+
+    mediaUploader.on("select", function () {
+      const attachment = mediaUploader.state().get("selection").first().toJSON()
+      const thumbnailUrl = attachment.sizes && attachment.sizes.thumbnail
+        ? attachment.sizes.thumbnail.url
+        : attachment.url
+      hiddenInput.val(attachment.url)
+      button.text("Change").addClass("has-photo")
+      // Update thumbnail preview
+      const preview = row.find(".poi-logo-preview")
+      preview.addClass("has-photo").html('<img src="' + thumbnailUrl + '" alt="" />')
     })
 
     mediaUploader.open()

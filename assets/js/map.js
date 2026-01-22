@@ -474,33 +474,37 @@ class ClearMap {
   }
 
   showPoiPopup(poi, coordinates) {
-    // Build popup content
+    // Build popup content - Layout: Photo, Name, Logo, Description
     let popupContent = `<div class="poi-popup">`
 
-    // POI name (always shown)
-    popupContent += `<div class="poi-popup-name"><strong>${poi.name}</strong></div>`
-
-    // Photo (if available)
+    // Photo at top (if available)
     if (poi.photo) {
-      popupContent += `<div class="poi-popup-photo"><img src="${poi.photo}" alt="${poi.name}" style="width:100%;max-height:200px;object-fit:cover;border-radius:4px;margin:8px 0;" /></div>`
+      popupContent += `<div class="poi-popup-photo"><img src="${poi.photo}" alt="${poi.name}" /></div>`
     }
 
-    // Address (if available)
-    if (poi.address) {
-      popupContent += `<div class="poi-popup-address">${poi.address}</div>`
+    // Content section
+    popupContent += `<div class="poi-popup-content">`
+
+    // Name/Address (centered with divider)
+    popupContent += `<div class="poi-popup-name">${poi.address || poi.name}</div>`
+    popupContent += `<div class="poi-popup-divider"></div>`
+
+    // Logo (if available)
+    if (poi.logo) {
+      popupContent += `<div class="poi-popup-logo"><img src="${poi.logo}" alt="${poi.name} logo" /></div>`
     }
 
     // Description (if available)
     if (poi.description) {
-      popupContent += `<div class="poi-popup-description" style="margin-top:8px;">${poi.description}</div>`
+      popupContent += `<div class="poi-popup-description">${poi.description}</div>`
     }
 
     // Website (if available)
     if (poi.website) {
-      popupContent += `<div class="poi-popup-website" style="margin-top:8px;"><a href="${poi.website}" target="_blank" rel="noopener noreferrer">Visit Website</a></div>`
+      popupContent += `<div class="poi-popup-website"><a href="${poi.website}" target="_blank" rel="noopener noreferrer">Visit Website</a></div>`
     }
 
-    popupContent += `</div>`
+    popupContent += `</div></div>`
 
     // Determine best anchor position based on viewport space
     const point = this.map.project(coordinates)
@@ -869,7 +873,6 @@ class ClearMap {
     const height = this.getResponsiveValue(this.data.filtersHeight, "auto")
     const style = this.getResponsiveValue(this.data.filtersStyle, "list")
     const bgTransparent = this.getResponsiveValue(this.data.filtersBgTransparent, "0")
-    const frosted = this.getResponsiveValue(this.data.filtersFrosted, "0")
     const showHeader = this.getResponsiveValue(this.data.filtersShowHeader, "1")
     const showItems = this.getResponsiveValue(this.data.filtersShowItems, "1")
 
@@ -880,7 +883,6 @@ class ClearMap {
       width,
       height,
       style,
-      frosted,
       showHeader,
       showItems
     })
@@ -918,13 +920,6 @@ class ClearMap {
       filtersEl.classList.add("bg-transparent")
     } else {
       filtersEl.classList.remove("bg-transparent")
-    }
-
-    // Apply frosted glass effect
-    if (frosted === "1" || frosted === 1) {
-      filtersEl.classList.add("filters-frosted")
-    } else {
-      filtersEl.classList.remove("filters-frosted")
     }
 
     // Apply show/hide header
