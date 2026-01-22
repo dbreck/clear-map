@@ -751,6 +751,12 @@
     margin: 0 auto 16px;
 }
 
+.poi-popup-address {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
 .poi-popup-logo {
     margin-bottom: 16px;
 }

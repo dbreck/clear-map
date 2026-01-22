@@ -474,10 +474,10 @@ class ClearMap {
   }
 
   showPoiPopup(poi, coordinates) {
-    // Build popup content - Layout: Photo, Name, Logo, Description
+    // Build popup content - Layout: Photo, Name, Underline, Address, Logo, Description
     let popupContent = `<div class="poi-popup">`
 
-    // Photo at top (if available)
+    // 1. Photo at top (if available)
     if (poi.photo) {
       popupContent += `<div class="poi-popup-photo"><img src="${poi.photo}" alt="${poi.name}" /></div>`
     }
@@ -485,16 +485,23 @@ class ClearMap {
     // Content section
     popupContent += `<div class="poi-popup-content">`
 
-    // Name/Address (centered with divider)
-    popupContent += `<div class="poi-popup-name">${poi.address || poi.name}</div>`
+    // 2. POI Name
+    popupContent += `<div class="poi-popup-name">${poi.name}</div>`
+
+    // 3. Underline
     popupContent += `<div class="poi-popup-divider"></div>`
 
-    // Logo (if available)
+    // 4. Address (if available)
+    if (poi.address) {
+      popupContent += `<div class="poi-popup-address">${poi.address}</div>`
+    }
+
+    // 5. Logo (if available)
     if (poi.logo) {
       popupContent += `<div class="poi-popup-logo"><img src="${poi.logo}" alt="${poi.name} logo" /></div>`
     }
 
-    // Description (if available)
+    // 6. Description (if available)
     if (poi.description) {
       popupContent += `<div class="poi-popup-description">${poi.description}</div>`
     }
