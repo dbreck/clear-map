@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 2.1.3
+ * Version: 2.2.0
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '2.1.3');
+define('CLEAR_MAP_VERSION', '2.2.0');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -48,6 +48,7 @@ class ClearMap {
         add_action('wp_ajax_clear_map_get_poi', array($this, 'ajax_get_poi'));
         add_action('wp_ajax_clear_map_save_poi', array($this, 'ajax_save_poi'));
         add_action('wp_ajax_clear_map_delete_poi', array($this, 'ajax_delete_poi'));
+        add_action('wp_ajax_clear_map_geocode_poi', array($this, 'ajax_geocode_poi'));
         add_action('wp_ajax_clear_map_bulk_action', array($this, 'ajax_bulk_action'));
         add_action('wp_ajax_clear_map_export_pois', array($this, 'ajax_export_pois'));
 
@@ -622,6 +623,11 @@ class ClearMap {
         }
 
         if ( $is_new ) {
+            // Geocode new POI if it has an address but no coordinates.
+            if ( ! empty( $poi_data['address'] ) && ( empty( $poi_data['lat'] ) || empty( $poi_data['lng'] ) ) ) {
+                $poi_data = $this->geocode_poi_data( $poi_data );
+            }
+
             // Add new POI.
             $pois[ $new_category ][] = $poi_data;
             $new_index               = count( $pois[ $new_category ] ) - 1;
@@ -648,6 +654,14 @@ class ClearMap {
 
             if ( ! isset( $pois[ $old_category ][ $old_index ] ) ) {
                 wp_send_json_error( 'POI not found' );
+            }
+
+            // Re-geocode if address changed.
+            $old_address = trim( $pois[ $old_category ][ $old_index ]['address'] ?? '' );
+            $new_address = trim( $poi_data['address'] ?? '' );
+
+            if ( ! empty( $new_address ) && $new_address !== $old_address ) {
+                $poi_data = $this->geocode_poi_data( $poi_data );
             }
 
             // Check if category changed.
@@ -686,6 +700,65 @@ class ClearMap {
                     )
                 );
             }
+        }
+    }
+
+    /**
+     * Forward-geocode a POI's address and update its coordinate fields.
+     *
+     * @param array $poi_data POI data array.
+     * @return array Updated POI data with geocoded coordinates.
+     */
+    private function geocode_poi_data( $poi_data ) {
+        $api_handler = new Clear_Map_API_Handler();
+        $result      = $api_handler->geocode_address( $poi_data['address'], $poi_data['name'] );
+
+        if ( $result && ! isset( $result['error'] ) ) {
+            $poi_data['lat']                = $result['lat'];
+            $poi_data['lng']                = $result['lng'];
+            $poi_data['coordinate_source']  = 'geocoded';
+            $poi_data['geocoded_address']    = $result['formatted_address'] ?? '';
+            $poi_data['geocoding_precision'] = $result['precision'] ?? '';
+            $poi_data['needs_geocoding']     = '';
+        } else {
+            error_log( 'Clear Map: Failed to geocode on save for ' . $poi_data['name'] . ': ' . ( $result['message'] ?? 'Unknown error' ) );
+        }
+
+        return $poi_data;
+    }
+
+    /**
+     * AJAX: Geocode a single POI address and return coordinates.
+     */
+    public function ajax_geocode_poi() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $address = isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : '';
+        $name    = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+
+        if ( empty( $address ) ) {
+            wp_send_json_error( 'Address is required' );
+        }
+
+        $api_handler = new Clear_Map_API_Handler();
+        $result      = $api_handler->geocode_address( $address, $name );
+
+        if ( $result && ! isset( $result['error'] ) ) {
+            wp_send_json_success(
+                array(
+                    'lat'               => $result['lat'],
+                    'lng'               => $result['lng'],
+                    'formatted_address' => $result['formatted_address'] ?? '',
+                    'precision'         => $result['precision'] ?? '',
+                    'source'            => $result['source'] ?? '',
+                )
+            );
+        } else {
+            wp_send_json_error( $result['message'] ?? 'Geocoding failed' );
         }
     }
 

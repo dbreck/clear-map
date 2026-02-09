@@ -2,7 +2,7 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 2.1.3
+**Version:** 2.2.0
 
 ## Features
 
@@ -174,6 +174,11 @@ clear-map/
 - `clear_map_geocode_building` - Geocode building address
 
 ## Changelog
+
+### Version 2.2.0 (2026-02-09)
+- Auto-geocode when POI address changes on save
+- Re-geocode button in POI edit modal for manual coordinate refresh
+- New POIs with addresses are automatically geocoded on creation
 
 ### Version 2.1.3 (2026-01-22)
 - POIs in filter panel sorted alphabetically (case-insensitive)

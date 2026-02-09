@@ -744,7 +744,12 @@ class Clear_Map_Admin
                             </div>
                             <div class="modal-field">
                                 <label for="poi-address">Address</label>
-                                <input type="text" id="poi-address" name="address" />
+                                <div class="address-field-wrap">
+                                    <input type="text" id="poi-address" name="address" />
+                                    <button type="button" class="button button-small" id="poi-geocode-btn" title="Re-geocode this address">
+                                        <span class="dashicons dashicons-location"></span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="modal-field">
                                 <label for="poi-description">Description</label>

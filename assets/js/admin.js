@@ -900,6 +900,11 @@ jQuery(document).ready(function ($) {
       savePoi()
     })
 
+    // Re-geocode POI address
+    $("#poi-geocode-btn").on("click", function () {
+      geocodePoiAddress()
+    })
+
     // Delete POI from modal
     $("#poi-delete-btn").on("click", function () {
       const poiId = $("#poi-id").val()
@@ -1100,6 +1105,54 @@ jQuery(document).ready(function ($) {
     ).fail(function () {
       alert("Network error deleting POI")
     })
+  }
+
+  function geocodePoiAddress() {
+    const address = $("#poi-address").val().trim()
+    const name = $("#poi-name").val().trim()
+    const $btn = $("#poi-geocode-btn")
+
+    if (!address) {
+      alert("Enter an address first")
+      $("#poi-address").focus()
+      return
+    }
+
+    $btn.prop("disabled", true)
+    $btn.find(".dashicons").removeClass("dashicons-location").addClass("dashicons-update spin")
+
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_geocode_poi",
+        nonce: clearMapAdmin.managePoisNonce,
+        address: address,
+        name: name,
+      },
+      function (response) {
+        if (response.success) {
+          $("#poi-lat").val(response.data.lat)
+          $("#poi-lng").val(response.data.lng)
+          $("#poi-coordinate-source").val("geocoded")
+          $("#poi-geocoded-address").val(response.data.formatted_address || "")
+          $("#poi-geocoding-precision").val(response.data.precision || "")
+          $btn.find(".dashicons").removeClass("dashicons-update spin").addClass("dashicons-yes-alt")
+          setTimeout(function () {
+            $btn.find(".dashicons").removeClass("dashicons-yes-alt").addClass("dashicons-location")
+          }, 2000)
+        } else {
+          alert("Geocoding failed: " + (response.data || "Unknown error"))
+          $btn.find(".dashicons").removeClass("dashicons-update spin").addClass("dashicons-location")
+        }
+      }
+    )
+      .fail(function () {
+        alert("Network error during geocoding")
+        $btn.find(".dashicons").removeClass("dashicons-update spin").addClass("dashicons-location")
+      })
+      .always(function () {
+        $btn.prop("disabled", false)
+      })
   }
 
   function openMediaUploader(targetId) {

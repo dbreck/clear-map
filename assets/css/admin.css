@@ -1954,6 +1954,41 @@ input[type="file"] {
     min-height: 80px;
 }
 
+.address-field-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.address-field-wrap input[type="text"] {
+    flex: 1;
+}
+
+#poi-geocode-btn {
+    flex-shrink: 0;
+    height: 36px;
+    width: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#poi-geocode-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+#poi-geocode-btn .dashicons.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
 .modal-field .readonly-field {
     background: #f0f0f1;
     color: #646970;

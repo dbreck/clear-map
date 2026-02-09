@@ -11,7 +11,14 @@
 
 ---
 
-## Recent Session Summary (Version 2.1.x)
+## Recent Session Summary (Version 2.2.x)
+
+### v2.2.0 - Auto-Geocode on Address Change (2026-02-09)
+- POI address changes now auto-geocode on save (compares old vs new address)
+- New POIs with addresses but no coordinates are geocoded on creation
+- Re-geocode button (location icon) next to address field in POI edit modal
+- New AJAX endpoint: `clear_map_geocode_poi` for single-address geocoding
+- New private helper: `geocode_poi_data()` in main plugin class
 
 ### v2.1.3 - Alphabetical POI Sorting (2026-01-22)
 - POIs in filter panel's expandable category lists now sorted alphabetically (case-insensitive)
@@ -264,6 +271,6 @@ gh release create vX.X.X --title "vX.X.X - Title" --notes "Release notes..." "..
 
 ## End of Context
 
-**Current Version**: 2.1.3
+**Current Version**: 2.2.0
 **Current Status**: Production ready
-**Last Updated**: 2026-01-22
+**Last Updated**: 2026-02-09
