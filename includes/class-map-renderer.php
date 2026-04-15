@@ -143,6 +143,7 @@ class Clear_Map_Renderer {
 			$center_lng = $this->get_setting( $atts, 'center_lng', '', -74.0011 );
 		}
 
+		$open_poi            = $this->get_setting( $atts, 'open_poi', '', '' );
 		$zoom                = $this->get_setting( $atts, 'zoom', '', 14 );
 		// Display settings (WPBakery only, no global fallback).
 		$cluster_distance    = $this->get_setting( $atts, 'cluster_distance', '', 50 );
@@ -196,6 +197,7 @@ class Clear_Map_Renderer {
 			'centerLat'           => floatval( $center_lat ),
 			'centerLng'           => floatval( $center_lng ),
 			'zoom'                => intval( $zoom ),
+			'openPoi'             => $open_poi,
 			'buildingCoords'      => $building_coords,
 			'buildingAddress'     => get_option( 'clear_map_building_address', $building_address ),
 			'buildingIconWidth'   => get_option( 'clear_map_building_icon_width', '40px' ),

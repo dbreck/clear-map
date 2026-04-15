@@ -11,7 +11,13 @@
 
 ---
 
-## Recent Session Summary (Version 2.2.x)
+## Recent Session Summary (Version 2.3.x)
+
+### v2.3.0 - Open POI on Load & Smart Popup Positioning (2026-04-15)
+- New "Open POI on Load" dropdown in WPBakery Map Position tab
+- Selecting a POI auto-opens its info panel when the map loads
+- Popup positioning now prefers left/right placement over top/bottom
+- Prevents popups from being cut off at top/bottom edges
 
 ### v2.2.0 - Auto-Geocode on Address Change (2026-02-09)
 - POI address changes now auto-geocode on save (compares old vs new address)
@@ -271,6 +277,6 @@ gh release create vX.X.X --title "vX.X.X - Title" --notes "Release notes..." "..
 
 ## End of Context
 
-**Current Version**: 2.2.0
+**Current Version**: 2.3.0
 **Current Status**: Production ready
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-04-15

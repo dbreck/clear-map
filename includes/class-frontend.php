@@ -51,6 +51,7 @@ class Clear_Map_Frontend {
 				'css'                       => '',
 				// Map Position.
 				'center_on'                 => '',
+				'open_poi'                  => '',
 				'center_lat'                => '',
 				'center_lng'                => '',
 				'zoom'                      => '',

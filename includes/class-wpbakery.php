@@ -305,6 +305,15 @@ class Clear_Map_WPBakery {
 					),
 					array(
 						'type'        => 'dropdown',
+						'heading'     => __( 'Open POI on Load', 'clear-map' ),
+						'param_name'  => 'open_poi',
+						'value'       => $this->get_center_on_options(),
+						'std'         => '',
+						'description' => __( 'Automatically open this POI\'s info panel when the map loads.', 'clear-map' ),
+						'group'       => __( 'Map Position', 'clear-map' ),
+					),
+					array(
+						'type'        => 'dropdown',
 						'heading'     => __( 'Initial Zoom Level', 'clear-map' ),
 						'param_name'  => 'zoom',
 						'value'       => array(

@@ -59,6 +59,7 @@ class ClearMap {
       this.setupPoisSource()
       this.loadSubwayLines()
       this.animateMapLoad()
+      this.openInitialPoi()
     })
 
     this.map.on("zoom", () => {
@@ -526,18 +527,19 @@ class ClearMap {
     const spaceRight = canvasRect.width - point.x
 
     // Determine best anchor (popup appears opposite to anchor)
-    // e.g., if anchor is 'bottom', popup appears above the pin
-    let anchor = 'bottom' // default: popup appears above pin
+    // Prioritize horizontal placement (left/right) since maps have more horizontal space
+    const popupWidth = 320
+    const popupHeight = 300
+    let anchor = 'bottom' // fallback: popup appears above pin
 
-    // Prioritize vertical placement first (above or below)
-    if (spaceBottom > spaceTop && spaceBottom > 250) {
-      anchor = 'top' // popup appears below pin
-    } else if (spaceTop > 250) {
+    if (spaceRight > popupWidth + 30) {
+      anchor = 'left' // popup appears to the right of pin
+    } else if (spaceLeft > popupWidth + 30) {
+      anchor = 'right' // popup appears to the left of pin
+    } else if (spaceTop > popupHeight) {
       anchor = 'bottom' // popup appears above pin
-    } else if (spaceRight > spaceLeft && spaceRight > 320) {
-      anchor = 'left' // popup appears to the right
-    } else if (spaceLeft > 320) {
-      anchor = 'right' // popup appears to the left
+    } else if (spaceBottom > popupHeight) {
+      anchor = 'top' // popup appears below pin
     }
 
     // Create and display the popup with smart positioning
@@ -1045,6 +1047,21 @@ class ClearMap {
     if (typeof gsap !== "undefined") {
       gsap.fromTo(this.map.getContainer(), { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" })
     }
+  }
+
+  openInitialPoi() {
+    if (!this.data.openPoi || !this.data.openPoi.includes('|')) return
+
+    const [catKey, idx] = this.data.openPoi.split('|')
+    const poiIndex = parseInt(idx, 10)
+    const poi = this.data.pois?.[catKey]?.[poiIndex]
+
+    if (!poi || !poi.lat || !poi.lng) return
+
+    // Wait a moment for the map to settle, then show the popup
+    setTimeout(() => {
+      this.showPoiPopup(poi, [poi.lng, poi.lat])
+    }, 500)
   }
 
   animateFiltersToggle(filtersEl) {
