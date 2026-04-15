@@ -543,11 +543,13 @@ class ClearMap {
     }
 
     // Create and display the popup with smart positioning
+    // We compute the anchor ourselves, so disable Mapbox's auto-pan which can jerk the page
     new mapboxgl.Popup({
       closeButton: true,
       maxWidth: '300px',
       anchor: anchor,
-      offset: 15
+      offset: 15,
+      focusAfterOpen: false
     })
       .setLngLat(coordinates)
       .setHTML(popupContent)
@@ -1058,10 +1060,16 @@ class ClearMap {
 
     if (!poi || !poi.lat || !poi.lng) return
 
-    // Wait a moment for the map to settle, then show the popup
-    setTimeout(() => {
-      this.showPoiPopup(poi, [poi.lng, poi.lat])
-    }, 500)
+    // Only open once the map is visible in the viewport to avoid page scroll jumps
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        observer.disconnect()
+        setTimeout(() => {
+          this.showPoiPopup(poi, [poi.lng, poi.lat])
+        }, 300)
+      }
+    }, { threshold: 0.3 })
+    observer.observe(this.map.getContainer())
   }
 
   animateFiltersToggle(filtersEl) {
