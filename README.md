@@ -175,6 +175,9 @@ clear-map/
 
 ## Changelog
 
+### Version 2.3.2 (2026-04-20)
+- Style POI popup close button as a white circle with dark × icon so it's visible over both dark and light photo backgrounds
+
 ### Version 2.2.0 (2026-02-09)
 - Auto-geocode when POI address changes on save
 - Re-geocode button in POI edit modal for manual coordinate refresh
