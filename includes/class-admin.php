@@ -107,6 +107,8 @@ class Clear_Map_Admin
     {
         // API Configuration.
         register_setting('clear_map_settings', 'clear_map_mapbox_token');
+        register_setting('clear_map_settings', 'clear_map_mapbox_style');
+        register_setting('clear_map_settings', 'clear_map_stadia_key');
         register_setting('clear_map_settings', 'clear_map_google_api_key');
 
         // Building Information.
@@ -117,6 +119,13 @@ class Clear_Map_Admin
         register_setting('clear_map_settings', 'clear_map_building_phone');
         register_setting('clear_map_settings', 'clear_map_building_email');
         register_setting('clear_map_settings', 'clear_map_building_description');
+        register_setting('clear_map_settings', 'clear_map_building_show_tooltip', array(
+            'type'              => 'string',
+            'sanitize_callback' => function ($value) {
+                return $value ? '1' : '0';
+            },
+            'default'           => '1',
+        ));
 
         // Categories and POIs.
         register_setting('clear_map_categories_pois', 'clear_map_categories');
@@ -330,6 +339,34 @@ class Clear_Map_Admin
                             </div>
 
                             <div class="settings-field">
+                                <label for="clear_map_mapbox_style">
+                                    Map Style
+                                    <span class="optional-badge">Optional</span>
+                                    <span class="help-tip" data-tooltip="A Mapbox style URL (e.g. a custom Mapbox Studio design), OR an artistic style keyword: watercolor, toner, toner-lite, terrain (these use Stadia Maps — set the key below). Leave blank for the default light theme.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_mapbox_style" name="clear_map_mapbox_style"
+                                    value="<?php echo esc_attr(get_option('clear_map_mapbox_style', '')); ?>"
+                                    class="widefat" placeholder="watercolor  —or—  mapbox://styles/your-username/style-id" />
+                                <p class="field-description">
+                                    Enter <code>watercolor</code> (or <code>toner</code>, <code>toner-lite</code>, <code>terrain</code>) for a Stamen artistic map, or paste a <a href="https://studio.mapbox.com/" target="_blank">Mapbox Studio</a> style URL. Blank = default light style.
+                                </p>
+                            </div>
+
+                            <div class="settings-field">
+                                <label for="clear_map_stadia_key">
+                                    Stadia Maps API Key
+                                    <span class="optional-badge">Optional</span>
+                                    <span class="help-tip" data-tooltip="Required only for the artistic style keywords (watercolor / toner / terrain), which are served by Stadia Maps. Leave blank if you use domain-based authentication or only Mapbox styles.">?</span>
+                                </label>
+                                <input type="text" id="clear_map_stadia_key" name="clear_map_stadia_key"
+                                    value="<?php echo esc_attr(get_option('clear_map_stadia_key', '')); ?>"
+                                    class="widefat" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                                <p class="field-description">
+                                    Needed for the <code>watercolor</code>/<code>toner</code>/<code>terrain</code> styles. <a href="https://client.stadiamaps.com/dashboard/" target="_blank">Get a free key from your Stadia dashboard →</a> (or whitelist your domain there and leave this blank).
+                                </p>
+                            </div>
+
+                            <div class="settings-field">
                                 <label for="clear_map_google_api_key">
                                     Google Geocoding API Key
                                     <span class="optional-badge">Optional</span>
@@ -458,6 +495,18 @@ class Clear_Map_Admin
                                 <label for="clear_map_building_description">Building Description</label>
                                 <textarea id="clear_map_building_description" name="clear_map_building_description"
                                     rows="3" class="widefat"><?php echo esc_textarea(get_option('clear_map_building_description', '')); ?></textarea>
+                            </div>
+
+                            <div class="settings-field">
+                                <label for="clear_map_building_show_tooltip">
+                                    <?php // Hidden field ensures an unchecked box still submits '0' (Settings API skips unchecked checkboxes). ?>
+                                    <input type="hidden" name="clear_map_building_show_tooltip" value="0" />
+                                    <input type="checkbox" id="clear_map_building_show_tooltip" name="clear_map_building_show_tooltip"
+                                        value="1" <?php checked('1', get_option('clear_map_building_show_tooltip', '1')); ?> />
+                                    Show Building Tooltip on Hover
+                                    <span class="help-tip" data-tooltip="When on, hovering the building icon shows a tooltip with the address, phone, email, and description. Turn off if you'd rather add a dedicated POI for the building. This does not hide the building icon itself.">?</span>
+                                </label>
+                                <p class="description">Uncheck to hide the hover tooltip (the building icon still shows).</p>
                             </div>
                         </div>
                     </div>

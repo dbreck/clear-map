@@ -85,8 +85,10 @@ class Clear_Map_Frontend {
 			return '<p>' . esc_html__( 'Map configuration required. Please set Mapbox token in admin.', 'clear-map' ) . '</p>';
 		}
 
-		wp_enqueue_script( 'mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true );
-		wp_enqueue_style( 'mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0' );
+		// Mapbox GL JS v3+ is required to render styles built on the Mapbox Standard
+		// basemap (e.g. custom Mapbox Studio styles). v2 renders such styles blank.
+		wp_enqueue_script( 'mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js', array(), '3.9.0', true );
+		wp_enqueue_style( 'mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css', array(), '3.9.0' );
 
 		$renderer = new Clear_Map_Renderer();
 		return $renderer->render( $atts );

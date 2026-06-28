@@ -194,6 +194,8 @@ class Clear_Map_Renderer {
 		// Prepare data for JS.
 		$map_data = array(
 			'mapboxToken'         => get_option( 'clear_map_mapbox_token' ),
+			'mapStyle'            => get_option( 'clear_map_mapbox_style', '' ),
+			'stadiaKey'           => get_option( 'clear_map_stadia_key', '' ),
 			'centerLat'           => floatval( $center_lat ),
 			'centerLng'           => floatval( $center_lng ),
 			'zoom'                => intval( $zoom ),
@@ -206,6 +208,7 @@ class Clear_Map_Renderer {
 			'buildingPhone'       => get_option( 'clear_map_building_phone', '' ),
 			'buildingEmail'       => get_option( 'clear_map_building_email', '' ),
 			'buildingDescription' => get_option( 'clear_map_building_description', '' ),
+			'buildingShowTooltip' => '0' !== get_option( 'clear_map_building_show_tooltip', '1' ),
 			'categories'          => $categories,
 			'pois'                => $pois,
 			'clusterDistance'     => intval( $cluster_distance ),

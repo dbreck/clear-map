@@ -37,13 +37,23 @@ class ClearMap {
 
     this.map = new mapboxgl.Map({
       container: this.containerId,
-      style: this.getCustomMapStyle(),
+      style: this.getMapStyle(),
+      projection: "mercator", // keep flat map (GL JS v3 defaults to globe)
       center: [centerLng, centerLat],
       zoom: this.data.zoom,
       minZoom: 2,
       maxZoom: 20,
       attributionControl: false,
       scrollZoom: false, // disables scroll zoom on map creation (for Mapbox GL >=2.0.0)
+      // Stadia Maps (watercolor/toner/terrain) authenticates every tile/glyph/TileJSON
+      // request. If a Stadia key is set, append it to all stadiamaps.com requests.
+      // (Leave the key blank to use Stadia domain-based auth instead.)
+      transformRequest: (url) => {
+        if (this.data.stadiaKey && url.indexOf("stadiamaps.com") !== -1 && url.indexOf("api_key=") === -1) {
+          return { url: url + (url.indexOf("?") === -1 ? "?" : "&") + "api_key=" + this.data.stadiaKey }
+        }
+        return { url: url }
+      },
     })
 
     // For Mapbox GL <2.0.0, also call:
@@ -78,6 +88,25 @@ class ClearMap {
         { passive: false }
       )
     }
+  }
+
+  getMapStyle() {
+    // If a Map Style is configured, use it. Accepts either:
+    //   - a Stamen artistic keyword (watercolor/toner/toner-lite/terrain), served by
+    //     Stadia Maps and authed via the transformRequest below, or
+    //   - any Mapbox/style-JSON URL (e.g. a Mapbox Studio design).
+    // Otherwise fall back to the default light-v10 raster style.
+    const custom = (this.data.mapStyle || "").trim()
+    if (!custom) {
+      return this.getCustomMapStyle()
+    }
+    const stadia = {
+      watercolor: "https://tiles.stadiamaps.com/styles/stamen_watercolor.json",
+      toner: "https://tiles.stadiamaps.com/styles/stamen_toner.json",
+      "toner-lite": "https://tiles.stadiamaps.com/styles/stamen_toner_lite.json",
+      terrain: "https://tiles.stadiamaps.com/styles/stamen_terrain.json",
+    }
+    return stadia[custom.toLowerCase()] || custom
   }
 
   getCustomMapStyle() {
@@ -570,21 +599,29 @@ class ClearMap {
       el.innerHTML = this.getBuildingIconSVG()
     }
 
-    const marker = new mapboxgl.Marker(el).setLngLat([this.data.buildingCoords.lng, this.data.buildingCoords.lat]).addTo(this.map)
+    new mapboxgl.Marker(el).setLngLat([this.data.buildingCoords.lng, this.data.buildingCoords.lat]).addTo(this.map)
 
-    // Info popup content
-    const info = `
-      <div class="building-popup">
-        <strong>${this.data.buildingAddress || ""}</strong><br />
-        ${this.data.buildingDescription ? `<div>${this.data.buildingDescription}</div>` : ""}
-        ${this.data.buildingPhone ? `<div><a href='tel:${this.data.buildingPhone}'>${this.data.buildingPhone}</a></div>` : ""}
-        ${this.data.buildingEmail ? `<div><a href='mailto:${this.data.buildingEmail}'>${this.data.buildingEmail}</a></div>` : ""}
-      </div>
-    `
-    const popup = new mapboxgl.Popup({ offset: 24, closeButton: true }).setHTML(info)
-    el.addEventListener("mouseenter", () => popup.addTo(this.map).setLngLat([this.data.buildingCoords.lng, this.data.buildingCoords.lat]))
+    // The hover tooltip is optional (Settings > Show Building Tooltip). The
+    // building icon itself always shows regardless of this toggle.
+    if (this.data.buildingShowTooltip === false) return
+
+    const address = this.data.buildingAddress || ""
+    const hasDetails = this.data.buildingDescription || this.data.buildingPhone || this.data.buildingEmail
+
+    // Polished popup matching the POI popup styling (centered, name/divider/details).
+    let info = `<div class="building-popup"><div class="building-popup-content">`
+    if (address) info += `<div class="building-popup-name">${address}</div>`
+    if (address && hasDetails) info += `<div class="building-popup-divider"></div>`
+    if (this.data.buildingDescription) info += `<div class="building-popup-description">${this.data.buildingDescription}</div>`
+    if (this.data.buildingPhone) info += `<div class="building-popup-contact"><a href="tel:${this.data.buildingPhone}">${this.data.buildingPhone}</a></div>`
+    if (this.data.buildingEmail) info += `<div class="building-popup-contact"><a href="mailto:${this.data.buildingEmail}">${this.data.buildingEmail}</a></div>`
+    info += `</div></div>`
+
+    const coords = [this.data.buildingCoords.lng, this.data.buildingCoords.lat]
+    const popup = new mapboxgl.Popup({ offset: 24, closeButton: false }).setHTML(info)
+    el.addEventListener("mouseenter", () => popup.addTo(this.map).setLngLat(coords))
     el.addEventListener("mouseleave", () => popup.remove())
-    el.addEventListener("click", () => popup.addTo(this.map).setLngLat([this.data.buildingCoords.lng, this.data.buildingCoords.lat]))
+    el.addEventListener("click", () => popup.addTo(this.map).setLngLat(coords))
   }
 
   getBuildingIconSVG() {

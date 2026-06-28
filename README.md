@@ -2,7 +2,7 @@
 
 A WordPress plugin for creating interactive Mapbox maps with customizable Points of Interest (POI) filtering and category management. Works for any geographic location worldwide.
 
-**Version:** 2.2.0
+**Version:** 2.4.1
 
 ## Features
 
@@ -174,6 +174,13 @@ clear-map/
 - `clear_map_geocode_building` - Geocode building address
 
 ## Changelog
+
+### Version 2.4.1 (2026-06-28)
+- Restyle the building hover tooltip with proper padding and centered name/divider/details layout, matching the POI popup look (previously it had no padding)
+- New "Show Building Tooltip on Hover" setting (Building Information) to toggle the hover tooltip off — useful when adding a dedicated POI for the building instead. Does not affect the building icon, which always shows.
+
+### Version 2.4.0 (2026-06-28)
+- Upgrade Mapbox GL JS v2.15.0 → v3.9.0 so styles built on the Mapbox Standard basemap render (v2 showed them blank)
 
 ### Version 2.3.2 (2026-04-20)
 - Style POI popup close button as a white circle with dark × icon so it's visible over both dark and light photo backgrounds

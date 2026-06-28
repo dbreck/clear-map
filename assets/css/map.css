@@ -836,3 +836,56 @@
 .poi-popup-website a:hover {
     text-decoration: underline;
 }
+
+/* ============================================
+   Building Popup (hover tooltip)
+   The global .mapboxgl-popup-content has padding:0, so the inner
+   wrapper supplies its own padding — matches the POI popup look.
+   ============================================ */
+.building-popup {
+    font-family: 'Area Normal', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.building-popup-content {
+    padding: 18px 22px;
+    text-align: center;
+    max-width: 260px;
+}
+
+.building-popup-name {
+    font-size: 15px;
+    font-weight: 400;
+    color: #5a4a3a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.35;
+}
+
+.building-popup-divider {
+    width: 40px;
+    height: 2px;
+    background: #5a4a3a;
+    margin: 12px auto 14px;
+}
+
+.building-popup-description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.building-popup-contact {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #666;
+}
+
+.building-popup-contact a {
+    color: #2271b1;
+    text-decoration: none;
+}
+
+.building-popup-contact a:hover {
+    text-decoration: underline;
+}
