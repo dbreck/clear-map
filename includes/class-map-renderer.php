@@ -330,7 +330,7 @@ class Clear_Map_Renderer {
 			<div class="<?php echo esc_attr( $filter_class ); ?>" id="<?php echo esc_attr( $map_id ); ?>-filters" style="<?php echo esc_attr( $filter_inline_style ); ?>">
 				<?php if ( $filters_show_header_desktop ) : ?>
 				<div class="filters-header">
-					<h5><?php esc_html_e( 'The Area', 'clear-map' ); ?></h5>
+					<h2 class="filters-title"><?php esc_html_e( 'The Area', 'clear-map' ); ?></h2>
 					<button class="toggle-filters" type="button">
 						<span class="screen-reader-text"><?php esc_html_e( 'Toggle Filters', 'clear-map' ); ?></span>
 						<svg width="20" height="20" viewBox="0 0 20 20">
@@ -393,8 +393,8 @@ class Clear_Map_Renderer {
 									<span class="category-name"><?php echo esc_html( $category['name'] ); ?></span>
 								</div>
 								<?php if ( $filters_show_items ) : ?>
-								<button class="category-expand" type="button">
-									<svg width="16" height="16" viewBox="0 0 16 16">
+								<button class="category-expand" type="button" aria-expanded="false" aria-controls="clear-map-pois-<?php echo esc_attr( $cat_key ); ?>" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: category name */ __( 'Toggle %s locations list', 'clear-map' ), $category['name'] ) ); ?>">
+									<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
 										<path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" fill="none" />
 									</svg>
 								</button>
@@ -402,7 +402,7 @@ class Clear_Map_Renderer {
 							</div>
 
 							<?php if ( $filters_show_items ) : ?>
-							<div class="category-pois" style="display: none;" aria-expanded="false">
+							<div class="category-pois" id="clear-map-pois-<?php echo esc_attr( $cat_key ); ?>" style="display: none;">
 								<?php
 								if ( isset( $pois[ $cat_key ] ) ) :
 									// Sort POIs alphabetically while preserving original index.

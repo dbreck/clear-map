@@ -175,6 +175,10 @@ clear-map/
 
 ## Changelog
 
+### Version 2.5.0 (2026-06-29)
+- Accessibility: the category expand toggles now have an accessible name (`aria-label`, e.g. "Toggle Dining locations list") plus `aria-controls`, and `aria-expanded` is on the button (the control) rather than the POI list it controls; the chevron SVG is marked decorative (`aria-hidden`). Previously these were unlabeled buttons that screen readers announced only as "button".
+- Accessibility: the "The Area" filter-panel title is now an `<h2 class="filters-title">` instead of a hard-coded `<h5>`, so it no longer creates a skipped heading level in the page outline. **Visible change:** this also activates the panel-label styling that was previously dead (the CSS targeted `.filters-header h3` while the markup was `<h5>`), so the title now renders as a compact uppercase label (16px) on every site, self-contained with `!important` so it ignores the host theme's `h2` sizing.
+
 ### Version 2.4.1 (2026-06-28)
 - Restyle the building hover tooltip with proper padding and centered name/divider/details layout, matching the POI popup look (previously it had no padding)
 - New "Show Building Tooltip on Hover" setting (Building Information) to toggle the hover tooltip off — useful when adding a dedicated POI for the building instead. Does not affect the building icon, which always shows.

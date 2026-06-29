@@ -92,6 +92,21 @@
     text-transform: uppercase;
 }
 
+/* The map's "The Area" heading carries a class so its heading LEVEL can be set
+   for a valid document outline (WCAG 1.3.1) independent of its appearance. The
+   !important keeps it a compact panel label regardless of the host theme's hN
+   font-size rules (e.g. Salient child themes set h2 font-size !important, which
+   would otherwise blow this title up to multi-line heading size). */
+.filters-header .filters-title {
+    margin: 0 !important;
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
 .toggle-filters {
     background: none;
     border: none;

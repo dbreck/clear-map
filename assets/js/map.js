@@ -664,7 +664,7 @@ class ClearMap {
           const isExpanded = poisEl.style.display !== "none"
           poisEl.style.display = isExpanded ? "none" : "block"
           expandBtn.classList.toggle("expanded", !isExpanded)
-          poisEl.setAttribute("aria-expanded", !isExpanded)
+          expandBtn.setAttribute("aria-expanded", String(!isExpanded))
           this.animateAccordion(poisEl, !isExpanded)
         })
       }
@@ -698,7 +698,7 @@ class ClearMap {
             if (this.showItems && poisEl && expandBtn) {
               poisEl.style.display = "none"
               expandBtn.classList.remove("expanded")
-              poisEl.setAttribute("aria-expanded", "false")
+              expandBtn.setAttribute("aria-expanded", "false")
               this.animateAccordion(poisEl, false)
             }
           } else {
@@ -715,7 +715,7 @@ class ClearMap {
                 if (this.showItems && prevPoisEl) {
                   prevPoisEl.style.display = "none"
                   if (prevExpandBtn) prevExpandBtn.classList.remove("expanded")
-                  prevPoisEl.setAttribute("aria-expanded", "false")
+                  if (prevExpandBtn) prevExpandBtn.setAttribute("aria-expanded", "false")
                   this.animateAccordion(prevPoisEl, false)
                 }
                 this.updateCategoryIcon(previousCategory, false)
