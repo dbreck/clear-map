@@ -7,11 +7,22 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 2.1.3
+**Current Version**: 2.6.0
 
 ---
 
-## Recent Session Summary (Version 2.3.x)
+## Recent Session Summary
+
+### v2.6.0 - POI "Override Address" for Manual Coordinates (2026-07-09)
+- New **Override Address** checkbox in the POI edit modal (top of the **Location Data** section)
+- When checked: unlocks the Latitude/Longitude fields for manual entry; the map pin uses those coords **instead of** geocoding the address
+- Server stores a per-POI `address_override` flag (`'1'`/`''`) → forces `coordinate_source='manual'`, clears `needs_geocoding`, and **skips geocode-on-save** in BOTH `ajax_save_poi` paths (new POI + address-changed existing POI)
+- Geocode button (address field) is disabled while override is on (it would clobber the manual coords)
+- `admin.js` helpers: `applyAddressOverride()` (unlock/lock fields + geocode btn), `setLocationSectionExpanded()` (auto-expands Location Data when a POI already has override on; resets locked+collapsed for new POIs)
+- Reused existing `.checkbox-field` component — no new CSS. Field lock uses the existing `readonly-field` class + `readonly` prop toggle
+- **No front-end/map change** — `class-map-renderer.php` already renders each POI's stored `lat`/`lng`
+- Backward compatible: POIs without the flag default to off
+- NOTE: v2.4.x and v2.5.0 shipped but were never logged in this file; see git history / GitHub releases for those
 
 ### v2.3.0 - Open POI on Load & Smart Popup Positioning (2026-04-15)
 - New "Open POI on Load" dropdown in WPBakery Map Position tab
@@ -277,6 +288,6 @@ gh release create vX.X.X --title "vX.X.X - Title" --notes "Release notes..." "..
 
 ## End of Context
 
-**Current Version**: 2.3.0
+**Current Version**: 2.6.0
 **Current Status**: Production ready
-**Last Updated**: 2026-04-15
+**Last Updated**: 2026-07-09
