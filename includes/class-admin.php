@@ -839,13 +839,22 @@ class Clear_Map_Admin
                             </div>
                         </div>
 
-                        <!-- Location Section (Read-only) -->
+                        <!-- Location Section -->
                         <div class="modal-section modal-section-collapsed">
                             <h3 class="section-toggle">
                                 Location Data
                                 <span class="dashicons dashicons-arrow-down-alt2"></span>
                             </h3>
                             <div class="section-content" style="display:none;">
+                                <div class="modal-field">
+                                    <div class="checkbox-field">
+                                        <input type="checkbox" id="poi-address-override" name="address_override" value="1" />
+                                        <div class="checkbox-field-content">
+                                            <label class="checkbox-field-label" for="poi-address-override">Override Address</label>
+                                            <span class="checkbox-field-description">Enter coordinates manually instead of geocoding the address. The map pin will use the latitude and longitude below, and the address will not be geocoded when you save.</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="modal-field-row">
                                     <div class="modal-field modal-field-half">
                                         <label for="poi-lat">Latitude</label>
@@ -1043,6 +1052,7 @@ class Clear_Map_Admin
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][reverse_geocoded]" value="' . esc_attr($poi['reverse_geocoded'] ?? '') . '" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoded_address]" value="' . esc_attr($poi['geocoded_address'] ?? '') . '" />';
         echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][geocoding_precision]" value="' . esc_attr($poi['geocoding_precision'] ?? '') . '" />';
+        echo '<input type="hidden" name="clear_map_pois[' . esc_attr($category) . '][' . esc_attr($index) . '][address_override]" value="' . esc_attr($poi['address_override'] ?? '') . '" />';
 
         echo '<button type="button" class="button upload-photo">Photo</button>';
         echo '<button type="button" class="button upload-logo">Logo</button>';

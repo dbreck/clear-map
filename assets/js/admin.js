@@ -905,6 +905,11 @@ jQuery(document).ready(function ($) {
       geocodePoiAddress()
     })
 
+    // Override Address toggle — unlock/lock manual coordinate entry
+    $("#poi-address-override").on("change", function () {
+      applyAddressOverride($(this).is(":checked"))
+    })
+
     // Delete POI from modal
     $("#poi-delete-btn").on("click", function () {
       const poiId = $("#poi-id").val()
@@ -963,6 +968,11 @@ jQuery(document).ready(function ($) {
       // Set defaults
       $("#poi-lat, #poi-lng, #poi-coordinate-source").val("")
 
+      // Reset override state — locked fields, collapsed section.
+      $("#poi-address-override").prop("checked", false)
+      applyAddressOverride(false)
+      setLocationSectionExpanded(false)
+
       $modal.fadeIn(200)
       $("#poi-name").focus()
     } else {
@@ -1008,6 +1018,13 @@ jQuery(document).ready(function ($) {
     $("#poi-geocoded-address").val(poi.geocoded_address || "")
     $("#poi-geocoding-precision").val(poi.geocoding_precision || "")
 
+    // Address override — unlock coords and reveal the section if it's on.
+    const addressOverride =
+      poi.address_override === "1" || poi.address_override === 1 || poi.address_override === true
+    $("#poi-address-override").prop("checked", addressOverride)
+    applyAddressOverride(addressOverride)
+    setLocationSectionExpanded(addressOverride)
+
     // Set media previews
     if (poi.photo) {
       $("#poi-photo").val(poi.photo)
@@ -1032,6 +1049,38 @@ jQuery(document).ready(function ($) {
 
   function closePoiModal() {
     $("#poi-modal").fadeOut(200)
+  }
+
+  // Unlock (or re-lock) the manual latitude/longitude fields.
+  function applyAddressOverride(enabled) {
+    const $coords = $("#poi-lat, #poi-lng")
+    const $geocodeBtn = $("#poi-geocode-btn")
+
+    if (enabled) {
+      $coords.prop("readonly", false).removeClass("readonly-field")
+      // Geocoding would clobber the manual coordinates, so lock it out.
+      $geocodeBtn.prop("disabled", true).attr("title", "Disabled while Override Address is on")
+    } else {
+      $coords.prop("readonly", true).addClass("readonly-field")
+      $geocodeBtn.prop("disabled", false).attr("title", "Re-geocode this address")
+    }
+  }
+
+  // Expand or collapse the Location Data section deterministically.
+  function setLocationSectionExpanded(expanded) {
+    const $section = $("#poi-lat").closest(".modal-section")
+    const $content = $section.find(".section-content")
+    const $icon = $section.find(".section-toggle .dashicons")
+
+    if (expanded) {
+      $content.show()
+      $section.removeClass("modal-section-collapsed")
+      $icon.removeClass("dashicons-arrow-down-alt2").addClass("dashicons-arrow-up-alt2")
+    } else {
+      $content.hide()
+      $section.addClass("modal-section-collapsed")
+      $icon.removeClass("dashicons-arrow-up-alt2").addClass("dashicons-arrow-down-alt2")
+    }
   }
 
   function savePoi() {
@@ -1067,6 +1116,7 @@ jQuery(document).ready(function ($) {
       reverse_geocoded: $("#poi-reverse-geocoded").val(),
       geocoded_address: $("#poi-geocoded-address").val(),
       geocoding_precision: $("#poi-geocoding-precision").val(),
+      address_override: $("#poi-address-override").is(":checked") ? "1" : "",
     }
 
     $.post(clearMapAdmin.ajaxurl, formData, function (response) {

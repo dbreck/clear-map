@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Clear Map
  * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 2.5.0
+ * Version: 2.6.0
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '2.5.0');
+define('CLEAR_MAP_VERSION', '2.6.0');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -598,6 +598,7 @@ class ClearMap {
             'reverse_geocoded'   => isset( $_POST['reverse_geocoded'] ) ? sanitize_text_field( wp_unslash( $_POST['reverse_geocoded'] ) ) : '',
             'geocoded_address'   => isset( $_POST['geocoded_address'] ) ? sanitize_text_field( wp_unslash( $_POST['geocoded_address'] ) ) : '',
             'geocoding_precision'=> isset( $_POST['geocoding_precision'] ) ? sanitize_text_field( wp_unslash( $_POST['geocoding_precision'] ) ) : '',
+            'address_override'   => isset( $_POST['address_override'] ) && '1' === $_POST['address_override'] ? '1' : '',
         );
 
         // Validate required fields.
@@ -622,9 +623,16 @@ class ClearMap {
             $pois[ $new_category ] = array();
         }
 
+        // If the address is overridden, trust the manually-entered coordinates
+        // and never geocode this POI on save.
+        if ( '1' === $poi_data['address_override'] ) {
+            $poi_data['coordinate_source'] = 'manual';
+            $poi_data['needs_geocoding']   = '';
+        }
+
         if ( $is_new ) {
-            // Geocode new POI if it has an address but no coordinates.
-            if ( ! empty( $poi_data['address'] ) && ( empty( $poi_data['lat'] ) || empty( $poi_data['lng'] ) ) ) {
+            // Geocode new POI if it has an address but no coordinates (unless overridden).
+            if ( empty( $poi_data['address_override'] ) && ! empty( $poi_data['address'] ) && ( empty( $poi_data['lat'] ) || empty( $poi_data['lng'] ) ) ) {
                 $poi_data = $this->geocode_poi_data( $poi_data );
             }
 
@@ -660,7 +668,7 @@ class ClearMap {
             $old_address = trim( $pois[ $old_category ][ $old_index ]['address'] ?? '' );
             $new_address = trim( $poi_data['address'] ?? '' );
 
-            if ( ! empty( $new_address ) && $new_address !== $old_address ) {
+            if ( empty( $poi_data['address_override'] ) && ! empty( $new_address ) && $new_address !== $old_address ) {
                 $poi_data = $this->geocode_poi_data( $poi_data );
             }
 
