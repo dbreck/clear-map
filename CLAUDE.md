@@ -22,6 +22,8 @@
 - **Frontend**: `class-map-renderer.php::get_shapes_geojson()` passes visible shapes as a FeatureCollection (fillOpacity pre-resolved to 0 when fill is off); `map.js::addBoundaryLayers()` adds fill + line layers (data-driven paint via `["get", ...]`) BEFORE POI layers so pins stay on top
 - **WPBakery**: new "Show Boundary Shapes" dropdown (Map Display group, `show_boundaries`, default Yes); shortcode att whitelisted in `class-frontend.php`
 - Built for BTI Partners' Google Earth KMZ (6 project boundaries: Viaterra, Governor's, CCUA Site, Pinewalk, Crossprairie ×3 polys, Toho Trace ×2 polys) — verified parsing standalone AND via `wplocal btipartners eval-file`
+- **KMZ upload fix (gotcha)**: browser KMZ upload had NEVER worked — PHP uploads land in an extensionless temp path, so the parser's `pathinfo()` extension check fed raw zip bytes to simplexml → "Invalid KML format". `parse($file_path, $original_name = '')` now takes the original filename AND sniffs the `PK\x03\x04` zip magic bytes (`is_zip_file()`) as the authoritative signal. When testing upload paths via WP-CLI, always copy the file to an EXTENSIONLESS temp path to simulate `$_FILES` tmp_name
+- Released to GitHub (tag + hand-built zip per SOP below) after Danny's local test on BTI
 
 ### v2.6.0 - POI "Override Address" for Manual Coordinates (2026-07-09)
 - New **Override Address** checkbox in the POI edit modal (top of the **Location Data** section)
