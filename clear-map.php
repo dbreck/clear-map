@@ -121,12 +121,12 @@ class ClearMap {
         }
         
         $kml_parser = new Clear_Map_KML_Parser();
-        $parsed_data = $kml_parser->parse($file['tmp_name']);
-        
+        $parsed_data = $kml_parser->parse($file['tmp_name'], $file['name']);
+
         if (is_wp_error($parsed_data)) {
             wp_send_json_error($parsed_data->get_error_message());
         }
-        
+
         // Store the parsed data temporarily
         set_transient('clear_map_import_data', $parsed_data, HOUR_IN_SECONDS);
         

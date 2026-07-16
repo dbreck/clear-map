@@ -8,12 +8,17 @@ class Clear_Map_KML_Parser {
     
     private $debug_log = array();
     
-    public function parse($file_path) {
+    public function parse($file_path, $original_name = '') {
         $this->debug_log = array();
-        $file_extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
-        
+
+        // Uploaded files land in a temp path with no extension, so check the
+        // original filename when provided — and sniff the zip magic bytes as
+        // the authoritative KMZ signal either way.
+        $name_for_extension = $original_name !== '' ? $original_name : $file_path;
+        $file_extension = strtolower(pathinfo($name_for_extension, PATHINFO_EXTENSION));
+
         try {
-            if ($file_extension === 'kmz') {
+            if ($file_extension === 'kmz' || $this->is_zip_file($file_path)) {
                 $kml_content = $this->extract_kml_from_kmz($file_path);
             } else {
                 $kml_content = file_get_contents($file_path);
@@ -42,6 +47,16 @@ class Clear_Map_KML_Parser {
         return $this->debug_log;
     }
     
+    private function is_zip_file($file_path) {
+        $handle = @fopen($file_path, 'rb');
+        if (!$handle) {
+            return false;
+        }
+        $magic = fread($handle, 4);
+        fclose($handle);
+        return $magic === "PK\x03\x04";
+    }
+
     private function extract_kml_from_kmz($kmz_path) {
         if (!class_exists('ZipArchive')) {
             throw new Exception('ZipArchive class not available. Cannot process KMZ files.');
