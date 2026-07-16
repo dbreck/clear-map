@@ -173,7 +173,7 @@ jQuery(document).ready(function ($) {
         alert("Import failed: Network error")
       },
       complete: function () {
-        importBtn.prop("disabled", false).text("Import POIs")
+        importBtn.prop("disabled", false).text("Upload & Preview")
         spinner.removeClass("is-active")
       },
     })
@@ -237,12 +237,16 @@ jQuery(document).ready(function ($) {
       sourceBreakdown = `<p><small>Coordinate sources: ${sourceDetails.join(', ')}</small></p>`
     }
 
+    const shapesCount = data.shapes ? data.shapes.length : 0
+    const shapesText = shapesCount > 0 ? `<p>Boundary shapes found: <strong>${shapesCount}</strong></p>` : ""
+
     summary.html(`
             <div class="notice notice-success">
-                <p><strong>Import successful!</strong> Found ${data.total} POIs.</p>
-                <p>POIs with coordinates: <strong>${poisWithCoords}</strong></p>
+                <p><strong>File parsed!</strong> Found ${data.total} POIs${shapesCount > 0 ? ` and ${shapesCount} boundary shapes` : ""}.</p>
+                ${data.total > 0 ? `<p>POIs with coordinates: <strong>${poisWithCoords}</strong></p>` : ""}
                 ${poisWithoutCoords > 0 ? `<p>POIs needing geocoding: <strong>${poisWithoutCoords}</strong></p>` : ""}
                 ${categoriesText}
+                ${shapesText}
                 ${sourceBreakdown}
             </div>
             ${coordinateStatus}
@@ -264,88 +268,191 @@ jQuery(document).ready(function ($) {
 
     results.show()
 
-    // If we have organized categories, auto-save them
-    if (data.pois_by_category && Object.keys(data.pois_by_category).length > 0) {
-      autoSaveCategorizedPois(data)
-    } else {
-      // Fall back to manual assignment
+    // Show the selection preview so the user chooses what gets imported.
+    const hasCategorizedPois = data.pois_by_category && Object.keys(data.pois_by_category).length > 0
+    const hasShapes = data.shapes && data.shapes.length > 0
+
+    if (hasCategorizedPois || hasShapes) {
+      showImportPreview(data)
+    } else if (data.pois && data.pois.length > 0) {
+      // Fall back to manual assignment (uncategorized POIs)
       showCategoryAssignment(data)
+    } else {
+      summary.append(`
+            <div class="notice notice-warning">
+                <p>Nothing importable was found in this file (no pins and no polygons).</p>
+            </div>
+        `)
     }
   }
 
-  function autoSaveCategorizedPois(data) {
-    const assignment = $("#category-assignment")
-    const summary = $("#import-summary")
+  function escHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    })
+  }
 
-    // Show saving status
-    summary.append(`
-            <div class="notice notice-info">
-                <p>POIs are already organized by category. Saving automatically...</p>
+  function buildPreviewGroup(groupKey, groupLabel, items) {
+    let html = `
+            <div class="import-preview-group" data-group="${escHtml(groupKey)}">
+                <label class="import-preview-group-header">
+                    <input type="checkbox" class="import-group-cb" checked />
+                    <strong>${escHtml(groupLabel)}</strong>
+                    <span class="import-preview-count">${items.length}</span>
+                </label>
+                <div class="import-preview-items">
+        `
+
+    items.forEach((item) => {
+      html += `
+                <label class="import-preview-item">
+                    <input type="checkbox" class="import-item-cb" data-group="${escHtml(groupKey)}" value="${item.value}" checked />
+                    <span class="import-preview-item-name">${escHtml(item.label)}</span>
+                    ${item.meta ? `<small class="import-preview-item-meta">${escHtml(item.meta)}</small>` : ""}
+                </label>
+            `
+    })
+
+    html += `
+                </div>
             </div>
-        `)
+        `
+    return html
+  }
+
+  function showImportPreview(data) {
+    const preview = $("#import-preview")
+    const list = $("#import-preview-list")
+    let html = ""
+
+    if (data.shapes && data.shapes.length > 0) {
+      html += buildPreviewGroup(
+        "shapes",
+        "Boundary Shapes",
+        data.shapes.map((shape, i) => ({
+          value: i,
+          label: shape.name,
+          meta: shape.geometry && shape.geometry.type === "MultiPolygon" ? `${shape.polygon_count} polygons` : "polygon",
+        }))
+      )
+    }
+
+    if (data.pois_by_category) {
+      const catNames = data.category_names || {}
+      Object.entries(data.pois_by_category).forEach(([catKey, pois]) => {
+        html += buildPreviewGroup(
+          "poi:" + catKey,
+          (catNames[catKey] || catKey) + " (POIs)",
+          pois.map((poi, i) => ({
+            value: i,
+            label: poi.name,
+            meta: poi.lat && poi.lng ? "" : "needs geocoding",
+          }))
+        )
+      })
+    }
+
+    list.html(html)
+    $("#category-assignment").hide()
+    preview.show()
+    $("html, body").animate({ scrollTop: preview.offset().top - 80 }, 300)
+  }
+
+  // Group checkbox toggles all items in its group
+  $(document).on("change", ".import-group-cb", function () {
+    const group = $(this).closest(".import-preview-group")
+    group.find(".import-item-cb").prop("checked", $(this).is(":checked"))
+  })
+
+  // Item checkbox updates its group checkbox state
+  $(document).on("change", ".import-item-cb", function () {
+    const group = $(this).closest(".import-preview-group")
+    const total = group.find(".import-item-cb").length
+    const checked = group.find(".import-item-cb:checked").length
+    group
+      .find(".import-group-cb")
+      .prop("checked", checked === total)
+      .prop("indeterminate", checked > 0 && checked < total)
+  })
+
+  // Cancel the preview (nothing was saved server-side yet)
+  $("#import-cancel-btn").on("click", function () {
+    $("#import-preview").hide()
+    $("#import-results").hide()
+    $("#import-preview-list").empty()
+  })
+
+  // Import only the selected items
+  $("#import-selected-btn").on("click", function () {
+    const button = $(this)
+    const spinner = $("#import-preview .spinner")
+
+    const selectedShapes = []
+    $('.import-item-cb[data-group="shapes"]:checked').each(function () {
+      selectedShapes.push(parseInt($(this).val(), 10))
+    })
+
+    const selectedPois = {}
+    $(".import-item-cb:checked").each(function () {
+      const group = $(this).data("group")
+      if (typeof group === "string" && group.indexOf("poi:") === 0) {
+        const catKey = group.slice(4)
+        if (!selectedPois[catKey]) {
+          selectedPois[catKey] = []
+        }
+        selectedPois[catKey].push(parseInt($(this).val(), 10))
+      }
+    })
+
+    const totalSelected = selectedShapes.length + Object.values(selectedPois).reduce((sum, arr) => sum + arr.length, 0)
+    if (totalSelected === 0) {
+      alert("Please select at least one item to import.")
+      return
+    }
 
     const replaceExisting = $("#replace-existing").is(":checked")
+
+    button.prop("disabled", true).text("Importing...")
+    spinner.addClass("is-active")
 
     $.post(
       clearMapAdmin.ajaxurl,
       {
         action: "clear_map_save_imported_pois",
         nonce: clearMapAdmin.importKmlNonce,
-        category_assignments: {}, // Empty since we're using auto-categorization
+        selected_pois: JSON.stringify(selectedPois),
+        selected_shapes: JSON.stringify(selectedShapes),
+        category_assignments: {},
         replace_existing: replaceExisting,
       },
       function (response) {
         if (response.success) {
-          let importStatsHtml = ""
-          if (response.data.import_stats) {
-            const stats = response.data.import_stats
-            const statDetails = []
-            
-            if (stats.coordinate_sources) {
-              for (const [source, count] of Object.entries(stats.coordinate_sources)) {
-                statDetails.push(`${count} from ${source}`)
-              }
-            }
-            
-            if (stats.geocoding_stats) {
-              const geoStats = stats.geocoding_stats
-              statDetails.push(`${geoStats.successfully_geocoded} successfully geocoded`)
-              if (geoStats.failed_geocoding > 0) {
-                statDetails.push(`${geoStats.failed_geocoding} failed geocoding`)
-              }
-            }
-            
-            if (statDetails.length > 0) {
-              importStatsHtml = `<p><small>Details: ${statDetails.join(', ')}</small></p>`
-            }
-          }
-          
-          summary.html(`
+          $("#import-preview").hide()
+          $("#import-summary").html(`
                     <div class="notice notice-success">
-                        <p><strong>Import Complete!</strong> ${response.data.message}</p>
-                        <p>Categories created: <strong>${response.data.categories.join(", ")}</strong></p>
-                        ${importStatsHtml}
+                        <p><strong>Import Complete!</strong> ${escHtml(response.data.message)}</p>
                     </div>
                     <div class="import-actions" style="margin-top: 15px;">
                         <a href="admin.php?page=clear-map" class="button button-primary">View Dashboard</a>
                         <a href="admin.php?page=clear-map-manage" class="button button-secondary">Manage POIs</a>
+                        ${response.data.shapes_imported > 0 ? '<a href="admin.php?page=clear-map-manage&tab=shapes" class="button button-secondary">Manage Shapes</a>' : ""}
                     </div>
                 `)
-
-          // Hide the assignment section since we auto-saved
-          assignment.hide()
+          $("#import-results").show()
+          $("html, body").animate({ scrollTop: $("#import-results").offset().top - 80 }, 300)
         } else {
-          alert("Auto-save failed: " + response.data)
-          // Fall back to manual assignment
-          showCategoryAssignment(data)
+          alert("Import failed: " + (response.data || "Unknown error"))
         }
       }
-    ).fail(function () {
-      alert("Auto-save failed: Network error")
-      // Fall back to manual assignment
-      showCategoryAssignment(data)
-    })
-  }
+    )
+      .fail(function () {
+        alert("Import failed: Network error")
+      })
+      .always(function () {
+        button.prop("disabled", false).text("Import Selected")
+        spinner.removeClass("is-active")
+      })
+  })
 
   function showCategoryAssignment(data) {
     const assignment = $("#category-assignment")
@@ -849,6 +956,9 @@ jQuery(document).ready(function ($) {
 
     // Category Modal handlers
     initCategoryModal()
+
+    // Shape Modal handlers
+    initShapeModal()
 
     // Export Modal handlers
     initExportModal()
@@ -1405,6 +1515,145 @@ jQuery(document).ready(function ($) {
       }
     ).fail(function () {
       alert("Network error deleting category")
+    })
+  }
+
+  // ========================================
+  // SHAPE MODAL
+  // ========================================
+
+  function initShapeModal() {
+    const $modal = $("#shape-modal")
+
+    // Open modal for editing
+    $(document).on("click", ".shape-edit-btn", function () {
+      openShapeModal($(this).data("shape-id"))
+    })
+
+    // Delete shape
+    $(document).on("click", ".shape-delete-btn", function () {
+      const shapeId = $(this).data("shape-id")
+      const shapeName = $('.shape-card[data-shape-id="' + shapeId + '"]').data("name") || "this shape"
+      if (confirm('Are you sure you want to delete "' + shapeName + '"? This cannot be undone.')) {
+        deleteShape(shapeId)
+      }
+    })
+
+    // Close modal handlers
+    $modal.on("click", ".modal-close, .modal-backdrop, #shape-cancel-btn", function () {
+      closeShapeModal()
+    })
+
+    // Save shape
+    $("#shape-save-btn").on("click", function () {
+      saveShape()
+    })
+
+    // Fill checkbox toggles the opacity field
+    $("#shape-fill").on("change", function () {
+      $("#shape-fill-opacity-field").toggle($(this).is(":checked"))
+    })
+
+    // Close on escape key
+    $(document).on("keydown", function (e) {
+      if (e.key === "Escape" && $modal.is(":visible")) {
+        closeShapeModal()
+      }
+    })
+  }
+
+  function openShapeModal(shapeId) {
+    const $modal = $("#shape-modal")
+    const $card = $('.shape-card[data-shape-id="' + shapeId + '"]')
+
+    if (!$card.length) return
+
+    $("#shape-edit-form")[0].reset()
+
+    if (!$("#shape-color").data("wpColorPicker")) {
+      $("#shape-color").wpColorPicker()
+    }
+
+    $("#shape-id").val(shapeId)
+    $("#shape-name").val($card.data("name"))
+    $("#shape-color").wpColorPicker("color", $card.data("color") || "#E14A13")
+    $("#shape-line-width").val($card.data("line-width") || 2.5)
+
+    const fillOn = String($card.data("fill")) === "1"
+    $("#shape-fill").prop("checked", fillOn)
+    $("#shape-fill-opacity").val(Math.round(parseFloat($card.data("fill-opacity") || 0.12) * 100))
+    $("#shape-fill-opacity-field").toggle(fillOn)
+
+    $("#shape-visible").prop("checked", String($card.data("visible")) === "1")
+
+    $modal.fadeIn(200)
+    setTimeout(() => $("#shape-name").focus(), 100)
+  }
+
+  function closeShapeModal() {
+    $("#shape-modal").fadeOut(200)
+  }
+
+  function saveShape() {
+    const $saveBtn = $("#shape-save-btn")
+    const originalText = $saveBtn.text()
+
+    const name = $("#shape-name").val().trim()
+    if (!name) {
+      alert("Shape name is required")
+      $("#shape-name").focus()
+      return
+    }
+
+    $saveBtn.prop("disabled", true).text(clearMapAdmin.strings.saving)
+
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_save_shape",
+        nonce: clearMapAdmin.managePoisNonce,
+        shape_id: $("#shape-id").val(),
+        name: name,
+        color: $("#shape-color").wpColorPicker("color"),
+        line_width: $("#shape-line-width").val(),
+        fill: $("#shape-fill").is(":checked") ? "1" : "",
+        fill_opacity: (parseFloat($("#shape-fill-opacity").val()) || 0) / 100,
+        visible: $("#shape-visible").is(":checked") ? "1" : "",
+      },
+      function (response) {
+        if (response.success) {
+          closeShapeModal()
+          window.location.reload()
+        } else {
+          alert("Error saving shape: " + (response.data || "Unknown error"))
+        }
+      }
+    )
+      .fail(function () {
+        alert("Network error saving shape")
+      })
+      .always(function () {
+        $saveBtn.prop("disabled", false).text(originalText)
+      })
+  }
+
+  function deleteShape(shapeId) {
+    $.post(
+      clearMapAdmin.ajaxurl,
+      {
+        action: "clear_map_delete_shape",
+        nonce: clearMapAdmin.managePoisNonce,
+        shape_id: shapeId,
+      },
+      function (response) {
+        if (response.success) {
+          window.location.reload()
+        } else {
+          alert("Error deleting shape: " + (response.data || "Unknown error"))
+        }
+      }
+    ).fail(function () {
+      alert("Network error deleting shape")
     })
   }
 

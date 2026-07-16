@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Clear Map
- * Description: Interactive map with POI filtering and category management. Import locations via KML, geocode addresses, and display on customizable Mapbox maps.
- * Version: 2.6.0
+ * Description: Interactive map with POI filtering and category management. Import locations and boundary shapes via KML/KMZ, geocode addresses, and display on customizable Mapbox maps.
+ * Version: 2.7.0
  * Author: Danny Breckenridge
  * Plugin URI: https://github.com/dbreck/clear-map
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CLEAR_MAP_VERSION', '2.6.0');
+define('CLEAR_MAP_VERSION', '2.7.0');
 define('CLEAR_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CLEAR_MAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -56,6 +56,10 @@ class ClearMap {
         add_action('wp_ajax_clear_map_save_category', array($this, 'ajax_save_category'));
         add_action('wp_ajax_clear_map_delete_category', array($this, 'ajax_delete_category'));
         add_action('wp_ajax_clear_map_reorder_categories', array($this, 'ajax_reorder_categories'));
+
+        // Shape (boundary) management AJAX endpoints.
+        add_action('wp_ajax_clear_map_save_shape', array($this, 'ajax_save_shape'));
+        add_action('wp_ajax_clear_map_delete_shape', array($this, 'ajax_delete_shape'));
 
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
@@ -130,8 +134,13 @@ class ClearMap {
         if (isset($parsed_data['categories']) && !empty($parsed_data['categories'])) {
             $categories_text = ' in ' . count($parsed_data['categories']) . ' categories';
         }
-        
-        $this->log_activity('KML file imported: ' . $parsed_data['total'] . ' POIs found' . $categories_text);
+
+        $shapes_text = '';
+        if (!empty($parsed_data['shapes'])) {
+            $shapes_text = ', ' . count($parsed_data['shapes']) . ' shapes';
+        }
+
+        $this->log_activity('KML file parsed: ' . $parsed_data['total'] . ' POIs found' . $categories_text . $shapes_text);
         
         wp_send_json_success($parsed_data);
     }
@@ -183,26 +192,30 @@ class ClearMap {
         
         $category_assignments = $_POST['category_assignments'] ?? array();
         $replace_existing = ($_POST['replace_existing'] ?? 'false') === 'true';
-        
-        // Create categories based on detected categories
-        $existing_categories = get_option('clear_map_categories', array());
-        $new_categories = $existing_categories;
-        
-        // Add detected categories
-        if (isset($import_data['category_names'])) {
-            foreach ($import_data['category_names'] as $key => $name) {
-                if (!isset($new_categories[$key])) {
-                    $new_categories[$key] = array(
-                        'name' => $name,
-                        'color' => $this->generate_category_color($key)
-                    );
+
+        // Optional selections from the import preview. When present, only the
+        // checked items are imported. Absent = import everything (back-compat).
+        $selected_pois = null;
+        if (isset($_POST['selected_pois'])) {
+            $decoded = json_decode(wp_unslash($_POST['selected_pois']), true);
+            if (is_array($decoded)) {
+                $selected_pois = array();
+                foreach ($decoded as $cat => $indices) {
+                    $selected_pois[$cat] = array_map('intval', (array) $indices);
                 }
             }
         }
+        $selected_shapes = null;
+        if (isset($_POST['selected_shapes'])) {
+            $decoded = json_decode(wp_unslash($_POST['selected_shapes']), true);
+            if (is_array($decoded)) {
+                $selected_shapes = array_map('intval', $decoded);
+            }
+        }
 
-        // Save only the categories that were imported from KML
-        update_option('clear_map_categories', $new_categories);
-        
+        $existing_categories = get_option('clear_map_categories', array());
+        $new_categories = $existing_categories;
+
         // Organize POIs by category
         $new_pois = array();
         $processed_count = 0;
@@ -217,10 +230,15 @@ class ClearMap {
         if (isset($import_data['pois_by_category']) && !empty($import_data['pois_by_category'])) {
             // POIs are already organized by category from KML folders
             foreach ($import_data['pois_by_category'] as $category => $pois) {
-                if (!isset($new_pois[$category])) {
-                    $new_pois[$category] = array();
-                }
-                foreach ($pois as $poi) {
+                foreach ($pois as $poi_index => $poi) {
+                    // Skip POIs the user unchecked in the import preview.
+                    if (is_array($selected_pois) &&
+                        (!isset($selected_pois[$category]) || !in_array($poi_index, $selected_pois[$category], true))) {
+                        continue;
+                    }
+                    if (!isset($new_pois[$category])) {
+                        $new_pois[$category] = array();
+                    }
                     $new_pois[$category][] = $poi;
                     $processed_count++;
                     $import_stats['total_processed']++;
@@ -272,79 +290,168 @@ class ClearMap {
             }
         }
         
-        // Check if POIs need forward geocoding (address → coordinates) or reverse geocoding (coordinates → address)
-        $needs_forward_geocoding = false;
-        $needs_reverse_geocoding = false;
-
-        foreach ($new_pois as $category => $pois) {
-            foreach ($pois as $poi) {
-                // Need forward geocoding if we have address but no coordinates
-                if (!empty($poi['address']) && (empty($poi['lat']) || empty($poi['lng']))) {
-                    $needs_forward_geocoding = true;
-                }
-                // Need reverse geocoding if we have coordinates but no address
-                if (!empty($poi['lat']) && !empty($poi['lng']) && empty($poi['address'])) {
-                    $needs_reverse_geocoding = true;
+        // Create categories only for categories that actually received POIs,
+        // so unchecked preview groups don't leave empty categories behind.
+        if (isset($import_data['category_names'])) {
+            foreach ($import_data['category_names'] as $key => $name) {
+                if (isset($new_pois[$key]) && !isset($new_categories[$key])) {
+                    $new_categories[$key] = array(
+                        'name' => $name,
+                        'color' => $this->generate_category_color($key)
+                    );
                 }
             }
         }
+        update_option('clear_map_categories', $new_categories);
 
-        $api_handler = new Clear_Map_API_Handler();
+        $action = 'added';
 
-        // Run forward geocoding if needed
-        if ($needs_forward_geocoding) {
-            $geocoding_result = $api_handler->geocode_pois($new_pois);
-            if (isset($geocoding_result['pois'])) {
-                $new_pois = $geocoding_result['pois'];
-                $import_stats['forward_geocoding_stats'] = $geocoding_result['stats'];
-            }
-        }
+        // Only touch POI storage when POIs were actually imported — a
+        // shapes-only import must not wipe or modify existing POIs.
+        if ($processed_count > 0) {
+            // Check if POIs need forward geocoding (address → coordinates) or reverse geocoding (coordinates → address)
+            $needs_forward_geocoding = false;
+            $needs_reverse_geocoding = false;
 
-        // Run reverse geocoding if needed
-        if ($needs_reverse_geocoding) {
-            $reverse_result = $api_handler->reverse_geocode_pois($new_pois);
-            if (isset($reverse_result['pois'])) {
-                $new_pois = $reverse_result['pois'];
-                $import_stats['reverse_geocoding_stats'] = $reverse_result['stats'];
-            }
-        }
-        
-        // Save POIs
-        if ($replace_existing) {
-            update_option('clear_map_pois', $new_pois);
-            $action = 'replaced all POIs with';
-        } else {
-            $existing_pois = get_option('clear_map_pois', array());
             foreach ($new_pois as $category => $pois) {
-                if (!isset($existing_pois[$category])) {
-                    $existing_pois[$category] = array();
+                foreach ($pois as $poi) {
+                    // Need forward geocoding if we have address but no coordinates
+                    if (!empty($poi['address']) && (empty($poi['lat']) || empty($poi['lng']))) {
+                        $needs_forward_geocoding = true;
+                    }
+                    // Need reverse geocoding if we have coordinates but no address
+                    if (!empty($poi['lat']) && !empty($poi['lng']) && empty($poi['address'])) {
+                        $needs_reverse_geocoding = true;
+                    }
                 }
-                $existing_pois[$category] = array_merge($existing_pois[$category], $pois);
             }
-            update_option('clear_map_pois', $existing_pois);
-            $action = 'added';
+
+            $api_handler = new Clear_Map_API_Handler();
+
+            // Run forward geocoding if needed
+            if ($needs_forward_geocoding) {
+                $geocoding_result = $api_handler->geocode_pois($new_pois);
+                if (isset($geocoding_result['pois'])) {
+                    $new_pois = $geocoding_result['pois'];
+                    $import_stats['forward_geocoding_stats'] = $geocoding_result['stats'];
+                }
+            }
+
+            // Run reverse geocoding if needed
+            if ($needs_reverse_geocoding) {
+                $reverse_result = $api_handler->reverse_geocode_pois($new_pois);
+                if (isset($reverse_result['pois'])) {
+                    $new_pois = $reverse_result['pois'];
+                    $import_stats['reverse_geocoding_stats'] = $reverse_result['stats'];
+                }
+            }
+
+            // Save POIs
+            if ($replace_existing) {
+                update_option('clear_map_pois', $new_pois);
+                $action = 'replaced all POIs with';
+            } else {
+                $existing_pois = get_option('clear_map_pois', array());
+                foreach ($new_pois as $category => $pois) {
+                    if (!isset($existing_pois[$category])) {
+                        $existing_pois[$category] = array();
+                    }
+                    $existing_pois[$category] = array_merge($existing_pois[$category], $pois);
+                }
+                update_option('clear_map_pois', $existing_pois);
+                $action = 'added';
+            }
         }
-        
+
+        // Save imported shapes (boundaries). Shapes merge by name: re-importing
+        // a boundary updates its geometry but keeps its styling.
+        $shapes_imported = 0;
+        if (!empty($import_data['shapes'])) {
+            $existing_shapes = get_option('clear_map_shapes', array());
+            $palette = array('#E14A13', '#335439', '#2E6F8E', '#8E4A2E', '#5B3A6B', '#B0722A', '#2E8E5B', '#8E2E4A');
+            $palette_index = count($existing_shapes);
+
+            foreach ($import_data['shapes'] as $shape_index => $shape) {
+                if (is_array($selected_shapes) && !in_array($shape_index, $selected_shapes, true)) {
+                    continue;
+                }
+
+                $existing_id = null;
+                foreach ($existing_shapes as $id => $existing) {
+                    if (strcasecmp($existing['name'], $shape['name']) === 0) {
+                        $existing_id = $id;
+                        break;
+                    }
+                }
+
+                if ($existing_id) {
+                    $existing_shapes[$existing_id]['geometry'] = $shape['geometry'];
+                } else {
+                    $base_id = sanitize_key(str_replace(' ', '_', strtolower($shape['name'])));
+                    if ('' === $base_id) {
+                        $base_id = 'shape';
+                    }
+                    $id = $base_id;
+                    $counter = 1;
+                    while (isset($existing_shapes[$id])) {
+                        $id = $base_id . '_' . $counter;
+                        $counter++;
+                    }
+
+                    $existing_shapes[$id] = array(
+                        'name'         => $shape['name'],
+                        'geometry'     => $shape['geometry'],
+                        'color'        => $palette[$palette_index % count($palette)],
+                        'line_width'   => 2.5,
+                        'fill'         => '1',
+                        'fill_opacity' => 0.12,
+                        'visible'      => '1',
+                    );
+                    $palette_index++;
+                }
+                $shapes_imported++;
+            }
+
+            if ($shapes_imported > 0) {
+                update_option('clear_map_shapes', $existing_shapes);
+            }
+        }
+
         // Clear the temporary data
         delete_transient('clear_map_import_data');
-        
+
         // Create detailed log message
-        $log_message = "POIs imported: $action $processed_count POIs across " . count($new_pois) . " categories";
-        if (isset($import_stats['coordinate_sources'])) {
+        $log_message = "Import: $action $processed_count POIs across " . count($new_pois) . " categories";
+        if ($shapes_imported > 0) {
+            $log_message .= ", $shapes_imported shapes";
+        }
+        if (!empty($import_stats['coordinate_sources'])) {
             $source_details = array();
             foreach ($import_stats['coordinate_sources'] as $source => $count) {
                 $source_details[] = "$count from $source";
             }
             $log_message .= ' (' . implode(', ', $source_details) . ')';
         }
-        
+
         $this->log_activity($log_message);
-        
+
+        $message_parts = array();
+        if ($processed_count > 0) {
+            $message_parts[] = "$action $processed_count POIs across " . count($new_pois) . " categories";
+        }
+        if ($shapes_imported > 0) {
+            $message_parts[] = "imported $shapes_imported boundary shape" . (1 === $shapes_imported ? '' : 's');
+        }
+        if (empty($message_parts)) {
+            $message_parts[] = 'nothing selected — no changes made';
+        }
+
         wp_send_json_success(array(
             'imported' => $processed_count,
+            'shapes_imported' => $shapes_imported,
             'categories' => array_keys($new_pois),
             'action' => $action,
-            'message' => "Successfully $action $processed_count POIs across " . count($new_pois) . " categories!",
+            'message' => 'Successfully ' . implode(' and ', $message_parts) . '!',
             'import_stats' => $import_stats
         ));
     }
@@ -1133,6 +1240,95 @@ class ClearMap {
             array(
                 'message'          => sprintf( 'Category "%s" deleted (%d POIs removed)', $cat_name, $poi_count ),
                 'pois_removed'     => $poi_count,
+            )
+        );
+    }
+
+    /**
+     * Save a shape's (boundary's) settings. Shapes are created via KML import;
+     * this endpoint only edits existing ones.
+     */
+    public function ajax_save_shape() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $shape_id = isset( $_POST['shape_id'] ) ? sanitize_key( wp_unslash( $_POST['shape_id'] ) ) : '';
+        $name     = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+
+        if ( empty( $name ) ) {
+            wp_send_json_error( 'Shape name is required' );
+        }
+
+        $shapes = get_option( 'clear_map_shapes', array() );
+
+        if ( empty( $shape_id ) || ! isset( $shapes[ $shape_id ] ) ) {
+            wp_send_json_error( 'Shape not found' );
+        }
+
+        $color = isset( $_POST['color'] ) ? sanitize_hex_color( wp_unslash( $_POST['color'] ) ) : '';
+        if ( empty( $color ) ) {
+            $color = '#E14A13';
+        }
+
+        $line_width = isset( $_POST['line_width'] ) ? floatval( $_POST['line_width'] ) : 2.5;
+        $line_width = max( 0.5, min( 20, $line_width ) );
+
+        $fill_opacity = isset( $_POST['fill_opacity'] ) ? floatval( $_POST['fill_opacity'] ) : 0.12;
+        $fill_opacity = max( 0, min( 1, $fill_opacity ) );
+
+        $shapes[ $shape_id ]['name']         = $name;
+        $shapes[ $shape_id ]['color']        = $color;
+        $shapes[ $shape_id ]['line_width']   = $line_width;
+        $shapes[ $shape_id ]['fill']         = ! empty( $_POST['fill'] ) && '1' === $_POST['fill'] ? '1' : '';
+        $shapes[ $shape_id ]['fill_opacity'] = $fill_opacity;
+        $shapes[ $shape_id ]['visible']      = ! empty( $_POST['visible'] ) && '1' === $_POST['visible'] ? '1' : '';
+
+        update_option( 'clear_map_shapes', $shapes );
+
+        $this->log_activity( 'Shape updated: ' . $name );
+
+        wp_send_json_success(
+            array(
+                'message' => 'Shape saved successfully',
+                'shape'   => $shapes[ $shape_id ],
+            )
+        );
+    }
+
+    /**
+     * Delete a shape (boundary).
+     */
+    public function ajax_delete_shape() {
+        check_ajax_referer( 'clear_map_manage_pois', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Unauthorized' );
+        }
+
+        $shape_id = isset( $_POST['shape_id'] ) ? sanitize_key( wp_unslash( $_POST['shape_id'] ) ) : '';
+
+        if ( empty( $shape_id ) ) {
+            wp_send_json_error( 'Shape ID is required' );
+        }
+
+        $shapes = get_option( 'clear_map_shapes', array() );
+
+        if ( ! isset( $shapes[ $shape_id ] ) ) {
+            wp_send_json_error( 'Shape not found' );
+        }
+
+        $shape_name = $shapes[ $shape_id ]['name'];
+        unset( $shapes[ $shape_id ] );
+        update_option( 'clear_map_shapes', $shapes );
+
+        $this->log_activity( 'Shape deleted: ' . $shape_name );
+
+        wp_send_json_success(
+            array(
+                'message' => sprintf( 'Shape "%s" deleted', $shape_name ),
             )
         );
     }

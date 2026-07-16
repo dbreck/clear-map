@@ -103,67 +103,235 @@ class Clear_Map_KML_Parser {
         foreach ($folders as $folder) {
             $category_name = (string) $folder->name;
             if (empty($category_name)) continue;
-            
+
             $this->log('Processing folder: ' . $category_name);
-            
+
             // Convert category name to internal key
             $category_key = $this->category_name_to_key($category_name);
-            $detected_categories[$category_key] = $category_name;
-            
+
             // Find placemarks in this folder - enhanced approach
             $folder_placemarks = $this->find_placemarks_in_folder($folder);
             $this->log('Found ' . count($folder_placemarks) . ' placemarks in folder: ' . $category_name);
-            
-            if (!isset($pois_by_category[$category_key])) {
-                $pois_by_category[$category_key] = array();
-            }
-            
+
+            $parsed_pois = array();
             foreach ($folder_placemarks as $placemark) {
                 $poi = $this->parse_placemark($placemark);
                 if ($poi) {
-                    $pois_by_category[$category_key][] = $poi;
+                    $parsed_pois[] = $poi;
                     $this->log('Successfully parsed POI: ' . $poi['name']);
                 } else {
                     $placemark_name = (string) $placemark->name;
-                    $this->log('Failed to parse placemark: ' . $placemark_name);
+                    $this->log('Skipped placemark (shape or unparseable): ' . $placemark_name);
                 }
             }
+
+            // Only register the category if it actually produced POIs
+            // (folders that hold only polygon shapes must not become empty categories).
+            if (!empty($parsed_pois)) {
+                $detected_categories[$category_key] = $category_name;
+                if (!isset($pois_by_category[$category_key])) {
+                    $pois_by_category[$category_key] = array();
+                }
+                $pois_by_category[$category_key] = array_merge($pois_by_category[$category_key], $parsed_pois);
+            }
         }
-        
+
         // Also check for any loose placemarks not in folders
         $loose_placemarks = $this->find_loose_placemarks($xml);
         $this->log('Found ' . count($loose_placemarks) . ' loose placemarks');
-        
+
         if (!empty($loose_placemarks)) {
-            $detected_categories['general'] = 'General';
-            if (!isset($pois_by_category['general'])) {
-                $pois_by_category['general'] = array();
-            }
-            
+            $loose_pois = array();
             foreach ($loose_placemarks as $placemark) {
                 $poi = $this->parse_placemark($placemark);
                 if ($poi) {
-                    $pois_by_category['general'][] = $poi;
+                    $loose_pois[] = $poi;
                 }
             }
+
+            if (!empty($loose_pois)) {
+                $detected_categories['general'] = 'General';
+                if (!isset($pois_by_category['general'])) {
+                    $pois_by_category['general'] = array();
+                }
+                $pois_by_category['general'] = array_merge($pois_by_category['general'], $loose_pois);
+            }
         }
-        
+
+        // Collect polygon shapes (boundaries) separately from POIs
+        $shapes = $this->find_shapes($xml);
+        $this->log('Total shapes parsed: ' . count($shapes));
+
         // Flatten POIs for legacy compatibility
         $all_pois = array();
         foreach ($pois_by_category as $category_pois) {
             $all_pois = array_merge($all_pois, $category_pois);
         }
-        
+
         $this->log('Total POIs parsed: ' . count($all_pois));
-        
+
         return array(
             'pois' => $all_pois,
             'pois_by_category' => $pois_by_category,
             'categories' => array_keys($detected_categories),
             'category_names' => $detected_categories,
+            'shapes' => $shapes,
             'total' => count($all_pois),
+            'total_shapes' => count($shapes),
             'debug_log' => $this->debug_log
         );
+    }
+
+    /**
+     * Find all placemarks containing polygon geometry and parse them as shapes.
+     */
+    private function find_shapes($xml) {
+        $shapes = array();
+        $seen_names = array();
+
+        $placemarks = array();
+        try {
+            $results = $xml->xpath('//*[local-name()="Placemark"]');
+            if (!empty($results)) {
+                $placemarks = $results;
+            }
+        } catch (Exception $e) {
+            $this->log('XPath shape placemark search failed: ' . $e->getMessage());
+        }
+
+        foreach ($placemarks as $placemark) {
+            $shape = $this->parse_shape_placemark($placemark);
+            if ($shape && !in_array($shape['name'], $seen_names, true)) {
+                $shapes[] = $shape;
+                $seen_names[] = $shape['name'];
+                $this->log('Successfully parsed shape: ' . $shape['name'] . ' (' . $shape['polygon_count'] . ' polygon(s))');
+            }
+        }
+
+        return $shapes;
+    }
+
+    /**
+     * Parse a placemark's polygon geometry into a GeoJSON Polygon/MultiPolygon shape.
+     * Returns null if the placemark has no valid polygon geometry.
+     */
+    private function parse_shape_placemark($placemark) {
+        $name = trim((string) $placemark->name);
+        if ($name === '') {
+            return null;
+        }
+
+        $polygons = array();
+
+        if (isset($placemark->Polygon)) {
+            foreach ($placemark->Polygon as $polygon) {
+                $rings = $this->parse_polygon_rings($polygon);
+                if ($rings) {
+                    $polygons[] = $rings;
+                }
+            }
+        }
+
+        if (isset($placemark->MultiGeometry->Polygon)) {
+            foreach ($placemark->MultiGeometry->Polygon as $polygon) {
+                $rings = $this->parse_polygon_rings($polygon);
+                if ($rings) {
+                    $polygons[] = $rings;
+                }
+            }
+        }
+
+        if (empty($polygons)) {
+            return null;
+        }
+
+        if (count($polygons) === 1) {
+            $geometry = array(
+                'type' => 'Polygon',
+                'coordinates' => $polygons[0],
+            );
+        } else {
+            $geometry = array(
+                'type' => 'MultiPolygon',
+                'coordinates' => $polygons,
+            );
+        }
+
+        return array(
+            'name' => $name,
+            'geometry' => $geometry,
+            'polygon_count' => count($polygons),
+        );
+    }
+
+    /**
+     * Parse a KML Polygon element into GeoJSON rings (outer boundary first, then holes).
+     */
+    private function parse_polygon_rings($polygon) {
+        $rings = array();
+
+        if (isset($polygon->outerBoundaryIs->LinearRing->coordinates)) {
+            $ring = $this->parse_ring_coordinates((string) $polygon->outerBoundaryIs->LinearRing->coordinates);
+            if ($ring) {
+                $rings[] = $ring;
+            }
+        }
+
+        if (empty($rings)) {
+            return null;
+        }
+
+        if (isset($polygon->innerBoundaryIs)) {
+            foreach ($polygon->innerBoundaryIs as $inner) {
+                if (isset($inner->LinearRing->coordinates)) {
+                    $ring = $this->parse_ring_coordinates((string) $inner->LinearRing->coordinates);
+                    if ($ring) {
+                        $rings[] = $ring;
+                    }
+                }
+            }
+        }
+
+        return $rings;
+    }
+
+    /**
+     * Parse a KML coordinate string ("lng,lat,alt lng,lat,alt ...") into an
+     * array of [lng, lat] pairs, closing the ring if needed.
+     */
+    private function parse_ring_coordinates($coord_string) {
+        $points = array();
+
+        foreach (preg_split('/\s+/', trim($coord_string)) as $tuple) {
+            $parts = explode(',', trim($tuple));
+            if (count($parts) < 2) {
+                continue;
+            }
+
+            $lng = filter_var($parts[0], FILTER_VALIDATE_FLOAT);
+            $lat = filter_var($parts[1], FILTER_VALIDATE_FLOAT);
+
+            if ($lng === false || $lat === false ||
+                $lat < -90 || $lat > 90 ||
+                $lng < -180 || $lng > 180) {
+                continue;
+            }
+
+            $points[] = array($lng, $lat);
+        }
+
+        if (count($points) < 3) {
+            return null;
+        }
+
+        // GeoJSON rings must be closed (first point === last point).
+        $first = $points[0];
+        $last = $points[count($points) - 1];
+        if ($first[0] !== $last[0] || $first[1] !== $last[1]) {
+            $points[] = $first;
+        }
+
+        return $points;
     }
     
     private function clean_kml_content($kml_content) {
@@ -386,7 +554,16 @@ class Clear_Map_KML_Parser {
             $this->log('Skipping placemark with empty name');
             return null;
         }
-        
+
+        // Polygon-only placemarks are boundaries/shapes, handled by find_shapes() —
+        // don't collapse them into a pin at their first vertex.
+        $has_point = isset($placemark->Point) || isset($placemark->MultiGeometry->Point);
+        $has_polygon = isset($placemark->Polygon) || isset($placemark->MultiGeometry->Polygon);
+        if ($has_polygon && !$has_point) {
+            $this->log('Skipping polygon placemark (imported as shape): ' . $name);
+            return null;
+        }
+
         $this->log('Parsing placemark: ' . $name);
         
         // Get coordinates - enhanced extraction with priority

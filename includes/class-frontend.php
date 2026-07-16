@@ -60,6 +60,7 @@ class Clear_Map_Frontend {
 				'cluster_min_points'        => '',
 				'zoom_threshold'            => '',
 				'show_subway_lines'         => '',
+				'show_boundaries'           => '',
 				// Filter Panel.
 				'show_filters'              => '',
 				'filters_width'             => '',

@@ -2173,3 +2173,156 @@ input[type="file"] {
         display: none;
     }
 }
+
+/* ========================================
+   IMPORT PREVIEW (select items before import)
+   ======================================== */
+
+#import-preview {
+    margin-top: 20px;
+    max-width: 700px;
+}
+
+.import-preview-group {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.import-preview-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    border-bottom: 1px solid #dcdcde;
+    cursor: pointer;
+    margin: 0;
+}
+
+.import-preview-group-header strong {
+    flex: 1;
+    font-size: 14px;
+}
+
+.import-preview-count {
+    background: #2271b1;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.import-preview-items {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.import-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 15px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.import-preview-item:hover {
+    background: #f0f6fc;
+}
+
+.import-preview-item-name {
+    flex: 1;
+}
+
+.import-preview-item-meta {
+    color: #996800;
+    font-style: italic;
+}
+
+/* ========================================
+   SHAPES TAB
+   ======================================== */
+
+.shapes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.shape-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.shape-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shape-card.shape-hidden {
+    opacity: 0.6;
+}
+
+.shape-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: #f6f7f7;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.shape-color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+
+.shape-name {
+    flex: 1;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.shape-card-body {
+    padding: 15px;
+}
+
+.shape-meta {
+    color: #646970;
+    font-size: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+
+.shape-card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 15px;
+    background: #f6f7f7;
+    border-top: 1px solid #dcdcde;
+}
+
+.no-shapes-notice {
+    grid-column: 1 / -1;
+    background: #fff;
+    border: 1px dashed #c3c4c7;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    color: #646970;
+}

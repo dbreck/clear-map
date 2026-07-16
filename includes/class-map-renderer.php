@@ -83,6 +83,52 @@ class Clear_Map_Renderer {
 	}
 
 	/**
+	 * Build a GeoJSON FeatureCollection of visible boundary shapes.
+	 *
+	 * Fill opacity is pre-resolved per shape (0 when fill is off) so the JS
+	 * layer can use simple data-driven paint expressions.
+	 *
+	 * @since 2.7.0
+	 *
+	 * @return array GeoJSON FeatureCollection.
+	 */
+	private function get_shapes_geojson() {
+		$shapes   = get_option( 'clear_map_shapes', array() );
+		$features = array();
+
+		foreach ( $shapes as $id => $shape ) {
+			if ( empty( $shape['visible'] ) ) {
+				continue;
+			}
+			if ( empty( $shape['geometry']['type'] ) || empty( $shape['geometry']['coordinates'] ) ) {
+				continue;
+			}
+
+			$fill_on = ! empty( $shape['fill'] );
+
+			$features[] = array(
+				'type'       => 'Feature',
+				'properties' => array(
+					'id'          => $id,
+					'name'        => isset( $shape['name'] ) ? $shape['name'] : '',
+					'color'       => ! empty( $shape['color'] ) ? $shape['color'] : '#E14A13',
+					'lineWidth'   => isset( $shape['line_width'] ) ? floatval( $shape['line_width'] ) : 2.5,
+					'fillOpacity' => $fill_on && isset( $shape['fill_opacity'] ) ? floatval( $shape['fill_opacity'] ) : ( $fill_on ? 0.12 : 0 ),
+				),
+				'geometry'   => array(
+					'type'        => $shape['geometry']['type'],
+					'coordinates' => $shape['geometry']['coordinates'],
+				),
+			);
+		}
+
+		return array(
+			'type'     => 'FeatureCollection',
+			'features' => $features,
+		);
+	}
+
+	/**
 	 * Render the map.
 	 *
 	 * @since 1.0.0
@@ -150,6 +196,7 @@ class Clear_Map_Renderer {
 		$cluster_min_points  = $this->get_setting( $atts, 'cluster_min_points', '', 3 );
 		$zoom_threshold      = $this->get_setting( $atts, 'zoom_threshold', '', 15 );
 		$show_subway_lines   = $this->get_setting( $atts, 'show_subway_lines', '', 0 );
+		$show_boundaries     = $this->get_setting( $atts, 'show_boundaries', '', 1 );
 
 		// Filter panel appearance settings (responsive values from WPBakery).
 		$filters_width_raw          = $this->get_setting( $atts, 'filters_width', '', '320px' );
@@ -182,6 +229,7 @@ class Clear_Map_Renderer {
 
 		// Convert string values to proper types for boolean comparisons (desktop values for backward compat).
 		$show_subway_lines             = 1 === (int) $show_subway_lines;
+		$show_boundaries               = 1 === (int) $show_boundaries;
 		$show_filters_desktop          = 1 === (int) $show_filters['desktop'];
 		// Render filter panel if ANY breakpoint shows it (JS will handle show/hide dynamically).
 		$show_filters_any_breakpoint   = $show_filters_desktop
@@ -216,6 +264,8 @@ class Clear_Map_Renderer {
 			'zoomThreshold'       => intval( $zoom_threshold ),
 			'showSubwayLines'     => $show_subway_lines,
 			'subwayDataUrl'       => CLEAR_MAP_PLUGIN_URL . 'assets/data/nyc-subway-lines.geojson',
+			'showBoundaries'      => $show_boundaries,
+			'shapes'              => $show_boundaries ? $this->get_shapes_geojson() : null,
 			// Filter panel settings for JS (responsive).
 			'showFilters'         => $show_filters,
 			'filtersWidth'        => $filters_width,

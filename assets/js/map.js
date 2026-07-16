@@ -66,6 +66,7 @@ class ClearMap {
     }
 
     this.map.on("load", () => {
+      this.addBoundaryLayers() // before POI layers so pins render on top
       this.setupPoisSource()
       this.loadSubwayLines()
       this.animateMapLoad()
@@ -128,6 +129,46 @@ class ClearMap {
       ],
       glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
     }
+  }
+
+  addBoundaryLayers() {
+    if (!this.data.showBoundaries) return
+
+    const shapes = this.data.shapes
+    if (!shapes || !shapes.features || shapes.features.length === 0) return
+
+    this.map.addSource("clear-map-boundaries", {
+      type: "geojson",
+      data: shapes,
+    })
+
+    // Translucent fill (fillOpacity is pre-resolved server-side; 0 = outline only)
+    this.map.addLayer({
+      id: "boundary-fills",
+      type: "fill",
+      source: "clear-map-boundaries",
+      paint: {
+        "fill-color": ["get", "color"],
+        "fill-opacity": ["get", "fillOpacity"],
+      },
+    })
+
+    // Outline
+    this.map.addLayer({
+      id: "boundary-lines",
+      type: "line",
+      source: "clear-map-boundaries",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": ["get", "color"],
+        "line-width": ["get", "lineWidth"],
+      },
+    })
+
+    console.log(`Clear Map: Added ${shapes.features.length} boundary shapes`)
   }
 
   setupPoisSource() {

@@ -378,6 +378,18 @@ class Clear_Map_WPBakery {
 						'description' => __( 'Display NYC subway lines on the map.', 'clear-map' ),
 						'group'       => __( 'Map Display', 'clear-map' ),
 					),
+					array(
+						'type'        => 'dropdown',
+						'heading'     => __( 'Show Boundary Shapes', 'clear-map' ),
+						'param_name'  => 'show_boundaries',
+						'value'       => array(
+							__( 'Yes', 'clear-map' ) => '1',
+							__( 'No', 'clear-map' )  => '0',
+						),
+						'std'         => '1',
+						'description' => __( 'Display imported boundary shapes (polygons) on this map. Manage shapes under Clear Map → Categories & POIs → Shapes.', 'clear-map' ),
+						'group'       => __( 'Map Display', 'clear-map' ),
+					),
 
 					// =====================
 					// Filter Panel Group

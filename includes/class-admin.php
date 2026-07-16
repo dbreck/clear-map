@@ -525,7 +525,7 @@ class Clear_Map_Admin
     {
     ?>
         <div class="wrap clear-map-admin">
-            <h1>Import POIs from KML</h1>
+            <h1>Import from KML</h1>
 
             <div class="import-instructions">
                 <div class="notice notice-info">
@@ -557,7 +557,7 @@ class Clear_Map_Admin
                         <th scope="row">KML File</th>
                         <td>
                             <input type="file" id="kml-file" name="kml_file" accept=".kml,.kmz" required />
-                            <p class="description">Upload a KML or KMZ file exported from Google My Maps</p>
+                            <p class="description">Upload a KML or KMZ file exported from Google My Maps or Google Earth. Pins import as POIs; drawn polygons import as boundary shapes.</p>
                         </td>
                     </tr>
 
@@ -575,7 +575,7 @@ class Clear_Map_Admin
 
                 <div class="import-actions">
                     <button type="submit" class="button button-primary" id="import-btn">
-                        Import POIs
+                        Upload &amp; Preview
                     </button>
                     <span class="spinner"></span>
                 </div>
@@ -585,6 +585,21 @@ class Clear_Map_Admin
                 <h3>Import Results</h3>
                 <div id="import-summary"></div>
                 <div id="import-details"></div>
+            </div>
+
+            <div id="import-preview" style="display: none;">
+                <h3>Review &amp; Select Items to Import</h3>
+                <p class="description">Uncheck anything you don't want. Nothing is saved until you click "Import Selected".</p>
+                <div id="import-preview-list"></div>
+                <div class="import-actions">
+                    <button type="button" class="button button-primary" id="import-selected-btn">
+                        Import Selected
+                    </button>
+                    <button type="button" class="button" id="import-cancel-btn">
+                        Cancel
+                    </button>
+                    <span class="spinner"></span>
+                </div>
             </div>
 
             <div id="category-assignment" style="display: none;">
@@ -635,6 +650,7 @@ class Clear_Map_Admin
         // Get stats.
         $categories = get_option('clear_map_categories', array());
         $pois       = get_option('clear_map_pois', array());
+        $shapes     = get_option('clear_map_shapes', array());
         $total_pois = 0;
         foreach ($pois as $cat_pois) {
             $total_pois += count($cat_pois);
@@ -649,6 +665,7 @@ class Clear_Map_Admin
             <div class="manage-stats">
                 <span class="stat-badge"><strong><?php echo esc_html($total_pois); ?></strong> POIs</span>
                 <span class="stat-badge"><strong><?php echo count($categories); ?></strong> Categories</span>
+                <span class="stat-badge"><strong><?php echo count($shapes); ?></strong> Shapes</span>
             </div>
 
             <!-- Tabs navigation -->
@@ -663,11 +680,18 @@ class Clear_Map_Admin
                     <span class="dashicons dashicons-category" style="vertical-align: text-bottom;"></span>
                     Categories
                 </a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=clear-map-manage&tab=shapes')); ?>"
+                   class="nav-tab <?php echo 'shapes' === $active_tab ? 'nav-tab-active' : ''; ?>">
+                    <span class="dashicons dashicons-admin-site-alt3" style="vertical-align: text-bottom;"></span>
+                    Shapes
+                </a>
             </nav>
 
             <div class="tab-content">
                 <?php if ('pois' === $active_tab) : ?>
                     <?php $this->render_pois_tab(); ?>
+                <?php elseif ('shapes' === $active_tab) : ?>
+                    <?php $this->render_shapes_tab(); ?>
                 <?php else : ?>
                     <?php $this->render_categories_tab(); ?>
                 <?php endif; ?>
@@ -678,6 +702,9 @@ class Clear_Map_Admin
 
             <!-- Category Edit Modal -->
             <?php $this->render_category_modal(); ?>
+
+            <!-- Shape Edit Modal -->
+            <?php $this->render_shape_modal(); ?>
 
             <!-- Export Modal -->
             <?php $this->render_export_modal(); ?>
@@ -753,6 +780,136 @@ class Clear_Map_Admin
                     <p>No categories found. <a href="#" id="add-first-category">Add your first category</a> to get started.</p>
                 </div>
             <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the Shapes (boundaries) tab.
+     */
+    private function render_shapes_tab()
+    {
+        $shapes = get_option('clear_map_shapes', array());
+        ?>
+        <div class="categories-header">
+            <a href="<?php echo esc_url(admin_url('admin.php?page=clear-map-import')); ?>" class="button button-primary">
+                <span class="dashicons dashicons-upload" style="vertical-align: text-bottom;"></span>
+                Import Shapes from KML/KMZ
+            </a>
+            <p class="description">Boundary shapes are drawn on every map, beneath the POI pins. Import them from a KML/KMZ file containing polygons.</p>
+        </div>
+
+        <div class="shapes-grid">
+            <?php foreach ($shapes as $id => $shape) :
+                $geometry_type = isset($shape['geometry']['type']) ? $shape['geometry']['type'] : 'Polygon';
+                $polygon_count = 'MultiPolygon' === $geometry_type && isset($shape['geometry']['coordinates'])
+                    ? count($shape['geometry']['coordinates'])
+                    : 1;
+                $is_visible   = !empty($shape['visible']);
+                $fill_on      = !empty($shape['fill']);
+                $line_width   = isset($shape['line_width']) ? floatval($shape['line_width']) : 2.5;
+                $fill_opacity = isset($shape['fill_opacity']) ? floatval($shape['fill_opacity']) : 0.12;
+                ?>
+                <div class="shape-card <?php echo $is_visible ? '' : 'shape-hidden'; ?>"
+                     data-shape-id="<?php echo esc_attr($id); ?>"
+                     data-name="<?php echo esc_attr($shape['name']); ?>"
+                     data-color="<?php echo esc_attr($shape['color']); ?>"
+                     data-line-width="<?php echo esc_attr($line_width); ?>"
+                     data-fill="<?php echo $fill_on ? '1' : '0'; ?>"
+                     data-fill-opacity="<?php echo esc_attr($fill_opacity); ?>"
+                     data-visible="<?php echo $is_visible ? '1' : '0'; ?>">
+                    <div class="shape-card-header">
+                        <span class="shape-color-swatch" style="background-color: <?php echo esc_attr($shape['color']); ?>;"></span>
+                        <h3 class="shape-name"><?php echo esc_html($shape['name']); ?></h3>
+                    </div>
+                    <div class="shape-card-body">
+                        <div class="shape-meta">
+                            <span><?php echo esc_html($polygon_count); ?> polygon<?php echo 1 === $polygon_count ? '' : 's'; ?></span>
+                            <span><?php echo $fill_on ? 'Filled' : 'Outline only'; ?></span>
+                            <span><?php echo $is_visible ? 'Visible' : 'Hidden'; ?></span>
+                        </div>
+                    </div>
+                    <div class="shape-card-actions">
+                        <button type="button" class="button shape-edit-btn" data-shape-id="<?php echo esc_attr($id); ?>">
+                            <span class="dashicons dashicons-edit" style="vertical-align: text-bottom;"></span> Edit
+                        </button>
+                        <button type="button" class="button shape-delete-btn" data-shape-id="<?php echo esc_attr($id); ?>">
+                            <span class="dashicons dashicons-trash" style="vertical-align: text-bottom;"></span> Delete
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <?php if (empty($shapes)) : ?>
+                <div class="no-shapes-notice">
+                    <p>No boundary shapes yet. <a href="<?php echo esc_url(admin_url('admin.php?page=clear-map-import')); ?>">Import a KML/KMZ file</a> containing polygons to add some.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the Shape edit modal.
+     */
+    private function render_shape_modal()
+    {
+        ?>
+        <div id="shape-modal" class="clear-map-modal" style="display:none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content modal-content-sm">
+                <div class="modal-header">
+                    <h2 id="shape-modal-title">Edit Shape</h2>
+                    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="shape-edit-form">
+                        <input type="hidden" id="shape-id" name="shape_id" value="" />
+
+                        <div class="modal-field">
+                            <label for="shape-name">Name <span class="required">*</span></label>
+                            <input type="text" id="shape-name" name="name" required />
+                        </div>
+                        <div class="modal-field">
+                            <label for="shape-color">Color</label>
+                            <input type="text" id="shape-color" name="color" class="color-picker" value="#E14A13" />
+                        </div>
+                        <div class="modal-field">
+                            <label for="shape-line-width">Outline Width (px)</label>
+                            <input type="number" id="shape-line-width" name="line_width" min="0.5" max="20" step="0.5" value="2.5" />
+                        </div>
+                        <div class="modal-field">
+                            <div class="checkbox-field">
+                                <input type="checkbox" id="shape-fill" name="fill" value="1" />
+                                <div class="checkbox-field-content">
+                                    <label class="checkbox-field-label" for="shape-fill">Fill Shape</label>
+                                    <span class="checkbox-field-description">Show a translucent fill inside the boundary. Uncheck for outline only.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-field" id="shape-fill-opacity-field">
+                            <label for="shape-fill-opacity">Fill Opacity (%)</label>
+                            <input type="number" id="shape-fill-opacity" name="fill_opacity" min="0" max="100" step="1" value="12" />
+                        </div>
+                        <div class="modal-field">
+                            <div class="checkbox-field">
+                                <input type="checkbox" id="shape-visible" name="visible" value="1" />
+                                <div class="checkbox-field-content">
+                                    <label class="checkbox-field-label" for="shape-visible">Visible on Map</label>
+                                    <span class="checkbox-field-description">Uncheck to hide this shape without deleting it.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-left"></div>
+                    <div class="modal-footer-right">
+                        <button type="button" class="button" id="shape-cancel-btn">Cancel</button>
+                        <button type="button" class="button button-primary" id="shape-save-btn">Save Shape</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <?php
     }

@@ -7,11 +7,21 @@
 
 **Plugin Location**: `/wp-content/plugins/clear-map/`
 
-**Current Version**: 2.6.0
+**Current Version**: 2.7.0
 
 ---
 
 ## Recent Session Summary
+
+### v2.7.0 - Boundary Shapes: KMZ polygon import + selective import preview (2026-07-16)
+- **Shapes (boundaries)** are a new first-class concept alongside POIs: KML/KMZ polygons import as GeoJSON Polygon/MultiPolygon shapes stored in the `clear_map_shapes` option (`id => {name, geometry, color, line_width, fill, fill_opacity, visible}`)
+- **Parser** (`class-kml-parser.php`): `find_shapes()` collects all polygon placemarks document-wide (handles MultiGeometry + innerBoundaryIs holes, closes open rings); polygon-only placemarks are now EXCLUDED from POI parsing (previously collapsed to a pin at their first vertex); folders that yield no POIs no longer create empty categories
+- **Selective import preview**: the import page no longer auto-saves after parsing. New flow: Upload & Preview → checkbox list grouped by POI category + "Boundary Shapes" group (group-level select-all with indeterminate state) → "Import Selected". Server (`save_imported_pois`) accepts `selected_pois` (JSON `{cat: [indices]}`) + `selected_shapes` (JSON `[indices]`); absent = import-all (back-compat). Categories are only created for groups that actually received POIs. A shapes-only import never touches POI storage (guarded by `$processed_count > 0`)
+- Shapes **merge by name** on re-import: geometry updates, styling (color/fill/visibility) is preserved
+- **Shapes admin tab** (Clear Map → Categories & POIs → Shapes): card grid with color swatch/meta, edit modal (name, color, outline width, fill on/off + opacity %, visible toggle), delete. AJAX: `clear_map_save_shape`, `clear_map_delete_shape` (nonce `clear_map_manage_pois`). Shapes are created ONLY via import — no "add shape" UI
+- **Frontend**: `class-map-renderer.php::get_shapes_geojson()` passes visible shapes as a FeatureCollection (fillOpacity pre-resolved to 0 when fill is off); `map.js::addBoundaryLayers()` adds fill + line layers (data-driven paint via `["get", ...]`) BEFORE POI layers so pins stay on top
+- **WPBakery**: new "Show Boundary Shapes" dropdown (Map Display group, `show_boundaries`, default Yes); shortcode att whitelisted in `class-frontend.php`
+- Built for BTI Partners' Google Earth KMZ (6 project boundaries: Viaterra, Governor's, CCUA Site, Pinewalk, Crossprairie ×3 polys, Toho Trace ×2 polys) — verified parsing standalone AND via `wplocal btipartners eval-file`
 
 ### v2.6.0 - POI "Override Address" for Manual Coordinates (2026-07-09)
 - New **Override Address** checkbox in the POI edit modal (top of the **Location Data** section)
@@ -288,6 +298,6 @@ gh release create vX.X.X --title "vX.X.X - Title" --notes "Release notes..." "..
 
 ## End of Context
 
-**Current Version**: 2.6.0
-**Current Status**: Production ready
-**Last Updated**: 2026-07-09
+**Current Version**: 2.7.0
+**Current Status**: v2.7.0 implemented, awaiting local testing before release
+**Last Updated**: 2026-07-16
